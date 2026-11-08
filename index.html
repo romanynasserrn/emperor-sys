@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emperor Sys | المنظومة المركزية لإدارة سلاسل الإمداد والعمليات الميدانية</title>
+  <title>Emperor Sys | المنظومة المركزية وخارطة الطريق</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,8 +30,11 @@
         </div>
       </div>
 
-      <!-- زر الدخول المباشر -->
-      <div>
+      <!-- روابط التنقل وزر الدخول -->
+      <div class="flex items-center gap-4">
+        <a href="#roadmap" class="hidden sm:inline-block text-xs font-bold text-slate-400 hover:text-white transition-colors">
+          خارطة الطريق 2027
+        </a>
         <a href="login.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-extrabold text-sm transition-all shadow-lg shadow-blue-600/25 border border-blue-400/30">
           <span>دخول المنظومة</span>
           <span class="text-xs">↗</span>
@@ -41,11 +44,10 @@
     </div>
   </header>
 
-  <!-- القسم الترحيبي الرئيسي -->
   <main class="flex-grow">
     
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-20 text-center relative overflow-hidden">
-      <!-- خلفية ضوئية جمالية -->
+    <!-- القسم الترحيبي -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-16 text-center relative overflow-hidden">
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-bold text-blue-400 mb-6">
@@ -65,60 +67,104 @@
         <a href="login.html" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-base transition-all shadow-xl shadow-blue-600/30 active:scale-95">
           تسجيل الدخول للمنظومة ⚡
         </a>
-        <a href="#modules" class="px-7 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-base transition-all border border-slate-800">
-          استعراض الموديولات التشغيلية
+        <!-- الزر المحدث للتوجه مباشرة إلى خارطة الطريق -->
+        <a href="#roadmap" class="px-7 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-base transition-all border border-slate-800 flex items-center gap-2">
+          <span>استعراض خارطة الطريق والموديولات</span>
+          <span>↓</span>
         </a>
       </div>
     </section>
 
+    <!-- قسم خارطة الطريق الاستراتيجية (Roadmap 2026 - 2027) -->
+    <section id="roadmap" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-900">
+      <div class="text-center mb-14">
+        <h2 class="text-2xl sm:text-3xl font-black text-white">خارطة الطريق الاستراتيجية (2026 - 2027)</h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-2">المسار الزمني لتطوير وتوسيع منظومة Emperor Sys المؤسسية</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        
+        <!-- الربع الرابع 2026 -->
+        <div class="p-5 rounded-2xl bg-slate-900/60 border border-emerald-500/40 relative">
+          <div class="text-xs font-black text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-md inline-block mb-3">
+            الربع الرابع 2026 (الوضع الحالي)
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">تأسيس النواة المركزية</h3>
+          <ul class="text-xs text-slate-400 space-y-2 leading-relaxed">
+            <li>✓ حجز الدومين وتفعيل البريد الرسمي.</li>
+            <li>✓ ربط قاعدة البيانات المركزية (Core DB).</li>
+            <li>✓ عزل الصلاحيات وحوكمة الوارد اليومي.</li>
+          </ul>
+        </div>
+
+        <!-- الربع الأول 2027 -->
+        <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/40 transition-all">
+          <div class="text-xs font-black text-blue-400 bg-blue-950/60 border border-blue-800/80 px-2.5 py-1 rounded-md inline-block mb-3">
+            الربع الأول 2027
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">دمج المصانع والمقايسات</h3>
+          <ul class="text-xs text-slate-400 space-y-2 leading-relaxed">
+            <li>• دمج موديول مصانع الألومنيوم كاملاً.</li>
+            <li>• تفعيل حارس مقايسات البلوكات الإنشائية.</li>
+            <li>• ربط دورة أذون الصرف مع الوارد.</li>
+          </ul>
+        </div>
+
+        <!-- الربع الثاني 2027 -->
+        <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/40 transition-all">
+          <div class="text-xs font-black text-indigo-400 bg-indigo-950/60 border border-indigo-800/80 px-2.5 py-1 rounded-md inline-block mb-3">
+            الربع الثاني 2027
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">الأتمتة والتقارير التنفيذية</h3>
+          <ul class="text-xs text-slate-400 space-y-2 leading-relaxed">
+            <li>• تقارير المخزون التلقائية عبر الوكلاء الأذكياء.</li>
+            <li>• تنبيهات العجز اللحظية للمشاريع.</li>
+            <li>• الربط عبر الـ Webhooks مع الأنظمة المالية.</li>
+          </ul>
+        </div>
+
+        <!-- النصف الثاني 2027 -->
+        <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/40 transition-all">
+          <div class="text-xs font-black text-purple-400 bg-purple-950/60 border border-purple-800/80 px-2.5 py-1 rounded-md inline-block mb-3">
+            النصف الثاني 2027
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">الإطلاق التجاري كمنصة SaaS</h3>
+          <ul class="text-xs text-slate-400 space-y-2 leading-relaxed">
+            <li>• فتح اشتراكات الشركات الخارجية وتعدد المستأجرين.</li>
+            <li>• بوابة دفع وإدارة اشتراكات تلقائية.</li>
+            <li>• نموذج تراخيص مفاتيح الـ API (BYOK).</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
     <!-- قطاعات المنظومة الأساسية -->
-    <section id="modules" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 border-t border-slate-900">
-      
-      <div class="text-center mb-12">
-        <h2 class="text-2xl font-black text-white">الموديولات المركزية المتكاملة</h2>
-        <p class="text-xs text-slate-400 mt-2">محركات تشغيل مترابطة تدير وتدقق الدورة المستندية آلياً</p>
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12 border-t border-slate-900">
+      <div class="text-center mb-10">
+        <h2 class="text-2xl font-black text-white">الموديولات المركزية</h2>
+        <p class="text-xs text-slate-400 mt-1">الأدوات الميدانية المتصلة بالمنظومة</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <!-- موديول 1: الوارد اليومي -->
-        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/50 transition-all">
-          <div class="text-3xl mb-4">📥</div>
-          <h3 class="text-lg font-bold text-white mb-2">إدارة الوارد اليومي الذكي</h3>
-          <p class="text-xs text-slate-400 leading-relaxed mb-4">
-            استخراج فوري لبنود الفواتير عبر الذكاء الاصطناعي (Gemini Vision)، مع الربط الآلي لأوامر التوريد (PO) وأذون الإضافة المخزنية (Inventory IN).
-          </p>
-          <div class="text-[11px] font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900/60 rounded-lg p-2 text-center">
-            ● مفعل ونشط ميدانياً
-          </div>
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+          <div class="text-3xl mb-3">📥</div>
+          <h3 class="text-base font-bold text-white mb-2">إدارة الوارد اليومي الذكي</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">فحص فوري للفواتير بالذكاء الاصطناعي مع إحكام ومطابقة أوامر التوريد والإضافة المخزنية.</p>
         </div>
 
-        <!-- موديول 2: مصانع الألومنيوم -->
-        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/50 transition-all">
-          <div class="text-3xl mb-4">⚙️</div>
-          <h3 class="text-lg font-bold text-white mb-2">تتبع مراحل تصنيع الألومنيوم</h3>
-          <p class="text-xs text-slate-400 leading-relaxed mb-4">
-            حوكمة تدفق قطاعات الألومنيوم عبر محطات: التقطيع، والتجميع، وتركيب الزجاج، واختبارات الجودة قبل الشحن الميداني للمواقع.
-          </p>
-          <div class="text-[11px] font-bold text-blue-400 bg-blue-950/40 border border-blue-900/60 rounded-lg p-2 text-center">
-            ● جاهز للتكامل والربط
-          </div>
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+          <div class="text-3xl mb-3">⚙️</div>
+          <h3 class="text-base font-bold text-white mb-2">تتبع تصنيع الألومنيوم</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">حوكمة تشغيل قطاعات الألومنيوم عبر محطات التقطيع والتجميع والزجاج والتركيب بالموقع.</p>
         </div>
 
-        <!-- موديول 3: مقايسات البلوكات والصرف -->
-        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/50 transition-all">
-          <div class="text-3xl mb-4">🧱</div>
-          <h3 class="text-lg font-bold text-white mb-2">الصرف وحارس مقايسات البلوكات</h3>
-          <p class="text-xs text-slate-400 leading-relaxed mb-4">
-            قفل صارم لصرف المواد الميدانية وفق الكميات المعتمدة هندسياً لكل زون وبلوك إنشائي، ومنع أي تجاوز استهلاكي دون اعتماد مسبق.
-          </p>
-          <div class="text-[11px] font-bold text-amber-400 bg-amber-950/40 border border-amber-900/60 rounded-lg p-2 text-center">
-            ● مرحلة الربط المبرمج
-          </div>
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+          <div class="text-3xl mb-3">🧱</div>
+          <h3 class="text-base font-bold text-white mb-2">حارس المقايسات والصرف</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">ضبط كميات الصرف الإنشائي وفق حدود المقايسة الهندسية المعتمدة لكل بلوك وزون.</p>
         </div>
-
       </div>
-
     </section>
 
   </main>
@@ -127,7 +173,7 @@
   <footer class="border-t border-slate-900 bg-slate-950 py-8 text-center text-xs text-slate-500">
     <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>
-        <span class="brand-font font-bold text-slate-300">EMPEROR SYS</span> — منصة إدارة العمليات والمخازن
+        <span class="brand-font font-bold text-slate-300">EMPEROR SYS</span> — المنظومة المركزية لإدارة سلاسل الإمداد
       </div>
       <div>
         جميع الحقوق محفوظة &copy; 2026
