@@ -1,1106 +1,139 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>خارطة التطوير الإمبراطورية 2027 - منظومة Emperor</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Cairo -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        cairo: ['Cairo', 'sans-serif'],
-                    },
-                    colors: {
-                        obsidian: '#0a0d14',
-                        slateCard: '#121824',
-                        slateHover: '#1a2234',
-                        gold: {
-                            DEFAULT: '#d4af37',
-                            light: '#f3e5ab',
-                            dark: '#aa820a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #0a0d14;
-            color: #f1f5f9;
-            overflow-x: hidden;
-        }
-        /* تأثيرات ذهبية ملكية */
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa820a 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .gold-border-glow {
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 4px 20px -2px rgba(212, 175, 55, 0.12);
-        }
-        .gold-border-glow:hover {
-            border-color: rgba(212, 175, 55, 0.75);
-            box-shadow: 0 8px 30px -4px rgba(212, 175, 55, 0.25);
-        }
-        .active-tab-gold {
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(170, 130, 10, 0.08) 100%);
-            border-color: #d4af37 !important;
-            color: #f3e5ab !important;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0a0d14;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #d4af37;
-            border-radius: 9999px;
-        }
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.65; transform: scale(1.06); }
-        }
-        .animate-pulse-slow {
-            animation: pulse-slow 2.5s infinite ease-in-out;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emperor Sys | المنظومة المركزية لإدارة سلاسل الإمداد والعمليات الميدانية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+    .brand-font { font-family: 'Montserrat', sans-serif; }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-gold selection:text-obsidian custom-scrollbar">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
 
-    <!-- الخلفية الضوئية -->
-    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div class="absolute -top-40 -right-40 w-96 h-96 bg-gold/10 rounded-full blur-3xl"></div>
-        <div class="absolute top-1/3 -left-40 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-40 right-1/3 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
+  <!-- شريط التنقل العلوي -->
+  <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
+      
+      <!-- الشعار -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <span class="text-xl">⚡</span>
+        </div>
+        <div>
+          <span class="brand-font font-black text-xl tracking-wider text-white">EMPEROR<span class="text-blue-500">SYS</span></span>
+          <p class="text-[10px] text-slate-400 font-bold -mt-1 tracking-wide">ENTERPRISE SUPPLY CHAIN</p>
+        </div>
+      </div>
+
+      <!-- زر الدخول المباشر -->
+      <div>
+        <a href="login.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-extrabold text-sm transition-all shadow-lg shadow-blue-600/25 border border-blue-400/30">
+          <span>دخول المنظومة</span>
+          <span class="text-xs">↗</span>
+        </a>
+      </div>
+
     </div>
+  </header>
 
-    <!-- الشريط العلوي (Header) -->
-    <header class="sticky top-0 z-30 backdrop-blur-xl bg-obsidian/90 border-b border-gold/20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
-            <!-- الشعار والعنوان -->
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gold/30 to-obsidian border border-gold flex items-center justify-center shadow-lg shadow-gold/20">
-                    <i class="fa-solid fa-crown text-2xl text-gold animate-pulse-slow"></i>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl font-black tracking-wider gold-gradient-text">EMPEROR</span>
-                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-gold/20 text-gold-light border border-gold/40 font-bold">خارطة 2027</span>
-                    </div>
-                    <h1 class="text-sm sm:text-base text-slate-300 font-semibold">خارطة التطوير الإمبراطورية 2027 - منظومة القيادة والسيطرة للمخازن والمشاريع</h1>
-                </div>
-            </div>
+  <!-- القسم الترحيبي الرئيسي -->
+  <main class="flex-grow">
+    
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-20 text-center relative overflow-hidden">
+      <!-- خلفية ضوئية جمالية -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-            <!-- أزرار التحكم السريع ووضع مجلس الإدارة -->
-            <div class="flex items-center gap-3">
-                <button id="presentationBtn" onclick="togglePresentationMode()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-gold to-gold-dark text-obsidian font-extrabold text-sm flex items-center gap-2 shadow-lg shadow-gold/20 hover:brightness-110 transition-all cursor-pointer">
-                    <i class="fa-solid fa-chalkboard-user"></i>
-                    <span>وضع العرض أمام مجلس الإدارة</span>
-                </button>
-                <button onclick="openROICalculator()" class="px-4 py-2.5 rounded-xl bg-slateCard hover:bg-slateHover text-gold-light border border-gold/40 font-bold text-sm flex items-center gap-2 transition-all cursor-pointer">
-                    <i class="fa-solid fa-calculator text-gold"></i>
-                    <span class="hidden sm:inline">حاسبة الوفر المالي</span>
-                </button>
-            </div>
-        </div>
-    </header>
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-bold text-blue-400 mb-6">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        المنصة الحية لرقابة وإدارة المشاريع الإنشائية والصناعية
+      </div>
 
-    <!-- المحتوى الرئيسي -->
-    <main class="relative z-10 flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto">
+        حوكمة شاملة لحركات المخازن الميدانية وسلاسل الإمداد
+      </h1>
 
-        <!-- شريط العرض التقديمي لمجلس الإدارة (يظهر عند التفعيل) -->
-        <div id="presentationBanner" class="hidden rounded-2xl bg-gradient-to-r from-slateCard via-gold/15 to-slateCard border-2 border-gold p-6 shadow-2xl transition-all">
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div class="space-y-2 text-center lg:text-right">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/20 text-gold-light text-xs font-bold">
-                        <i class="fa-solid fa-star"></i>
-                        <span>وضع العرض التنفيذي لمجلس الإدارة نشط الآن</span>
-                    </div>
-                    <h2 id="presStageTitle" class="text-xl sm:text-2xl font-black text-white">المرحلة الأولى (Q1 2027): الإطلاق التأسيسي والرقابة الذكية - Emperor v1.0</h2>
-                    <p id="presStageDesc" class="text-slate-300 text-sm max-w-3xl">نبدأ العام بـ 6 محركات قاتلة تمنع تجاوز المقايسات لحظياً، تصفر المخزون الراكد بين المشاريع، وتطابق الأرصدة مع الـ ERP تلقائياً.</p>
-                </div>
-                <div class="flex items-center gap-3 shrink-0">
-                    <button onclick="stepPresentation(-1)" class="px-4 py-2.5 rounded-xl bg-obsidian/80 hover:bg-obsidian border border-gold/40 text-gold-light font-bold text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-chevron-right"></i>
-                        <span>المرحلة السابقة</span>
-                    </button>
-                    <span id="presStepIndicator" class="px-4 py-2 rounded-xl bg-gold text-obsidian font-black text-sm">1 / 4</span>
-                    <button onclick="stepPresentation(1)" class="px-4 py-2.5 rounded-xl bg-obsidian/80 hover:bg-obsidian border border-gold/40 text-gold-light font-bold text-sm flex items-center gap-2">
-                        <span>المرحلة التالية</span>
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                </div>
-            </div>
+      <p class="mt-6 text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        بيئة عمل موحدة متعددة الكيانات (Multi-Tenant) تجمع الفحص الفوري للتوريدات بالذكاء الاصطناعي، ومطابقة مقايسات البلوكات، وتتبع خطوط تصنيع قطاعات الألومنيوم للمشاريع الكبرى.
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <a href="login.html" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-base transition-all shadow-xl shadow-blue-600/30 active:scale-95">
+          تسجيل الدخول للمنظومة ⚡
+        </a>
+        <a href="#modules" class="px-7 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-base transition-all border border-slate-800">
+          استعراض الموديولات التشغيلية
+        </a>
+      </div>
+    </section>
+
+    <!-- قطاعات المنظومة الأساسية -->
+    <section id="modules" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 border-t border-slate-900">
+      
+      <div class="text-center mb-12">
+        <h2 class="text-2xl font-black text-white">الموديولات المركزية المتكاملة</h2>
+        <p class="text-xs text-slate-400 mt-2">محركات تشغيل مترابطة تدير وتدقق الدورة المستندية آلياً</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- موديول 1: الوارد اليومي -->
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/50 transition-all">
+          <div class="text-3xl mb-4">📥</div>
+          <h3 class="text-lg font-bold text-white mb-2">إدارة الوارد اليومي الذكي</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            استخراج فوري لبنود الفواتير عبر الذكاء الاصطناعي (Gemini Vision)، مع الربط الآلي لأوامر التوريد (PO) وأذون الإضافة المخزنية (Inventory IN).
+          </p>
+          <div class="text-[11px] font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900/60 rounded-lg p-2 text-center">
+            ● مفعل ونشط ميدانياً
+          </div>
         </div>
 
-        <!-- البانر التنفيذي والعدادات الـ 4 الكبرى -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- عداد 1 -->
-            <div class="bg-slateCard/90 gold-border-glow rounded-2xl p-5 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-400 font-bold mb-1">إجمالي الأدوات المبتكرة (2027)</p>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-black gold-gradient-text">24</span>
-                        <span class="text-xs text-gold-light font-semibold">محركاً ذكياً حصرياً</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-1">موزعة على 4 إصدارات ربع سنوية</p>
-                </div>
-                <div class="w-12 h-12 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center text-gold text-xl">
-                    <i class="fa-solid fa-microchip"></i>
-                </div>
-            </div>
-
-            <!-- عداد 2 -->
-            <div class="bg-slateCard/90 gold-border-glow rounded-2xl p-5 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-400 font-bold mb-1">جاهز للإطلاق الفوري (Q1)</p>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-black text-emerald-400">6</span>
-                        <span class="text-xs text-emerald-300 font-semibold">أدوات أساسية نشطة</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-1">Emperor v1.0 - النواة الإمبراطورية</p>
-                </div>
-                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl">
-                    <i class="fa-solid fa-rocket"></i>
-                </div>
-            </div>
-
-            <!-- عداد 3 -->
-            <div class="bg-slateCard/90 gold-border-glow rounded-2xl p-5 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-400 font-bold mb-1">نسبة التغطية الرقابية والميدانية</p>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-black text-sky-400">100%</span>
-                        <span class="text-xs text-sky-300 font-semibold">مواقع + مصانع + نقل</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-1">ربط لحظي بين المكتب الفني والمخزن</p>
-                </div>
-                <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-            </div>
-
-            <!-- عداد 4 -->
-            <div class="bg-slateCard/90 gold-border-glow rounded-2xl p-5 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-400 font-bold mb-1">العائد المالي المتوقع (ROI)</p>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-black text-amber-400">15-25%</span>
-                        <span class="text-xs text-amber-300 font-semibold">وفر مباشر من الهالك</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-1">وتسييل فوري للرواكد بين المشاريع</p>
-                </div>
-                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl">
-                    <i class="fa-solid fa-sack-dollar"></i>
-                </div>
-            </div>
-        </section>
-
-        <!-- شريط اختيار المراحل الربع سنوية (Timeline Tabs) -->
-        <section class="space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-check text-gold"></i>
-                    <span>المراحل الربع سنوية لخارطة التطوير 2027 (6 أدوات كل كوارتر)</span>
-                </h2>
-                <span class="text-xs text-slate-400">اضغط على أي ربع سنوي لاستعراض إصداراته، أو اضغط على أي أداة لمعاينة أثرها المالي</span>
-            </div>
-
-            <!-- أزرار الأرباع -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="quarterTabs">
-                <!-- الكل -->
-                <button onclick="selectQuarter('ALL')" data-q="ALL" class="q-tab active-tab-gold text-right p-4 rounded-2xl bg-slateCard border border-slate-700/80 transition-all cursor-pointer flex flex-col justify-between">
-                    <div class="flex items-center justify-between w-full mb-2">
-                        <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-gold/20 text-gold-light">العام بالكامل</span>
-                        <i class="fa-solid fa-layer-group text-gold"></i>
-                    </div>
-                    <div class="font-black text-base text-white">كل الإصدارات (24 أداة)</div>
-                    <div class="text-[11px] text-slate-400 mt-1">الرؤية الشاملة لمنظومة 2027</div>
-                </button>
-
-                <!-- Q1 -->
-                <button onclick="selectQuarter('Q1')" data-q="Q1" class="q-tab text-right p-4 rounded-2xl bg-slateCard border border-slate-700/80 hover:border-gold/50 transition-all cursor-pointer flex flex-col justify-between">
-                    <div class="flex items-center justify-between w-full mb-2">
-                        <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                            الربع الأول Q1
-                        </span>
-                        <span class="text-xs font-mono text-gold font-bold">v1.0</span>
-                    </div>
-                    <div class="font-black text-sm text-white">الإطلاق التأسيسي والرقابة</div>
-                    <div class="text-[11px] text-emerald-400 mt-1 font-semibold">يناير - مارس | 6 أدوات جاهزة</div>
-                </button>
-
-                <!-- Q2 -->
-                <button onclick="selectQuarter('Q2')" data-q="Q2" class="q-tab text-right p-4 rounded-2xl bg-slateCard border border-slate-700/80 hover:border-gold/50 transition-all cursor-pointer flex flex-col justify-between">
-                    <div class="flex items-center justify-between w-full mb-2">
-                        <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            <i class="fa-solid fa-crown text-[10px] ml-1"></i>الربع الثاني Q2
-                        </span>
-                        <span class="text-xs font-mono text-gold font-bold">v2.0</span>
-                    </div>
-                    <div class="font-black text-sm text-white">السيطرة الميدانية واللوجستية</div>
-                    <div class="text-[11px] text-amber-300/90 mt-1 font-semibold">أبريل - يونيو | قيد التطوير</div>
-                </button>
-
-                <!-- Q3 -->
-                <button onclick="selectQuarter('Q3')" data-q="Q3" class="q-tab text-right p-4 rounded-2xl bg-slateCard border border-slate-700/80 hover:border-gold/50 transition-all cursor-pointer flex flex-col justify-between">
-                    <div class="flex items-center justify-between w-full mb-2">
-                        <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                            <i class="fa-solid fa-crown text-[10px] ml-1"></i>الربع الثالث Q3
-                        </span>
-                        <span class="text-xs font-mono text-gold font-bold">v3.0</span>
-                    </div>
-                    <div class="font-black text-sm text-white">الذكاء المالي وسلاسل الإمداد</div>
-                    <div class="text-[11px] text-purple-300/90 mt-1 font-semibold">يوليو - سبتمبر | تحديث مجدول</div>
-                </button>
-
-                <!-- Q4 -->
-                <button onclick="selectQuarter('Q4')" data-q="Q4" class="q-tab text-right p-4 rounded-2xl bg-slateCard border border-slate-700/80 hover:border-gold/50 transition-all cursor-pointer flex flex-col justify-between">
-                    <div class="flex items-center justify-between w-full mb-2">
-                        <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                            <i class="fa-solid fa-crown text-[10px] ml-1"></i>الربع الرابع Q4
-                        </span>
-                        <span class="text-xs font-mono text-gold font-bold">v4.0</span>
-                    </div>
-                    <div class="font-black text-sm text-white">التنبؤ الاستراتيجي والقيادة</div>
-                    <div class="text-[11px] text-sky-300/90 mt-1 font-semibold">أكتوبر - ديسمبر | تحديث مجدول</div>
-                </button>
-            </div>
-        </section>
-
-        <!-- شريط البحث والفلترة التخصصية -->
-        <section class="bg-slateCard/80 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <!-- مربع البحث -->
-            <div class="relative w-full md:w-96">
-                <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-gold"></i>
-                <input
-                    type="text"
-                    id="searchInput"
-                    oninput="filterTools()"
-                    placeholder="ابحث باسم الأداة، الكود الهندسي، أو المشكلة (مثال: المقايسة، الراكد، الطقس)..."
-                    class="w-full bg-obsidian border border-slate-700 focus:border-gold rounded-xl pr-11 pl-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all"
-                >
-            </div>
-
-            <!-- فلاتر التخصص -->
-            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-start md:justify-end" id="categoryFilters">
-                <button onclick="selectCategory('ALL')" data-cat="ALL" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gold text-obsidian transition-all cursor-pointer">
-                    كل التخصصات
-                </button>
-                <button onclick="selectCategory('الرقابة الهندسية')" data-cat="الرقابة الهندسية" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-obsidian text-slate-300 border border-slate-700 hover:border-gold/50 transition-all cursor-pointer">
-                    الرقابة الهندسية والمقايسات
-                </button>
-                <button onclick="selectCategory('الذكاء المالي')" data-cat="الذكاء المالي" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-obsidian text-slate-300 border border-slate-700 hover:border-gold/50 transition-all cursor-pointer">
-                    الذكاء المالي والرواكد
-                </button>
-                <button onclick="selectCategory('الذكاء الاصطناعي والميدان')" data-cat="الذكاء الاصطناعي والميدان" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-obsidian text-slate-300 border border-slate-700 hover:border-gold/50 transition-all cursor-pointer">
-                    الذكاء الاصطناعي والميدان
-                </button>
-                <button onclick="selectCategory('اللوجستيات والموارد')" data-cat="اللوجستيات والموارد" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-obsidian text-slate-300 border border-slate-700 hover:border-gold/50 transition-all cursor-pointer">
-                    اللوجستيات والموردين
-                </button>
-            </div>
-        </section>
-
-        <!-- شبكة عرض الـ 24 أداة -->
-        <section>
-            <div id="toolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- يتم توليد الكروت ديناميكياً بواسطة الجافاسكريبت -->
-            </div>
-
-            <!-- رسالة عدم وجود نتائج -->
-            <div id="emptyState" class="hidden text-center py-16 bg-slateCard/50 rounded-2xl border border-slate-800">
-                <i class="fa-solid fa-box-open text-4xl text-gold mb-3"></i>
-                <h3 class="text-lg font-bold text-white">لا توجد أدوات مطابقة لبحثك الحالي</h3>
-                <p class="text-sm text-slate-400 mt-1">جرب تغيير كلمة البحث أو اختيار "كل الإصدارات"</p>
-                <button onclick="resetFilters()" class="mt-4 px-5 py-2 rounded-xl bg-gold text-obsidian font-bold text-sm">إعادة ضبط الفلاتر</button>
-            </div>
-        </section>
-
-        <!-- قسم التكتيك التسويقي المدمج في النظام -->
-        <section class="rounded-2xl bg-gradient-to-l from-slateCard via-slateCard to-gold/10 border border-gold/40 p-6 sm:p-8">
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div class="space-y-2">
-                    <div class="inline-flex items-center gap-2 text-gold text-xs font-extrabold uppercase tracking-wider">
-                        <i class="fa-solid fa-chess-king"></i>
-                        <span>استراتيجية البيع والترقية المستمرة (Upselling Engine)</span>
-                    </div>
-                    <h3 class="text-xl font-black text-white">كيف تبيع خارطة 2027 بالكامل منذ اليوم الأول؟</h3>
-                    <p class="text-sm text-slate-300 leading-relaxed max-w-3xl">
-                        عند إطلاق <span class="text-emerald-400 font-bold">Emperor v1.0</span> في الربع الأول (بأدواته الست الجاهزة)، تظل أيقونات الـ 18 أداة القادمة ظاهرة داخل لوحة تحكم العميل وعليها <span class="text-gold-light font-bold">"شارة التاج الذهبي 🔒"</span>. هذا يمنح مجلس إدارة الشركة الثقة في أنهم يتعاقدون مع منظومة حية تتطور كل 90 يوماً، ويضمن لك تجديد العقود وترقية الباقات طوال عام 2027.
-                    </p>
-                </div>
-                <div class="shrink-0 flex flex-col sm:flex-row gap-3">
-                    <button onclick="selectQuarter('Q1')" class="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-obsidian font-extrabold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
-                        <i class="fa-solid fa-bolt"></i>
-                        <span>استعراض أدوات الإطلاق الفوري (Q1)</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- الفوتر -->
-    <footer class="relative z-10 border-t border-slate-800/80 bg-obsidian py-6 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-crown text-gold"></i>
-                <span class="font-bold text-slate-200">منظومة EMPEROR</span>
-                <span>— وثيقة خارطة التطوير الإمبراطورية المعتمدة لعام 2027</span>
-            </div>
-            <div>جميع الحقوق محفوظة © 2027 | مصممة للعروض التنفيذية ومجالس الإدارة</div>
+        <!-- موديول 2: مصانع الألومنيوم -->
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/50 transition-all">
+          <div class="text-3xl mb-4">⚙️</div>
+          <h3 class="text-lg font-bold text-white mb-2">تتبع مراحل تصنيع الألومنيوم</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            حوكمة تدفق قطاعات الألومنيوم عبر محطات: التقطيع، والتجميع، وتركيب الزجاج، واختبارات الجودة قبل الشحن الميداني للمواقع.
+          </p>
+          <div class="text-[11px] font-bold text-blue-400 bg-blue-950/40 border border-blue-900/60 rounded-lg p-2 text-center">
+            ● جاهز للتكامل والربط
+          </div>
         </div>
-    </footer>
 
-    <!-- نافذة تفاصيل الأداة والعائد الاستثماري (Tool Modal) -->
-    <div id="toolModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="bg-slateCard border-2 border-gold rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative animate-fadeIn max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <!-- زر الإغلاق -->
-            <button onclick="closeToolModal()" class="absolute top-5 left-5 w-10 h-10 rounded-full bg-obsidian border border-slate-700 hover:border-gold text-slate-300 hover:text-gold flex items-center justify-center transition-all cursor-pointer">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-
-            <!-- رأس النافذة -->
-            <div class="flex items-center gap-3 mb-4">
-                <span id="modalBadge" class="px-3 py-1 rounded-full text-xs font-extrabold"></span>
-                <span id="modalCategory" class="px-3 py-1 rounded-full bg-obsidian border border-slate-700 text-slate-300 text-xs font-bold"></span>
-            </div>
-
-            <h3 id="modalTitle" class="text-2xl font-black text-white mb-2"></h3>
-            <!-- الكود التقني على سطر مستقل -->
-            <div class="my-3">
-                <code id="modalCode" class="inline-block px-3.5 py-1.5 rounded-lg bg-obsidian border border-gold/40 text-gold-light font-mono text-xs sm:text-sm"></code>
-            </div>
-
-            <!-- مقارنة المشكلة والحل -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
-                <div class="p-4 rounded-2xl bg-red-950/25 border border-red-500/30">
-                    <div class="flex items-center gap-2 text-red-400 font-extrabold text-xs mb-2">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        <span>الثغرة في الأنظمة التقليدية (مثل دفترة و ERP)</span>
-                    </div>
-                    <p id="modalPain" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
-                </div>
-
-                <div class="p-4 rounded-2xl bg-emerald-950/25 border border-emerald-500/30">
-                    <div class="flex items-center gap-2 text-emerald-400 font-extrabold text-xs mb-2">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span>الابتكار الحصري في Emperor</span>
-                    </div>
-                    <p id="modalSolution" class="text-xs sm:text-sm text-slate-200 leading-relaxed"></p>
-                </div>
-            </div>
-
-            <!-- الأثر المالي والرقابي لمجلس الإدارة -->
-            <div class="p-4 rounded-2xl bg-gradient-to-r from-gold/15 to-obsidian border border-gold/40 mb-6">
-                <div class="flex items-center gap-2 text-gold font-extrabold text-xs mb-1">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>العائد المباشر لصالح مجلس الإدارة (Executive ROI):</span>
-                </div>
-                <p id="modalROI" class="text-sm font-bold text-white leading-relaxed"></p>
-            </div>
-
-            <!-- أزرار التفاعل داخل المودال -->
-            <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-800">
-                <span id="modalReleaseDate" class="text-xs text-slate-400 font-semibold"></span>
-                <div class="flex items-center gap-3">
-                    <button onclick="closeToolModal()" class="px-5 py-2.5 rounded-xl bg-obsidian border border-slate-700 text-slate-300 font-bold text-xs hover:border-slate-500 cursor-pointer">
-                        إغلاق النافذة
-                    </button>
-                </div>
-            </div>
+        <!-- موديول 3: مقايسات البلوكات والصرف -->
+        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/50 transition-all">
+          <div class="text-3xl mb-4">🧱</div>
+          <h3 class="text-lg font-bold text-white mb-2">الصرف وحارس مقايسات البلوكات</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            قفل صارم لصرف المواد الميدانية وفق الكميات المعتمدة هندسياً لكل زون وبلوك إنشائي، ومنع أي تجاوز استهلاكي دون اعتماد مسبق.
+          </p>
+          <div class="text-[11px] font-bold text-amber-400 bg-amber-950/40 border border-amber-900/60 rounded-lg p-2 text-center">
+            ● مرحلة الربط المبرمج
+          </div>
         </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- التذييل -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-8 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <span class="brand-font font-bold text-slate-300">EMPEROR SYS</span> — منصة إدارة العمليات والمخازن
+      </div>
+      <div>
+        جميع الحقوق محفوظة &copy; 2026
+      </div>
     </div>
+  </footer>
 
-    <!-- نافذة حاسبة الوفر المالي لمجلس الإدارة (ROI Calculator Modal) -->
-    <div id="roiModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="bg-slateCard border-2 border-gold rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative">
-            <button onclick="closeROICalculator()" class="absolute top-5 left-5 w-10 h-10 rounded-full bg-obsidian border border-slate-700 hover:border-gold text-slate-300 hover:text-gold flex items-center justify-center transition-all cursor-pointer">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-gold/20 border border-gold flex items-center justify-center text-gold">
-                    <i class="fa-solid fa-sack-dollar"></i>
-                </div>
-                <div>
-                    <h3 class="text-xl font-black text-white">حاسبة الوفر المالي السنوي لمنظومة Emperor</h3>
-                    <p class="text-xs text-slate-400">اعرض لمجلس الإدارة كم ستوفر لهم المنظومة بالأرقام الحية</p>
-                </div>
-            </div>
-
-            <div class="space-y-4 my-6">
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-2">إجمالي قيمة المشتريات والخامات السنوية للشركة (بالجنيه):</label>
-                    <input type="number" id="annualPurchasesInput" value="50000000" oninput="calculateROI()" class="w-full bg-obsidian border border-gold/50 rounded-xl px-4 py-3 text-white font-bold text-base outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-2">عدد المواقع / المشاريع / المصانع النشطة:</label>
-                    <input type="number" id="projectsCountInput" value="5" oninput="calculateROI()" class="w-full bg-obsidian border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold text-sm outline-none">
-                </div>
-            </div>
-
-            <div class="p-5 rounded-2xl bg-obsidian border border-gold/40 space-y-3">
-                <div class="flex justify-between items-center text-xs sm:text-sm">
-                    <span class="text-slate-400">الوفر من منع تجاوز المقايسات والهالك (8%):</span>
-                    <span id="roiWasteSave" class="font-extrabold text-emerald-400">4,000,000 ج.م</span>
-                </div>
-                <div class="flex justify-between items-center text-xs sm:text-sm">
-                    <span class="text-slate-400">تسييل الرواكد عبر البورصة الداخلية (5%):</span>
-                    <span id="roiStagnantSave" class="font-extrabold text-amber-400">2,500,000 ج.م</span>
-                </div>
-                <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
-                    <span class="text-sm font-black text-gold-light">إجمالي الوفر النقدي السنوي المتوقع:</span>
-                    <span id="roiTotalSave" class="text-xl font-black gold-gradient-text">6,500,000 ج.م</span>
-                </div>
-            </div>
-
-            <div class="mt-6 text-left">
-                <button onclick="closeROICalculator()" class="px-6 py-2.5 rounded-xl bg-gold text-obsidian font-extrabold text-sm cursor-pointer">تم</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- الكود البرمجي الكامل للبيانات والتفاعل -->
-    <script>
-        // قاعدة بيانات الـ 24 أداة موزعة على أرباع عام 2027
-        const roadmapTools = [
-            // ================= الربع الأول Q1 (v1.0) =================
-            {
-                id: 1,
-                quarter: 'Q1',
-                version: 'Emperor v1.0',
-                releaseWindow: 'الربع الأول 2027 (يناير - مارس) - جاهز للإطلاق',
-                status: 'ACTIVE',
-                category: 'الرقابة الهندسية',
-                icon: 'fa-map-location-dot',
-                title: 'الخريطة المكانية التفاعلية للمواقع والمصانع',
-                code: 'Spatial & Visual Warehouse Map',
-                summary: 'تحويل الجداول الصماء إلى خريطة حية للموقع والمصنع تومض بالألوان (أخضر، ذهبي، أحمر) وتعرض أرصدة كل منطقة وحالتها بضغطة زر.',
-                pain: 'الأنظمة التقليدية تعرض المخازن كقوائم نصية مملة، فلا يدرك المدير أين تتكدس الخامات أو أي بلوك يعاني من خطر تشغيلي.',
-                solution: 'خريطة تفاعلية ذكية تقسم المشروع والمصنع إلى مناطق جغرافية حية؛ تضغط على البلوك أو منطقة التشوين فترى أرصدتها والأذون المفتوحة فيها فوراً.',
-                roi: 'إبهار بصري فوري لمجلس الإدارة، واختصار 80% من وقت البحث عن أماكن التشوين وحالة المواقع.'
-            },
-            {
-                id: 2,
-                quarter: 'Q1',
-                version: 'Emperor v1.0',
-                releaseWindow: 'الربع الأول 2027 (يناير - مارس) - جاهز للإطلاق',
-                status: 'ACTIVE',
-                category: 'الرقابة الهندسية',
-                icon: 'fa-shield-halved',
-                title: 'الحارس الهندسي الذكي للمقايسات',
-                code: 'BOQ Smart Guard',
-                summary: 'ربط شاشة إذن الصرف بجدول الكميات والمقايسات لحظياً، وإغلاق الصرف تلقائياً إذا تجاوز الطلب سقف المقايسة المسموح للبلوك.',
-                pain: 'أمين المخزن يصرف الخامات طالما هناك رصيد على الرف، وتكتشف الإدارة بعد فوات الأوان أن الموقع استهلك خامات تتجاوز المقايسة بـ 30%.',
-                solution: 'فلتر هندسي صارم يفحص الكمية المطلوبة مقارنة بالمقايسة ونسبة الهالك في جزء من الثانية، ويمنع الصرف الزائد إلا باستثناء موثق من الإدارة العليا.',
-                roi: 'حماية أرباح المشروع مباشرة وتوفير من 10% إلى 15% من الهالك والسرقات غير المحسوبة.'
-            },
-            {
-                id: 3,
-                quarter: 'Q1',
-                version: 'Emperor v1.0',
-                releaseWindow: 'الربع الأول 2027 (يناير - مارس) - جاهز للإطلاق',
-                status: 'ACTIVE',
-                category: 'الذكاء المالي',
-                icon: 'fa-arrow-right-arrow-left',
-                title: 'البورصة الداخلية للمشاريع وتصفير الراكد',
-                code: 'Inter-Project Material Exchange',
-                summary: 'محرك مقاصة ذكي يوقف طلبات الشراء الجديدة إذا اكتشف وجود نفس الخامة راكدة في مشروع آخر ويحولها لأمر نقل داخلي.',
-                pain: 'مشروع يشتري خامات بملايين الجنيهات بينما نفس الخامات مكدسة وراكدة في مخزن مشروع زميل تابع لنفس الشركة دون علم الإدارة.',
-                solution: 'مسح آلي لكافة مخازن الشركة لحظة كتابة طلب الشراء، وتنبيه فوري بوجود فائض راكد منذ 30 يوماً في موقع آخر لتحويله بضغطة زر.',
-                roi: 'البرنامج يدفع ثمنه من أول أسبوع عبر تسييل المخزون الراكد وتوفير السيولة النقدية (Cash Flow).'
-            },
-            {
-                id: 4,
-                quarter: 'Q1',
-                version: 'Emperor v1.0',
-                releaseWindow: 'الربع الأول 2027 (يناير - مارس) - جاهز للإطلاق',
-                status: 'ACTIVE',
-                category: 'الرقابة الهندسية',
-                icon: 'fa-stopwatch',
-                title: 'رادار الاختناق المستندي وكاشف التلاعب',
-                code: 'Workflow Bottleneck & Anomaly Radar',
-                summary: 'قياس زمن بقاء الإذن بالساعة والدقيقة لدى كل إدارة (المكتب الفني، مدير المشروع)، ورصد محاولات تفتيت الأذون أو الصرف في أوقات مريبة.',
-                pain: 'تأخر إغلاق الحسابات وضياع الأذون بين الأقسام دون معرفة المتسبب الحقيقي، مع سهولة التحايل بتجزئة كميات الصرف.',
-                solution: 'بصمة زمنية لكل مرحلة في دورة الاعتماد مع عداد سرعة يفضح القسم المتأخر باللون الأحمر، ومحقق ذكي يلتقط أي سلوك صرف غير معتاد.',
-                roi: 'تقليص زمن الدورة المستندية من عدة أيام إلى أقل من 4 ساعات، وإحكام الرقابة الداخلية بنسبة 100%.'
-            },
-            {
-                id: 5,
-                quarter: 'Q1',
-                version: 'Emperor v1.0',
-                releaseWindow: 'الربع الأول 2027 (يناير - مارس) - جاهز للإطلاق',
-                status: 'ACTIVE',
-                category: 'الذكاء الاصطناعي والميدان',
-                icon: 'fa-camera-retro',
-                title: 'الاستلام البصري بالكاميرا والتوقيع الحي',
-                code: 'AI Visual Gatekeeper & Biometric Handover',
-                summary: 'قراءة بونات الموردين الورقية بكاميرا الهاتف عبر الذكاء الاصطناعي في 3 ثوانٍ، مع توثيق توقيع وصورة المستلم لحظة الصرف.',
-                pain: 'تكدس سيارات التوريد على البوابات، أخطاء الإدخال اليدوي، وإنكار بعض المشرفين أو المقاولين لتوقيعاتهم الورقية لاحقاً.',
-                solution: 'تصوير البون الورقي ليقوم الذكاء الاصطناعي بملء إذن الإضافة تلقائياً، والتوقيع بالإصبع على شاشة الموبايل مع لقطة كاميرا تدمج كختم مائي.',
-                roi: 'إنهاء عصر الورق والإنكار البشري تماماً، وتسريع عملية الاستلام والصرف الميداني بمقدار 5 أضعاف.'
-            },
-            {
-                id: 6,
-                quarter: 'Q1',
-                version: 'Emperor v1.0',
-                releaseWindow: 'الربع الأول 2027 (يناير - مارس) - جاهز للإطلاق',
-                status: 'ACTIVE',
-                category: 'الذكاء المالي',
-                icon: 'fa-scale-balanced',
-                title: 'محرك المطابقة الذكي مع الـ ERP والجرد الأعمى',
-                code: 'ERP Reconciliation & Blind Spot Check',
-                summary: 'إلزام أمين المخزن بجرد أعمى يومي لـ 3 أصناف في 5 دقائق صباحاً، ومطابقة أرصدة الموقع الفعلية مع دفاتر الـ ERP لكشف السقط المحاسبي.',
-                pain: 'فجوة دائمة بين رصيد الموقع الفعلي ورصيد البرنامج المحاسبي في الإدارة، ولا تُكتشف الفروقات إلا في الجرد السنوي المرهق.',
-                solution: 'جسر مطابقة آلي يعمل كمدقق خارجي على أي نظام ERP تمتلكه الشركة، مع خوارزمية جرد جزئي يومي أعمى بدون إيقاف المخزن.',
-                roi: 'دقة مخزنية 100% طوال العام دون إيقاف العمل ساعة واحدة، وإلغاء حجة "لدينا برنامج محاسبي بالفعل".'
-            },
-
-            // ================= الربع الثاني Q2 (v2.0) =================
-            {
-                id: 7,
-                quarter: 'Q2',
-                version: 'Emperor v2.0',
-                releaseWindow: 'الربع الثاني 2027 (أبريل - يونيو) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'اللوجستيات والموارد',
-                icon: 'fa-truck-fast',
-                title: 'الرادار اللوجستي وتتبع أسطول النقل بين المواقع',
-                code: 'In-Transit Logistics & Fleet Radar',
-                summary: 'مخزن افتراضي للبضاعة بالطريق يحسب زمن الرحلة المتوقع بين المصنع والموقع، ويطلق إنذاراً عند تأخر السيارة مع تسليم بكود سري OTP.',
-                pain: 'خروج الخامات من المخزن الرئيسي أو المصنع وتأخرها أو ضياع أجزاء منها على الطريق قبل دخولها لمخزن الموقع.',
-                solution: 'ربط إذن التحويل بعداد زمني للرحلة وكود تحقق OTP لا يُغلق إلا بتأكيد أمين المخزن المستلم بعد مطابقة الحمولة.',
-                roi: 'إغلاق الثقب الأسود للبضاعة بالطريق ومنع أي تلاعب أثناء النقل بين الفروع والمشاريع.'
-            },
-            {
-                id: 8,
-                quarter: 'Q2',
-                version: 'Emperor v2.0',
-                releaseWindow: 'الربع الثاني 2027 (أبريل - يونيو) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'اللوجستيات والموارد',
-                icon: 'fa-screwdriver-wrench',
-                title: 'الصندوق الأسود للمعدات والعدد',
-                code: 'Equipment & Tools Blackbox',
-                summary: 'جواز سفر رقمي (QR) لكل معدة أو أداة (هيلتي، صاروخ، ماكينة لحام) يتتبع عهدتها بالساعة، عمرها التشغيلي، وتاريخ صيانتها.',
-                pain: 'ضياع وسرقة العدد والأدوات الصغرى وتلف المعدات سريعاً دون معرفة من استلمها أو أي ماركة هي الأكثر تعطلاً.',
-                solution: 'مسح QR المعدة عند تسليمها للفني صباحاً وعند استردادها مساءً، مع منع إخلاء طرف أي موظف قبل تصفية عهدة العدد.',
-                roi: 'توفير 35% من ميزانية شراء وإحلال العدد والمعدات المفقودة أو التالفة سوء استخدام.'
-            },
-            {
-                id: 9,
-                quarter: 'Q2',
-                version: 'Emperor v2.0',
-                releaseWindow: 'الربع الثاني 2027 (أبريل - يونيو) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الذكاء الاصطناعي والميدان',
-                icon: 'fa-cloud-bolt',
-                title: 'درع الطقس والمخاطر البيئية للتشوينات',
-                code: 'Weather-Linked Storage Shield',
-                summary: 'ربط النظام بالأرصاد الجوية لموقع كل مشروع لإطلاق إنذار مبكر قبل الأمطار أو الرطوبة بـ 24 ساعة لحماية التشوينات المكشوفة.',
-                pain: 'تلف مئات الشكائر من الأسمنت والجبس والأخشاب في المواقع المفتوحة بسبب تغير مفاجئ في الطقس والأمطار.',
-                solution: 'فحص آلي للأصناف المشونة في مناطق مكشوفة وإرسال تنبيه فوري لأمين المخزن لتغطيتها وتصوير الإجراء قبل هطول المطر.',
-                roi: 'حماية استباقية للخامات الحساسة ومنع الخسائر الكارثية الناتجة عن العوامل الجوية.'
-            },
-            {
-                id: 10,
-                quarter: 'Q2',
-                version: 'Emperor v2.0',
-                releaseWindow: 'الربع الثاني 2027 (أبريل - يونيو) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'اللوجستيات والموارد',
-                icon: 'fa-trophy',
-                title: 'دوري الأبطال لأمناء المخازن والحوافز',
-                code: 'Storekeeper Gamification & KPI Engine',
-                summary: 'نظام نقاط آلي يقيم أمناء المخازن بناءً على سرعة التسجيل اللحظي، دقة الجرد الأعمى، واكتمال المرفقات، مع لوحة شرف شهرية.',
-                pain: 'مقاومة أمناء المخازن للبرامج الجديدة وتأخير إدخال الأذون لنهاية الأسبوع، وغياب معيار رقمي عادل لصرف المكافآت.',
-                solution: 'تحويل الانضباط المخزني إلى منافسة إيجابية بنقاط تحسب تلقائياً وتُخرج تقرير كفاءة قاطع لكل فرد في فريق المخازن.',
-                roi: 'رفع سرعة وانضباط الإدخال اللحظي في المواقع بنسبة 90% دون ضغط إداري.'
-            },
-            {
-                id: 11,
-                quarter: 'Q2',
-                version: 'Emperor v2.0',
-                releaseWindow: 'الربع الثاني 2027 (أبريل - يونيو) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الذكاء الاصطناعي والميدان',
-                icon: 'fa-microphone-lines',
-                title: 'المساعد الصوتي الميداني لأمين المخزن',
-                code: 'Voice-Assisted Storekeeper',
-                summary: 'إصدار أوامر الاستلام والاستعلام عن الأرصدة بالصوت باللهجة المصرية مباشرة أثناء انشغال يد أمين المخزن بالفحص في الموقع.',
-                pain: 'صعوبة الكتابة على شاشة الهاتف تحت أشعة الشمس أو أثناء ارتداء القفازات وفحص البضائع في الموقع.',
-                solution: 'زر ميكروفون ذكي يحول الكلام المنطوق إلى حركات مخزنية مسجلة أو يجيب صوتياً عن رصيد أي صنف ومكانه.',
-                roi: 'سهولة استخدام غير مسبوقة تجعل أقل المستخدمين خبرة يتعامل مع النظام في ثوانٍ.'
-            },
-            {
-                id: 12,
-                quarter: 'Q2',
-                version: 'Emperor v2.0',
-                releaseWindow: 'الربع الثاني 2027 (أبريل - يونيو) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الذكاء الاصطناعي والميدان',
-                icon: 'fa-eye',
-                title: 'الكتالوج البصري والمطابقة بالكاميرا',
-                code: 'Visual Technical Spec & Match',
-                summary: 'التعرف على القطع والإكسسوارات المتشابهة وقطاعات الألومنيوم بكاميرا الهاتف لمنع صرف صنف بقطر أو كود خاطئ للفنيين.',
-                pain: 'تشابه آلاف الأكواد والقطاعات والإكسسوارات مما يؤدي لصرف قطعة خاطئة لا تُكتشف إلا بعد التركيب وتخريب العمل.',
-                solution: 'توجيه الكاميرا للقطعة ليقوم الذكاء الاصطناعي بمطابقة شكلها الهندسي مع كتالوج الأصناف وتأكيد كودها الصحيح قبل الصرف.',
-                roi: 'القضاء التام على أخطاء الصرف الفني وتكلفة فك وإعادة تركيب الخامات الخاطئة.'
-            },
-
-            // ================= الربع الثالث Q3 (v3.0) =================
-            {
-                id: 13,
-                quarter: 'Q3',
-                version: 'Emperor v3.0',
-                releaseWindow: 'الربع الثالث 2027 (يوليو - سبتمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الذكاء المالي',
-                icon: 'fa-recycle',
-                title: 'بوابة مخزن الهالك والمخلفات الاستثمارية',
-                code: 'Scrap & Salvage Monetization Engine',
-                summary: 'حساب كمية الفضلات والخردة المتوقعة تلقائياً من كل أمر تصنيع أو صرف (حديد، ألومنيوم، كابلات) ومطالبة الموقع بتوريدها لبيعها رسمياً.',
-                pain: 'خروج الخامة من الدفاتر بمجرد صرفها، مما يجعل فضلات الحديد والألومنيوم والنحاس عرضة للسرقة أو البيع غير الرسمي.',
-                solution: 'تحويل نسبة الهالك المعيارية تلقائياً إلى "رصيد مستحق في مخزن الخردة" لا يُغلق إلا باستلام الفضلات وتقييمها مالياً.',
-                roi: 'تحويل المخلفات والهالك إلى إيراد مالي موثق يدر ملايين الجنيهات سنوياً لخزينة الشركة.'
-            },
-            {
-                id: 14,
-                quarter: 'Q3',
-                version: 'Emperor v3.0',
-                releaseWindow: 'الربع الثالث 2027 (يوليو - سبتمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الرقابة الهندسية',
-                icon: 'fa-user-lock',
-                title: 'البصمة الرقمية وعهدة مقاولي الباطن',
-                code: 'Subcontractor Material Accountability',
-                summary: 'بقاء الخامات المنصرفة لمقاول الباطن كـ "عهدة معلقة في ذمته" لا تُخصم إلا بمقدار ما يثبته مهندس الموقع في المستخلص الفعلي.',
-                pain: 'سحب مقاول الباطن لخامات تفوق حجم إنجازه الفعلي وإهدارها أو تسريبها خارج الموقع دون خصم دقيق في المستخلصات.',
-                solution: 'ربط حساب عهدة المقاول بنسب الإنجاز الهندسي، وحساب أي عجز في الخامات كخصم مالي تلقائي من مستخلصه.',
-                roi: 'ضبط كامل لعهد مقاولي الباطن واسترداد قيمة أي خامات مهدرة من مستحقاتهم تلقائياً.'
-            },
-            {
-                id: 15,
-                quarter: 'Q3',
-                version: 'Emperor v3.0',
-                releaseWindow: 'الربع الثالث 2027 (يوليو - سبتمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'اللوجستيات والموارد',
-                icon: 'fa-medal',
-                title: 'التقييم الذكي والآلي للموردين من واقع المخزن',
-                code: 'Warehouse-Driven Vendor Rating',
-                summary: 'تقييم كل مورد آلياً مع كل إذن استلام بناءً على دقة المواعيد، مطابقة الكميات، ونسبة التالف، لكشف التكلفة الحقيقية للمورد الرخيص.',
-                pain: 'المشتريات تختار المورد الأرخص سعراً على الورق، بينما يعاني الموقع من تأخره المستمر وارتفاع نسبة التالف في بضاعته.',
-                solution: 'تقرير رقابي شهري يربط أداء المورد الفعلي على بوابة المخزن بقرارات الشراء المستقبلية.',
-                roi: 'منع تعطل المواقع بسبب الموردين غير الملتزمين وتوجيه السيولة للمورد الأعلى كفاءة.'
-            },
-            {
-                id: 16,
-                quarter: 'Q3',
-                version: 'Emperor v3.0',
-                releaseWindow: 'الربع الثالث 2027 (يوليو - سبتمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'اللوجستيات والموارد',
-                icon: 'fa-globe',
-                title: 'البوابة التفاعلية للموردين ومقاولي الباطن',
-                code: 'External Partner Self-Service Portal',
-                summary: 'رابط خارجي آمن يسجل فيه المورد بيانات الشحنة والسيارة قبل تحركها لتظهر في الموقع كـ "شحنة في الطريق"، ويتابع حالة الفحص إلكترونياً.',
-                pain: 'فوضى الاتصالات الهاتفية اليومية من الموردين للاستعلام عن أذون الإضافة ومفاجأة الموقع بوصول سيارات بدون تجهيز أوناش.',
-                solution: 'إخطار مسبق بوصول الشحنات على شاشة المخزن وأمن البوابة، ومتابعة ذاتية لحالة القبول أو الرفض الفني.',
-                roi: 'تنظيم كامل لحركة البوابات والأوناش وتوفير وقت فريق المخازن والمشتريات.'
-            },
-            {
-                id: 17,
-                quarter: 'Q3',
-                version: 'Emperor v3.0',
-                releaseWindow: 'الربع الثالث 2027 (يوليو - سبتمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الذكاء المالي',
-                icon: 'fa-coins',
-                title: 'البورصة المالية للمخزون وتكلفة الإحلال ضد التضخم',
-                code: 'Inflation-Adjusted Inventory Valuation',
-                summary: 'تقييم المخزون بسعر الإحلال السوقي اللحظي بجانب السعر الدفتري القديم، لإظهار مكاسب التخزين المبكر وتكلفة تعويض الخامات الحقيقية.',
-                pain: 'الأنظمة المحاسبية تقيم المخزن بسعر الشراء القديم فقط، فتفاجأ الإدارة بصدمة مالية عند نفاد الصنف وشرائه بالسعر الجديد.',
-                solution: 'مؤشر مالي حي يقارن القيمة الدفترية بالقيمة السوقية الحالية ويثبت لمجلس الإدارة حجم الوفر الشرائي المحقق.',
-                roi: 'رؤية مالية حقيقية تحمي التسعير والميزانيات من تقلبات التضخم وأسعار الصرف.'
-            },
-            {
-                id: 18,
-                quarter: 'Q3',
-                version: 'Emperor v3.0',
-                releaseWindow: 'الربع الثالث 2027 (يوليو - سبتمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الذكاء المالي',
-                icon: 'fa-hand-holding-dollar',
-                title: 'المستشار المالي لتدوير السيولة واسترداد الكاش',
-                code: 'Dead-Capital Recovery Advisor',
-                summary: 'تحليل الأصناف الفائضة في المشاريع المنتهية وحساب تكلفة الفرصة البديلة للأموال المجمدة، وتقديم خطة تسييل لتمويل مشتريات جديدة.',
-                pain: 'تحول المخازن إلى مقبرة للسيولة النقدية بعد انتهاء مراحل المشاريع دون خطة مالية لتحويل الفوائض إلى كاش.',
-                solution: 'محرك استشاري يحدد الأصناف القابلة للتسييل أو الإرجاع للموردين ويحسب كم ستغطي من احتياجات السيولة للشهر القادم.',
-                roi: 'تحرير ملايين الجنيهات المجمدة في المخازن وتحويل المخزن إلى مركز تمويل ذاتي.'
-            },
-
-            // ================= الربع الرابع Q4 (v4.0) =================
-            {
-                id: 19,
-                quarter: 'Q4',
-                version: 'Emperor v4.0',
-                releaseWindow: 'الربع الرابع 2027 (أكتوبر - ديسمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الذكاء المالي',
-                icon: 'fa-Wand-sparkles',
-                title: 'محاكي القرارات الاستراتيجية ("ماذا لو؟")',
-                code: 'Executive What-If Scenario Simulator',
-                summary: 'أداة محاكاة لمجلس الإدارة تحسب في ثوانٍ تأثير تسريع جدول مشروع أو ارتفاع أسعار الخامات على أرصدة المخازن والسيولة المطلوبة.',
-                pain: 'اتخاذ قرارات بتسريع العمل أو فتح مراحل جديدة دون معرفة التاريخ الدقيق الذي ستنفد فيه الخامات والسيولة الإضافية المطلوبة.',
-                solution: 'إدخال المتغيرات الافتراضية ليقوم النظام بمحاكاة معدلات السحب وإخراج خطة الاحتياج المالي والكمي فوراً.',
-                roi: 'دعم القرار الاستراتيجي لمجلس الإدارة بأرقام مستقبلية دقيقة تمنع المفاجآت المالية.'
-            },
-            {
-                id: 20,
-                quarter: 'Q4',
-                version: 'Emperor v4.0',
-                releaseWindow: 'الربع الرابع 2027 (أكتوبر - ديسمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الرقابة الهندسية',
-                icon: 'fa-hourglass-half',
-                title: 'المحاكاة الزمنية واستشراف أزمات التشوين',
-                code: 'Predictive Stock-Out Simulator',
-                summary: 'ترجمة الرصيد الحالي إلى "عدد أيام وساعات عمل متبقية" بناءً على سرعة السحب الفعلي في الموقع خلال آخر 7 أيام.',
-                pain: 'الاعتماد على رقم "الحد الأدنى الثابت" الذي يفشل عندما يتضاعف معدل الاستهلاك اليومي في الموقع فجأة.',
-                solution: 'قياس سرعة الحرق اليومي للخامة وتنبيه الإدارة بالتاريخ والساعة المتوقعة لتوقف الموقع قبل حدوث الأزمة بوقت كافٍ.',
-                roi: 'صفر توقف في مواقع الإنشاءات وخطوط الإنتاج بسبب نفاد الخامات المفاجئ.'
-            },
-            {
-                id: 21,
-                quarter: 'Q4',
-                version: 'Emperor v4.0',
-                releaseWindow: 'الربع الرابع 2027 (أكتوبر - ديسمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الرقابة الهندسية',
-                icon: 'fa-diagram-project',
-                title: 'مصفوفة البدائل الهندسية اللحظية',
-                code: 'Smart Material Substitution Matrix',
-                summary: 'اقتراح الصنف البديل المعتمد هندسياً والموجود في المخزن تلقائياً عند طلب صنف رصيده صفر لمنع تعطل الموقع.',
-                pain: 'توقف العمل في الموقع لعدم وجود صنف معين رغم وجود بديل مطابق له هندسياً في المخزن تحت كود أو مسمى آخر.',
-                solution: 'مصفوفة بدائل معتمدة مسبقاً من المكتب الفني تظهر تلقائياً لأمين المخزن والمهندس لحظة نفاد الصنف الأصلي.',
-                roi: 'استمرارية العمل الميداني دون انقطاع واستغلال كامل لكافة الأرصدة المتاحة.'
-            },
-            {
-                id: 22,
-                quarter: 'Q4',
-                version: 'Emperor v4.0',
-                releaseWindow: 'الربع الرابع 2027 (أكتوبر - ديسمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'اللوجستيات والموارد',
-                icon: 'fa-cubes-stacked',
-                title: 'نظام التشوين الذكي على المخطط الزمني والمساحة',
-                code: 'Just-In-Time Site Space Optimizer',
-                summary: 'ربط أوامر التوريد بسعة مناطق التشوين الفعلية والجدول الزمني للتركيب لمنع تكدس الموقع وتكسير الخامات الموردة مبكراً.',
-                pain: 'توريد دفعات ضخمة من السيراميك أو الألومنيوم قبل موعد تركيبها بشهرين مما يغلق حركة الموقع ويعرضها للكسر.',
-                solution: 'فحص نسبة إشغال المخزن وموعد بدء البند هندسياً واقتراح جدولة التوريد على دفعات متزامنة مع التنفيذ.',
-                roi: 'تقليل تكسير وتلف الخامات الناتج عن سوء التشوين والتكدس بنسبة 70%.'
-            },
-            {
-                id: 23,
-                quarter: 'Q4',
-                version: 'Emperor v4.0',
-                releaseWindow: 'الربع الرابع 2027 (أكتوبر - ديسمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الرقابة الهندسية',
-                icon: 'fa-fingerprint',
-                title: 'بوابة التحقيق الجنائي للخامات (التتبع العكسي)',
-                code: 'Reverse Quality Forensics',
-                summary: 'شجرة نسب رقمية لكل خامة مركبة في أي وحدة أو بلوك تكشف فوراً رقم التشغيلة، اسم المورد، وتاريخ الاستلام عند ظهور أي عيب مستقبلي.',
-                pain: 'ظهور عيوب في السباكة أو الدهانات أو الألومنيوم بعد التسليم دون القدرة على معرفة هذه الخامة جاءت من أي توريدة أو مورد.',
-                solution: 'ربط كل إذن صرف بالوحدة الهندسية ورقم التشغيلة والمورد لتمكين الرجوع القانوني والمالي على المورد وحصر باقي الوحدات المتأثرة.',
-                roi: 'حماية السمعة الهندسية للشركة واسترداد تعويضات الضمان من الموردين بالأدلة القاطعة.'
-            },
-            {
-                id: 24,
-                quarter: 'Q4',
-                version: 'Emperor v4.0',
-                releaseWindow: 'الربع الرابع 2027 (أكتوبر - ديسمبر) - تحديث مجدول',
-                status: 'UPCOMING',
-                category: 'الذكاء الاصطناعي والميدان',
-                icon: 'fa-newspaper',
-                title: 'التقرير الصباحي الذكي للمدير التنفيذي',
-                code: 'AI Morning Executive Briefing',
-                summary: 'نشرة تنفيذية مولدة بالذكاء الاصطناعي كل صباح تلخص لرئيس الشركة أهم 3 مخاطر اليوم، وحجم الوفر المحقق، وأبطأ قسم في الاعتمادات.',
-                pain: 'عدم امتلاك رئيس مجلس الإدارة للوقت الكافي لفتح عشرات التقارير والجداول المعقدة لمتابعة الموقف اليومي.',
-                solution: 'ملخص تنفيذي ذكي يُقرأ في 60 ثانية يعرض نبض المخازن والمشاريع والسيولة بلغة القرارات العليا.',
-                roi: 'وضع رئيس الشركة في قلب الحدث يومياً دون أي مجهود رقابي.'
-            }
-        ];
-
-        // حالة الفلاتر الحالية
-        let currentQuarter = 'ALL';
-        let currentCategory = 'ALL';
-        let presentationActive = false;
-        const quarterOrder = ['Q1', 'Q2', 'Q3', 'Q4'];
-        let currentPresIndex = 0;
-
-        const quarterMeta = {
-            'Q1': {
-                title: 'المرحلة الأولى (Q1 2027): الإطلاق التأسيسي والرقابة الذكية - Emperor v1.0',
-                desc: 'نبدأ العام بـ 6 محركات قاتلة تمنع تجاوز المقايسات لحظياً، تصفر المخزون الراكد بين المشاريع، وتطابق الأرصدة مع الـ ERP تلقائياً.'
-            },
-            'Q2': {
-                title: 'المرحلة الثانية (Q2 2027): تحديث السيطرة الميدانية واللوجستية - Emperor v2.0',
-                desc: 'في الربع الثاني نطلق 6 أدوات تحكم القبضة على حركة سيارات النقل، عهدة المعدات، حماية التشوينات من الطقس، وتحفيز أمناء المخازن.'
-            },
-            'Q3': {
-                title: 'المرحلة الثالثة (Q3 2027): تحديث الذكاء المالي وسلاسل الإمداد - Emperor v3.0',
-                desc: 'في الربع الثالث نحول المخازن إلى مركز ربحية عبر مخزن الهالك الاستثماري، عهد مقاولي الباطن، والتقييم اللحظي ضد التضخم.'
-            },
-            'Q4': {
-                title: 'المرحلة الرابعة (Q4 2027): التنبؤ الاستراتيجي وغرفة القيادة العليا - Emperor v4.0',
-                desc: 'في الربع الرابع نصل لقمة الأتمتة عبر محاكي القرارات "ماذا لو؟"، استشراف أزمات التشوين، والتحقيق الجنائي لجودة الخامات.'
-            }
-        };
-
-        // دالة بناء وعرض الكروت
-        function renderTools() {
-            const grid = document.getElementById('toolsGrid');
-            const emptyState = document.getElementById('emptyState');
-            const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
-
-            const filtered = roadmapTools.filter(tool => {
-                const matchQ = currentQuarter === 'ALL' || tool.quarter === currentQuarter;
-                const matchCat = currentCategory === 'ALL' || tool.category === currentCategory;
-                const matchSearch = !searchQuery ||
-                    tool.title.toLowerCase().includes(searchQuery) ||
-                    tool.code.toLowerCase().includes(searchQuery) ||
-                    tool.summary.toLowerCase().includes(searchQuery) ||
-                    tool.category.toLowerCase().includes(searchQuery);
-                return matchQ && matchCat && matchSearch;
-            });
-
-            grid.innerHTML = '';
-
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            emptyState.classList.add('hidden');
-
-            filtered.forEach(tool => {
-                const isQ1 = tool.quarter === 'Q1';
-                const badgeStyle = isQ1
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'bg-gold/15 text-gold-light border border-gold/40';
-
-                const statusLabel = isQ1
-                    ? `<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>جاهز في الإطلاق الأول (${tool.quarter})</span>`
-                    : `<span class="flex items-center gap-1.5"><i class="fa-solid fa-crown text-gold text-[11px]"></i>تحديث ${tool.quarter} - 2027 🔒</span>`;
-
-                const card = document.createElement('div');
-                card.className = 'bg-slateCard/95 gold-border-glow rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 cursor-pointer group';
-                card.onclick = () => openToolModal(tool.id);
-
-                card.innerHTML = `
-                    <div>
-                        <!-- رأس الكارت -->
-                        <div class="flex items-center justify-between gap-2 mb-4">
-                            <div class="flex items-center gap-2">
-                                <span class="w-8 h-8 rounded-lg bg-obsidian border border-gold/40 text-gold font-black text-xs flex items-center justify-center">#${tool.id}</span>
-                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-obsidian text-slate-300 border border-slate-800">${tool.category}</span>
-                            </div>
-                            <div class="text-[11px] font-extrabold px-3 py-1 rounded-full ${badgeStyle}">
-                                ${statusLabel}
-                            </div>
-                        </div>
-
-                        <!-- الأيقونة والعنوان -->
-                        <div class="flex items-start gap-3.5 mb-3">
-                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-gold/20 to-obsidian border border-gold/40 flex items-center justify-center text-gold text-lg shrink-0 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid ${tool.icon}"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-base sm:text-lg font-extrabold text-white group-hover:text-gold-light transition-colors leading-snug">${tool.title}</h3>
-                            </div>
-                        </div>
-
-                        <!-- الكود الإنجليزي على سطر مستقل كما هو معتمد -->
-                        <div class="my-2.5">
-                            <code class="block w-full px-3 py-1.5 rounded-lg bg-obsidian/90 border border-slate-800 text-gold-light font-mono text-xs truncate">${tool.code}</code>
-                        </div>
-
-                        <!-- الملخص التنفيذي -->
-                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mt-3">
-                            ${tool.summary}
-                        </p>
-                    </div>
-
-                    <!-- ذيل الكارت -->
-                    <div class="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                        <span class="font-mono text-slate-400 font-bold">${tool.version}</span>
-                        <span class="text-gold font-extrabold flex items-center gap-1.5 group-hover:translate-x-[-4px] transition-transform">
-                            <span>معاينة الأثر والعائد</span>
-                            <i class="fa-solid fa-arrow-left text-[11px]"></i>
-                        </span>
-                    </div>
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        // اختيار الربع السنوي
-        function selectQuarter(q) {
-            currentQuarter = q;
-            document.querySelectorAll('.q-tab').forEach(btn => {
-                if (btn.getAttribute('data-q') === q) {
-                    btn.classList.add('active-tab-gold');
-                } else {
-                    btn.classList.remove('active-tab-gold');
-                }
-            });
-            renderTools();
-        }
-
-        // اختيار التخصص
-        function selectCategory(cat) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                if (btn.getAttribute('data-cat') === cat) {
-                    btn.className = 'cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gold text-obsidian transition-all cursor-pointer';
-                } else {
-                    btn.className = 'cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-obsidian text-slate-300 border border-slate-700 hover:border-gold/50 transition-all cursor-pointer';
-                }
-            });
-            renderTools();
-        }
-
-        // فلترة البحث
-        function filterTools() {
-            renderTools();
-        }
-
-        // إعادة ضبط الفلاتر
-        function resetFilters() {
-            document.getElementById('searchInput').value = '';
-            selectQuarter('ALL');
-            selectCategory('ALL');
-        }
-
-        // فتح نافذة تفاصيل الأداة
-        function openToolModal(id) {
-            const tool = roadmapTools.find(t => t.id === id);
-            if (!tool) return;
-
-            const isQ1 = tool.quarter === 'Q1';
-            const badgeEl = document.getElementById('modalBadge');
-            badgeEl.className = isQ1
-                ? 'px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                : 'px-3 py-1 rounded-full text-xs font-extrabold bg-gold/20 text-gold-light border border-gold/40';
-            badgeEl.innerHTML = isQ1 ? `أداة رقم #${tool.id} — جاهز للإطلاق (${tool.quarter})` : `أداة رقم #${tool.id} — تحديث ${tool.quarter} 🔒`;
-
-            document.getElementById('modalCategory').textContent = tool.category;
-            document.getElementById('modalTitle').textContent = tool.title;
-            document.getElementById('modalCode').textContent = tool.code;
-            document.getElementById('modalPain').textContent = tool.pain;
-            document.getElementById('modalSolution').textContent = tool.solution;
-            document.getElementById('modalROI').textContent = tool.roi;
-            document.getElementById('modalReleaseDate').textContent = `جدول الإطلاق: ${tool.releaseWindow}`;
-
-            const modal = document.getElementById('toolModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeToolModal() {
-            const modal = document.getElementById('toolModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        // وضع العرض التقديمي لمجلس الإدارة
-        function togglePresentationMode() {
-            presentationActive = !presentationActive;
-            const banner = document.getElementById('presentationBanner');
-            const btn = document.getElementById('presentationBtn');
-
-            if (presentationActive) {
-                banner.classList.remove('hidden');
-                btn.classList.add('ring-4', 'ring-gold/50');
-                currentPresIndex = 0;
-                updatePresentationStage();
-            } else {
-                banner.classList.add('hidden');
-                btn.classList.remove('ring-4', 'ring-gold/50');
-                selectQuarter('ALL');
-            }
-        }
-
-        function stepPresentation(direction) {
-            currentPresIndex = (currentPresIndex + direction + quarterOrder.length) % quarterOrder.length;
-            updatePresentationStage();
-        }
-
-        function updatePresentationStage() {
-            const q = quarterOrder[currentPresIndex];
-            document.getElementById('presStageTitle').textContent = quarterMeta[q].title;
-            document.getElementById('presStageDesc').textContent = quarterMeta[q].desc;
-            document.getElementById('presStepIndicator').textContent = `${currentPresIndex + 1} / 4`;
-            selectQuarter(q);
-        }
-
-        // حاسبة العائد المالي ROI
-        function openROICalculator() {
-            calculateROI();
-            const modal = document.getElementById('roiModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeROICalculator() {
-            const modal = document.getElementById('roiModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function calculateROI() {
-            const purchases = parseFloat(document.getElementById('annualPurchasesInput').value) || 0;
-            const wasteSave = purchases * 0.08;
-            const stagnantSave = purchases * 0.05;
-            const totalSave = wasteSave + stagnantSave;
-
-            document.getElementById('roiWasteSave').textContent = wasteSave.toLocaleString('ar-EG') + ' ج.م';
-            document.getElementById('roiStagnantSave').textContent = stagnantSave.toLocaleString('ar-EG') + ' ج.م';
-            document.getElementById('roiTotalSave').textContent = totalSave.toLocaleString('ar-EG') + ' ج.م';
-        }
-
-        // إغلاق النوافذ عند الضغط خارجها
-        window.addEventListener('click', (e) => {
-            const toolModal = document.getElementById('toolModal');
-            const roiModal = document.getElementById('roiModal');
-            if (e.target === toolModal) closeToolModal();
-            if (e.target === roiModal) closeROICalculator();
-        });
-
-        // تشغيل الصفحة عند التحميل
-        window.onload = function () {
-            renderTools();
-        };
-    </script>
 </body>
 </html>
