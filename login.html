@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Emperor Sys | بوابة إدارة العمليات والمخازن</title>
+
+  <!-- إعدادات تطبيق الموبايل PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/crown.png">
+
   <style>
     :root {
       --primary: #0f172a;
@@ -516,6 +524,17 @@
       loginSection.style.display = 'flex';
       userPasswordInput.value = '';
     });
+  </script>
+
+  <!-- تفعيل محرك التطبيق PWA Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => console.log('PWA Service Worker جاهز ومسجل بنجاح:', reg.scope))
+          .catch((err) => console.log('PWA فشل تسجيل العامل:', err));
+      });
+    }
   </script>
 </body>
 </html>
