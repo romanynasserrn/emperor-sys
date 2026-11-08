@@ -45,8 +45,8 @@
     .login-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 40px;
+      border-radius: 14px;
+      padding: 36px 32px;
       width: 100%;
       max-width: 420px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
@@ -54,7 +54,7 @@
 
     .brand-header {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     .brand-title {
@@ -71,7 +71,7 @@
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .form-label {
@@ -80,6 +80,12 @@
       font-weight: 600;
       margin-bottom: 8px;
       color: var(--text);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
     }
 
     .form-input {
@@ -94,6 +100,37 @@
 
     .form-input:focus {
       border-color: var(--accent);
+    }
+
+    .toggle-password-btn {
+      position: absolute;
+      left: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
     }
 
     .btn-submit {
@@ -116,6 +153,29 @@
     .btn-submit:disabled {
       background-color: var(--text-muted);
       cursor: not-allowed;
+    }
+
+    .support-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .support-link {
+      color: #059669;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .support-link:hover {
+      text-decoration: underline;
     }
 
     .alert {
@@ -292,12 +352,12 @@
 </head>
 <body>
 
-  <!-- 1. شاشة تسجيل الدخول -->
+  <!-- 1. شاشة تسجيل الدخول الميدانية -->
   <div id="loginSection" class="login-container">
     <div class="login-card">
       <div class="brand-header">
         <h1 class="brand-title">EMPEROR SYS</h1>
-        <p class="brand-subtitle">نظام إدارة المشاريع وسلاسل الإمداد المتعدد</p>
+        <p class="brand-subtitle">بوابة إدارة العمليات والمخازن المركزية</p>
       </div>
 
       <div id="alertBox" class="alert alert-danger"></div>
@@ -305,16 +365,35 @@
       <form id="loginForm">
         <div class="form-group">
           <label class="form-label" for="userEmail">البريد الإلكتروني المعتمد</label>
-          <input type="email" id="userEmail" class="form-input" placeholder="name@company.com" required value="ceo@emperor-sys.com">
+          <div class="input-wrapper">
+            <input type="email" id="userEmail" class="form-input" placeholder="name@company.com" required>
+          </div>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="userPassword">كلمة المرور</label>
-          <input type="password" id="userPassword" class="form-input" placeholder="••••••••" required value="123456">
+          <div class="input-wrapper">
+            <input type="password" id="userPassword" class="form-input" placeholder="••••••••" required>
+            <button type="button" id="togglePasswordBtn" class="toggle-password-btn" title="إظهار / إخفاء كلمة المرور">👁️</button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" id="rememberMe" checked>
+            <span>تذكر بيانات الدخول</span>
+          </label>
         </div>
 
         <button type="submit" id="submitBtn" class="btn-submit">تسجيل الدخول للمنظومة</button>
       </form>
+
+      <div class="support-section">
+        <span>تواجه مشكلة أو نسيت كلمة المرور؟</span><br>
+        <a href="https://wa.me/201201502476" target="_blank" class="support-link">
+          💬 تواصل مع الدعم الفني المباشر
+        </a>
+      </div>
     </div>
   </div>
 
@@ -328,9 +407,7 @@
       </div>
 
       <nav>
-        <ul id="dynamicNav" class="modules-nav">
-          <!-- يتم إنشاء القائمة تلقائياً -->
-        </ul>
+        <ul id="dynamicNav" class="modules-nav"></ul>
       </nav>
 
       <button id="logoutBtn" class="btn-logout">تسجيل الخروج</button>
@@ -343,21 +420,13 @@
           فتح بنافذة كاملة ↗
         </a>
       </div>
-      <div id="workspaceBody" class="workspace-body">
-        <!-- يتم تحميل البرنامج المضمن هنا -->
-      </div>
+      <div id="workspaceBody" class="workspace-body"></div>
     </main>
   </div>
 
   <script>
-    // ------------------------------------------------------------------
-    // رابط السكربت المركزي الخاص بقاعدة البيانات المركزية (Auth API)
-    // ------------------------------------------------------------------
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
 
-    // ------------------------------------------------------------------
-    // خريطة البرامج الفعلية المربوطة بالمنظومة
-    // ------------------------------------------------------------------
     const SYSTEM_MODULES = {
       "INWARD": {
         name: "إدارة الوارد اليومي",
@@ -376,7 +445,6 @@
       }
     };
 
-    // متغير لتخزين بيانات جلسة المستخدم بعد نجاح الدخول
     let currentSession = null;
 
     const loginForm = document.getElementById('loginForm');
@@ -392,6 +460,40 @@
     const activeModuleTitle = document.getElementById('activeModuleTitle');
     const externalLinkBtn = document.getElementById('externalLinkBtn');
     const workspaceBody = document.getElementById('workspaceBody');
+    const userEmailInput = document.getElementById('userEmail');
+    const userPasswordInput = document.getElementById('userPassword');
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const rememberMeCheck = document.getElementById('rememberMe');
+
+    // تفعيل إظهار / إخفاء كلمة المرور
+    togglePasswordBtn.addEventListener('click', () => {
+      const isPassword = userPasswordInput.type === 'password';
+      userPasswordInput.type = isPassword ? 'text' : 'password';
+      togglePasswordBtn.textContent = isPassword ? '🙈' : '👁️';
+    });
+
+    // استعادة الجلسة المحفوظة أو البريد الإلكتروني تلقائياً
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedSession = localStorage.getItem('emperor_session');
+      if (savedSession) {
+        try {
+          const parsed = JSON.parse(savedSession);
+          currentSession = parsed;
+          renderDashboard(parsed);
+          return;
+        } catch (e) {
+          localStorage.removeItem('emperor_session');
+        }
+      }
+
+      const savedEmail = localStorage.getItem('emperor_saved_email');
+      if (savedEmail) {
+        userEmailInput.value = savedEmail;
+        userPasswordInput.focus();
+      } else {
+        userEmailInput.value = "store.faha@alkarma.com";
+      }
+    });
 
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -399,15 +501,13 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'جاري التحقق والاتصال...';
 
-      const email = document.getElementById('userEmail').value.trim();
-      const password = document.getElementById('userPassword').value;
+      const email = userEmailInput.value.trim();
+      const password = userPasswordInput.value;
 
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8',
-          },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ email, password })
         });
 
@@ -415,12 +515,21 @@
 
         if (data.success) {
           currentSession = data;
+
+          if (rememberMeCheck.checked) {
+            localStorage.setItem('emperor_session', JSON.stringify(data));
+            localStorage.setItem('emperor_saved_email', email);
+          } else {
+            localStorage.removeItem('emperor_session');
+            localStorage.removeItem('emperor_saved_email');
+          }
+
           renderDashboard(data);
         } else {
           showError(data.message || 'فشل التحقق من البيانات المدخلة');
         }
       } catch (err) {
-        showError('تعذر الاتصال بقاعدة البيانات المركزية. تأكد من إعدادات النشر Anyone.');
+        showError('تعذر الاتصال بقاعدة البيانات المركزية. تأكد من اتصال الإنترنت.');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'تسجيل الدخول للمنظومة';
@@ -439,7 +548,6 @@
       displayCompanyName.textContent = sessionData.company.companyName;
       displayUserEmail.textContent = sessionData.user.email + ' (' + sessionData.user.role + ')';
 
-      // عرض نطاق المشاريع المسند للمستخدم في الشريط الجانبي
       if (sessionData.user.role === 'SUPER_ADMIN' || sessionData.user.assignedProjectId === 'ALL') {
         displayProjectScope.textContent = 'نطاق المشاريع: كافة مشاريع الشركة (' + (sessionData.projects ? sessionData.projects.length : 0) + ')';
       } else if (sessionData.projects && sessionData.projects.length > 0) {
@@ -471,7 +579,6 @@
         dynamicNav.appendChild(li);
       });
 
-      // تشغيل أول موديول افتراضياً
       if (allowed.length > 0) {
         loadModuleView(allowed[0], SYSTEM_MODULES[allowed[0]]);
       }
@@ -481,17 +588,13 @@
       activeModuleTitle.textContent = moduleInfo.name;
 
       if (moduleInfo.url && currentSession) {
-        // تجهيز معاملات الجلسة لتمريرها في الرابط المضمن
         const compId = currentSession.company.companyId;
         const compName = currentSession.company.companyName;
         const userEmail = currentSession.user.email;
         const userRole = currentSession.user.role;
         const assignedProj = currentSession.user.assignedProjectId || 'ALL';
-        
-        // تحويل قائمة المشاريع إلى نص مشفر
         const projectsParam = encodeURIComponent(JSON.stringify(currentSession.projects || []));
 
-        // بناء الرابط المدمج بالمعاملات
         const parameterizedUrl = `${moduleInfo.url}?cid=${encodeURIComponent(compId)}&cname=${encodeURIComponent(compName)}&uemail=${encodeURIComponent(userEmail)}&role=${encodeURIComponent(userRole)}&assigned_pid=${encodeURIComponent(assignedProj)}&projects=${projectsParam}`;
 
         externalLinkBtn.href = parameterizedUrl;
@@ -510,10 +613,11 @@
     }
 
     logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('emperor_session');
       currentSession = null;
       dashboardSection.style.display = 'none';
       loginSection.style.display = 'flex';
-      document.getElementById('userPassword').value = '';
+      userPasswordInput.value = '';
     });
   </script>
 </body>
