@@ -18,341 +18,60 @@
       --danger: #dc2626;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 36px 32px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+    .brand-header { text-align: center; margin-bottom: 24px; }
+    .brand-title { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+    .brand-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .form-input, .form-select { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; background: white; }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); }
+    .toggle-password-btn { position: absolute; left: 12px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px; }
+    .form-options { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; font-size: 13px; }
+    .remember-me { display: flex; align-items: center; gap: 6px; color: var(--text-muted); cursor: pointer; user-select: none; }
+    .btn-submit { width: 100%; padding: 12px; background-color: var(--accent); color: #ffffff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+    .btn-submit:hover { background-color: var(--accent-hover); }
+    .btn-submit:disabled { background-color: var(--text-muted); cursor: not-allowed; }
+    .alert { padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: none; }
+    .alert-danger { background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
-    /* شاشة تسجيل الدخول */
-    .login-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
+    /* لوحة التحكم */
+    .dashboard-container { display: none; height: 100vh; overflow: hidden; flex-direction: row; }
+    .sidebar { width: 280px; background: var(--primary); color: #ffffff; display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; }
+    .sidebar-header { padding-bottom: 20px; border-bottom: 1px solid #334155; margin-bottom: 24px; }
+    .company-badge { font-size: 16px; font-weight: 700; color: #ffffff; }
+    .user-info { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .project-scope-badge { display: inline-block; margin-top: 8px; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
+    .modules-nav { list-style: none; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; overflow-y: auto; }
+    .module-item { padding: 12px 14px; border-radius: 8px; color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .module-item:hover, .module-item.active { background: #1e293b; color: #ffffff; }
+    .btn-logout { background: transparent; border: 1px solid #475569; color: #cbd5e1; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s; margin-top: auto; }
+    .btn-logout:hover { background: #334155; color: #ffffff; }
+    .main-content { flex-grow: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
+    .workspace-header { padding: 16px 24px; background: #ffffff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .workspace-title { font-size: 18px; font-weight: 700; color: var(--primary); }
+    .btn-external { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--accent); background: #eff6ff; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 6px; text-decoration: none; }
+    .workspace-body { flex-grow: 1; padding: 0; height: calc(100vh - 65px); position: relative; overflow-y: auto; }
+    .module-iframe { width: 100%; height: 100%; border: none; display: block; }
 
-    .login-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 36px 32px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-    }
-
-    .brand-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .brand-title {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--primary);
-      letter-spacing: -0.5px;
-    }
-
-    .brand-subtitle {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-input:focus {
-      border-color: var(--accent);
-    }
-
-    .toggle-password-btn {
-      position: absolute;
-      left: 12px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 16px;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .form-options {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      font-size: 13px;
-    }
-
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--text-muted);
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 12px;
-      background-color: var(--accent);
-      color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .btn-submit:hover {
-      background-color: var(--accent-hover);
-    }
-
-    .btn-submit:disabled {
-      background-color: var(--text-muted);
-      cursor: not-allowed;
-    }
-
-    .support-section {
-      margin-top: 24px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .support-link {
-      color: #059669;
-      text-decoration: none;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 4px;
-    }
-
-    .support-link:hover {
-      text-decoration: underline;
-    }
-
-    .alert {
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .alert-danger {
-      background-color: #fef2f2;
-      color: var(--danger);
-      border: 1px solid #fecaca;
-    }
-
-    /* لوحة التحكم الرئيسية */
-    .dashboard-container {
-      display: none;
-      height: 100vh;
-      overflow: hidden;
-      flex-direction: row;
-    }
-
-    .sidebar {
-      width: 280px;
-      background: var(--primary);
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 16px;
-      flex-shrink: 0;
-    }
-
-    .sidebar-header {
-      padding-bottom: 20px;
-      border-bottom: 1px solid #334155;
-      margin-bottom: 24px;
-    }
-
-    .company-badge {
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .user-info {
-      font-size: 12px;
-      color: #94a3b8;
-      margin-top: 4px;
-    }
-
-    .project-scope-badge {
-      display: inline-block;
-      margin-top: 8px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      background: #1e293b;
-      color: #38bdf8;
-      border: 1px solid #334155;
-    }
-
-    .modules-nav {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex-grow: 1;
-    }
-
-    .module-item {
-      padding: 12px 14px;
-      border-radius: 8px;
-      color: #cbd5e1;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-
-    .module-item:hover, .module-item.active {
-      background: #1e293b;
-      color: #ffffff;
-    }
-
-    .btn-logout {
-      background: transparent;
-      border: 1px solid #475569;
-      color: #cbd5e1;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-top: auto;
-    }
-
-    .btn-logout:hover {
-      background: #334155;
-      color: #ffffff;
-    }
-
-    .main-content {
-      flex-grow: 1;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg);
-      overflow: hidden;
-    }
-
-    .workspace-header {
-      padding: 16px 24px;
-      background: #ffffff;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .workspace-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .btn-external {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--accent);
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      padding: 6px 12px;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    .btn-external:hover {
-      background: #dbeafe;
-    }
-
-    .workspace-body {
-      flex-grow: 1;
-      padding: 0;
-      height: calc(100vh - 65px);
-      position: relative;
-    }
-
-    .module-iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
-
-    .placeholder-card {
-      padding: 40px;
-      margin: 24px;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
+    /* شاشة إدارة المستخدمين */
+    .admin-panel { padding: 24px; max-width: 950px; margin: auto; }
+    .admin-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 24px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+    .user-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+    .user-table th, .user-table td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border); }
+    .user-table th { background: #f8fafc; font-weight: 700; }
   </style>
 </head>
 <body>
 
-  <!-- 1. شاشة تسجيل الدخول الميدانية -->
+  <!-- 1. شاشة تسجيل الدخول -->
   <div id="loginSection" class="login-container">
     <div class="login-card">
       <div class="brand-header">
@@ -374,7 +93,7 @@
           <label class="form-label" for="userPassword">كلمة المرور</label>
           <div class="input-wrapper">
             <input type="password" id="userPassword" class="form-input" placeholder="••••••••" required>
-            <button type="button" id="togglePasswordBtn" class="toggle-password-btn" title="إظهار / إخفاء كلمة المرور">👁️</button>
+            <button type="button" id="togglePasswordBtn" class="toggle-password-btn">👁️</button>
           </div>
         </div>
 
@@ -387,17 +106,10 @@
 
         <button type="submit" id="submitBtn" class="btn-submit">تسجيل الدخول للمنظومة</button>
       </form>
-
-      <div class="support-section">
-        <span>تواجه مشكلة أو نسيت كلمة المرور؟</span><br>
-        <a href="https://wa.me/201201502476" target="_blank" class="support-link">
-          💬 تواصل مع الدعم الفني المباشر
-        </a>
-      </div>
     </div>
   </div>
 
-  <!-- 2. لوحة التحكم المركزية الديناميكية -->
+  <!-- 2. لوحة التحكم المركزية -->
   <div id="dashboardSection" class="dashboard-container">
     <aside class="sidebar">
       <div class="sidebar-header">
@@ -415,10 +127,8 @@
 
     <main class="main-content">
       <div class="workspace-header">
-        <h2 id="activeModuleTitle" class="workspace-title">إدارة الوارد اليومي</h2>
-        <a id="externalLinkBtn" href="#" target="_blank" class="btn-external" style="display: none;">
-          فتح بنافذة كاملة ↗
-        </a>
+        <h2 id="activeModuleTitle" class="workspace-title">لوحة العمليات</h2>
+        <a id="externalLinkBtn" href="#" target="_blank" class="btn-external" style="display: none;">فتح بنافذة كاملة ↗</a>
       </div>
       <div id="workspaceBody" class="workspace-body"></div>
     </main>
@@ -433,19 +143,20 @@
         url: "https://script.google.com/macros/s/AKfycbyeE79yBlkUxAXkXJISMeKNx-AMuGqSYjnxd10jbAjXR4n_yvvGRwpClMisBftm6Kq5/exec",
         desc: "تسجيل ومطابقة أذون استلام التوريدات الميدانية والفحص الإداري."
       },
-      "OUTWARD": {
-        name: "الصرف ومقايسات البلوكات",
-        url: "",
-        desc: "حوكمة صرف المواد وفق حدود حارس المقايسة المعتمد لكل بلوك."
-      },
       "ALUMINUM": {
         name: "تتبع مصانع الألومنيوم",
         url: "",
         desc: "تتبع مراحل تشغيل وتركيب قطاعات الألومنيوم لقطاع المشاريع."
+      },
+      "OUTWARD": {
+        name: "الصرف ومقايسات البلوكات",
+        url: "",
+        desc: "حوكمة صرف المواد وفق حدود حارس المقايسة المعتمد لكل بلوك."
       }
     };
 
     let currentSession = null;
+    let metadataCache = null;
 
     const loginForm = document.getElementById('loginForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -465,14 +176,12 @@
     const togglePasswordBtn = document.getElementById('togglePasswordBtn');
     const rememberMeCheck = document.getElementById('rememberMe');
 
-    // تفعيل إظهار / إخفاء كلمة المرور
     togglePasswordBtn.addEventListener('click', () => {
       const isPassword = userPasswordInput.type === 'password';
       userPasswordInput.type = isPassword ? 'text' : 'password';
       togglePasswordBtn.textContent = isPassword ? '🙈' : '👁️';
     });
 
-    // استعادة الجلسة المحفوظة أو البريد الإلكتروني تلقائياً
     window.addEventListener('DOMContentLoaded', () => {
       const savedSession = localStorage.getItem('emperor_session');
       if (savedSession) {
@@ -491,7 +200,7 @@
         userEmailInput.value = savedEmail;
         userPasswordInput.focus();
       } else {
-        userEmailInput.value = "store.faha@alkarma.com";
+        userEmailInput.value = "ceo@emperor-sys.com";
       }
     });
 
@@ -499,7 +208,7 @@
       e.preventDefault();
       alertBox.style.display = 'none';
       submitBtn.disabled = true;
-      submitBtn.textContent = 'جاري التحقق والاتصال...';
+      submitBtn.textContent = 'جاري التحقق...';
 
       const email = userEmailInput.value.trim();
       const password = userPasswordInput.value;
@@ -508,28 +217,23 @@
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ action: "LOGIN", email, password })
         });
 
         const data = await response.json();
 
         if (data.success) {
           currentSession = data;
-
           if (rememberMeCheck.checked) {
             localStorage.setItem('emperor_session', JSON.stringify(data));
             localStorage.setItem('emperor_saved_email', email);
-          } else {
-            localStorage.removeItem('emperor_session');
-            localStorage.removeItem('emperor_saved_email');
           }
-
           renderDashboard(data);
         } else {
-          showError(data.message || 'فشل التحقق من البيانات المدخلة');
+          showError(data.message || 'بيانات الدخول غير صحيحة');
         }
       } catch (err) {
-        showError('تعذر الاتصال بقاعدة البيانات المركزية. تأكد من اتصال الإنترنت.');
+        showError('تعذر الاتصال بالخادم المركزي');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'تسجيل الدخول للمنظومة';
@@ -549,26 +253,32 @@
       displayUserEmail.textContent = sessionData.user.email + ' (' + sessionData.user.role + ')';
 
       if (sessionData.user.role === 'SUPER_ADMIN' || sessionData.user.assignedProjectId === 'ALL') {
-        displayProjectScope.textContent = 'نطاق المشاريع: كافة مشاريع الشركة (' + (sessionData.projects ? sessionData.projects.length : 0) + ')';
+        displayProjectScope.textContent = 'نطاق المشاريع: كافة المشاريع (' + (sessionData.projects ? sessionData.projects.length : 0) + ')';
       } else if (sessionData.projects && sessionData.projects.length > 0) {
         displayProjectScope.textContent = 'المشروع المسند: ' + sessionData.projects[0].name;
-      } else {
-        displayProjectScope.textContent = 'نطاق المشاريع: غير محدد';
       }
 
       dynamicNav.innerHTML = '';
-      const allowed = sessionData.allowedModules || [];
 
-      if (allowed.length === 0) {
-        dynamicNav.innerHTML = '<li style="font-size:12px;color:#94a3b8;padding:8px;">لا توجد خدمات نشطة بالتعاقد</li>';
-        return;
+      // شاشة إدارة المستخدمين والصلاحيات لحساب SUPER_ADMIN
+      if (sessionData.user.role === 'SUPER_ADMIN') {
+        const adminLi = document.createElement('li');
+        adminLi.className = 'module-item active';
+        adminLi.innerHTML = '<span>🛡️</span> <span>إدارة الصلاحيات والمستخدمين</span>';
+        adminLi.addEventListener('click', () => {
+          document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
+          adminLi.classList.add('active');
+          loadAdminUserManagement();
+        });
+        dynamicNav.appendChild(adminLi);
       }
 
-      allowed.forEach((moduleKey, index) => {
-        const moduleInfo = SYSTEM_MODULES[moduleKey] || { name: moduleKey, url: "", desc: "خدمة مفعلة بالتعاقد" };
+      const allowed = sessionData.allowedModules || [];
+      allowed.forEach((moduleKey, idx) => {
+        const moduleInfo = SYSTEM_MODULES[moduleKey] || { name: moduleKey, url: "" };
         const li = document.createElement('li');
-        li.className = 'module-item' + (index === 0 ? ' active' : '');
-        li.textContent = moduleInfo.name;
+        li.className = 'module-item' + (sessionData.user.role !== 'SUPER_ADMIN' && idx === 0 ? ' active' : '');
+        li.innerHTML = `<span>📦</span> <span>${moduleInfo.name}</span>`;
 
         li.addEventListener('click', () => {
           document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
@@ -579,7 +289,9 @@
         dynamicNav.appendChild(li);
       });
 
-      if (allowed.length > 0) {
+      if (sessionData.user.role === 'SUPER_ADMIN') {
+        loadAdminUserManagement();
+      } else if (allowed.length > 0) {
         loadModuleView(allowed[0], SYSTEM_MODULES[allowed[0]]);
       }
     }
@@ -603,12 +315,197 @@
       } else {
         externalLinkBtn.style.display = 'none';
         workspaceBody.innerHTML = `
-          <div class="placeholder-card">
-            <h3 style="margin-bottom:8px; color:var(--primary);">${moduleInfo.name}</h3>
-            <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">${moduleInfo.desc}</p>
-            <p style="margin-top:16px; font-size:13px; color:#2563eb; font-weight:600;">(جاهز للربط مع برنامجك القائم فور تزويد رابطه)</p>
+          <div style="padding:40px; background:white; margin:24px; border-radius:12px; border:1px solid var(--border);">
+            <h3>${moduleInfo.name}</h3>
+            <p style="color:var(--text-muted); margin-top:8px;">${moduleInfo.desc || 'خدمة مفعلة بالمنظومة'}</p>
           </div>
         `;
+      }
+    }
+
+    // ==========================================
+    // شاشة تحكم المدير: إضافة وتعديل المستخدمين
+    // ==========================================
+    async function loadAdminUserManagement() {
+      activeModuleTitle.textContent = "إدارة المستخدمين والصلاحيات المركزية";
+      externalLinkBtn.style.display = 'none';
+      workspaceBody.innerHTML = `<div style="text-align:center; padding:50px;">⏳ جاري تحميل بيانات الهيكل التنظيمي...</div>`;
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: "GET_METADATA", adminEmail: currentSession.user.email })
+        });
+        const meta = await res.json();
+        if (!meta.success) {
+          workspaceBody.innerHTML = `<div style="color:red; padding:20px;">خطأ: ${meta.message}</div>`;
+          return;
+        }
+
+        metadataCache = meta;
+        renderAdminForm(meta);
+
+      } catch (err) {
+        workspaceBody.innerHTML = `<div style="color:red; padding:20px;">فشل الاتصال بجداول الصلاحيات.</div>`;
+      }
+    }
+
+    function renderAdminForm(meta) {
+      let companyOptions = '';
+      meta.companies.forEach(c => {
+        companyOptions += `<option value="${c.id}">${c.name}</option>`;
+      });
+
+      let projectOptions = '<option value="ALL">كافة مشاريع الشركة (صلاحية كاملة)</option>';
+      meta.projects.forEach(p => {
+        projectOptions += `<option value="${p.id}">${p.name}</option>`;
+      });
+
+      let usersRows = '';
+      meta.users.forEach(u => {
+        usersRows += `
+          <tr>
+            <td style="font-weight:bold;">${u.email}</td>
+            <td>${u.companyId}</td>
+            <td>${u.role}</td>
+            <td>${u.assignedProjectId}</td>
+            <td><span style="color:${u.status === 'ACTIVE' ? 'green':'red'}; font-weight:bold;">${u.status}</span></td>
+            <td>
+              <button onclick="editUser('${u.email}')" style="background:#2563eb; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">تعديل</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      workspaceBody.innerHTML = `
+        <div class="admin-panel">
+          <div class="admin-card">
+            <h3 style="margin-bottom:16px; font-size:16px; font-weight:bold; color:var(--primary);">➕ إضافة / تحديث مستخدم وتعيين الصلاحيات</h3>
+            <form id="saveUserForm">
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">البريد الإلكتروني للموظف:</label>
+                  <input type="email" id="targetEmail" class="form-input" placeholder="user@company.com" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">كلمة المرور (اتركها فارغة إذا لم ترد تغييرها):</label>
+                  <input type="text" id="targetPass" class="form-input" placeholder="123456">
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">تابع لشركة:</label>
+                  <select id="targetCompany" class="form-select">${companyOptions}</select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">الدور الوظيفي (Role):</label>
+                  <select id="targetRole" class="form-select">
+                    <option value="STOREKEEPER">أمين مخزن (STOREKEEPER)</option>
+                    <option value="PROJECT_MANAGER">مدير مشروع (PROJECT_MANAGER)</option>
+                    <option value="DIRECTOR">مدير قطاع / إدارة (DIRECTOR)</option>
+                    <option value="SUPER_ADMIN">مدير عام المنظومة (SUPER_ADMIN)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">المشروع المتاح للمستخدم:</label>
+                  <select id="targetProject" class="form-select">${projectOptions}</select>
+                  <small style="color:var(--text-muted); font-size:11px;">إذا كان أمين مخزن، اختر مشروعه ليتم قفل شاشته عليه تلقائياً.</small>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">حالة الحساب:</label>
+                  <select id="targetStatus" class="form-select">
+                    <option value="ACTIVE">نشط (ACTIVE)</option>
+                    <option value="INACTIVE">معطل (INACTIVE)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" id="saveUserBtn" class="btn-submit" style="margin-top:10px;">حفظ واعتماد الصلاحيات في قاعدة البيانات 💾</button>
+            </form>
+          </div>
+
+          <div class="admin-card">
+            <h3 style="margin-bottom:12px; font-size:15px; font-weight:bold;">📋 المستخدمون المعتمدون بالمنظومة</h3>
+            <div style="overflow-x:auto;">
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>البريد الإلكتروني</th>
+                    <th>كود الشركة</th>
+                    <th>الدور</th>
+                    <th>المشروع المتاح</th>
+                    <th>الحالة</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody>${usersRows}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('saveUserForm').addEventListener('submit', submitUserSave);
+    }
+
+    window.editUser = function(email) {
+      const user = metadataCache.users.find(u => u.email === email);
+      if (!user) return;
+
+      document.getElementById('targetEmail').value = user.email;
+      document.getElementById('targetCompany').value = user.companyId;
+      document.getElementById('targetRole').value = user.role;
+      document.getElementById('targetProject').value = user.assignedProjectId;
+      document.getElementById('targetStatus').value = user.status;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    async function submitUserSave(e) {
+      e.preventDefault();
+      const saveBtn = document.getElementById('saveUserBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'جاري الحفظ في النواة المركزية...';
+
+      const email = document.getElementById('targetEmail').value.trim();
+      const password = document.getElementById('targetPass').value.trim();
+      const companyId = document.getElementById('targetCompany').value;
+      const role = document.getElementById('targetRole').value;
+      const assignedProjectId = document.getElementById('targetProject').value;
+      const status = document.getElementById('targetStatus').value;
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "SAVE_USER",
+            email,
+            password: password || undefined,
+            companyId,
+            role,
+            assignedProjectId,
+            status
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert('✓ ' + data.message);
+          loadAdminUserManagement();
+        } else {
+          alert('خطأ: ' + data.message);
+        }
+      } catch (err) {
+        alert('حدث خطأ أثناء الاتصال بالخادم المركزي');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'حفظ واعتماد الصلاحيات في قاعدة البيانات 💾';
       }
     }
 
