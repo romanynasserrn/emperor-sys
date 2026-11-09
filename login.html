@@ -29,14 +29,12 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* شاشة تسجيل الدخول */
     .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; overflow-y: auto; }
     .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
     .brand-header { text-align: center; margin-bottom: 20px; }
     .brand-title { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
     .brand-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
 
-    /* زر ولافتة تثبيت التطبيق */
     .install-banner {
       display: none;
       align-items: center;
@@ -48,25 +46,8 @@
       padding: 12px 14px;
       margin-bottom: 20px;
     }
-    .install-banner-text {
-      font-size: 12px;
-      font-weight: 700;
-      color: #1e40af;
-      line-height: 1.4;
-    }
-    .btn-install {
-      background: #2563eb;
-      color: #ffffff;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-    .btn-install:hover { background: #1d4ed8; }
+    .install-banner-text { font-size: 12px; font-weight: 700; color: #1e40af; line-height: 1.4; }
+    .btn-install { background: #2563eb; color: #ffffff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 
     .form-group { margin-bottom: 18px; }
     .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
@@ -82,22 +63,8 @@
     .alert { padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: none; }
     .alert-danger { background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
-    /* لوحة التحكم الرئيسية */
     .dashboard-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
-    
-    .sidebar { 
-      width: 280px; 
-      background: var(--primary); 
-      color: #ffffff; 
-      display: flex; 
-      flex-direction: column; 
-      padding: 24px 16px; 
-      flex-shrink: 0; 
-      height: 100vh;
-      z-index: 50;
-      transition: transform 0.3s ease;
-    }
-
+    .sidebar { width: 280px; background: var(--primary); color: #ffffff; display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; height: 100vh; z-index: 50; transition: transform 0.3s ease; }
     .sidebar-header { padding-bottom: 20px; border-bottom: 1px solid #334155; margin-bottom: 24px; position: relative; }
     .company-badge { font-size: 16px; font-weight: 700; color: #ffffff; }
     .user-info { font-size: 12px; color: #94a3b8; margin-top: 4px; word-break: break-all; }
@@ -116,46 +83,14 @@
     .workspace-body { flex-grow: 1; padding: 0; height: calc(100vh - 56px); position: relative; overflow-y: auto; width: 100%; }
     .module-iframe { width: 100%; height: 100%; border: none; display: block; }
 
-    .menu-toggle-btn {
-      display: none;
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 18px;
-      cursor: pointer;
-      color: var(--primary);
-    }
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 40;
-      backdrop-filter: blur(2px);
-    }
+    .menu-toggle-btn { display: none; background: #f1f5f9; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 18px; cursor: pointer; color: var(--primary); }
+    .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); z-index: 40; backdrop-filter: blur(2px); }
 
     @media (max-width: 768px) {
       .menu-toggle-btn { display: inline-flex; align-items: center; justify-content: center; }
-      .sidebar {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 82%;
-        max-width: 320px;
-        transform: translateX(100%);
-        box-shadow: -5px 0 25px rgba(0,0,0,0.3);
-      }
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      .sidebar-overlay.active {
-        display: block;
-      }
+      .sidebar { position: fixed; top: 0; right: 0; bottom: 0; width: 82%; max-width: 320px; transform: translateX(100%); box-shadow: -5px 0 25px rgba(0,0,0,0.3); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.active { display: block; }
       .workspace-header { padding: 10px 14px; }
       .workspace-title { font-size: 15px; }
     }
@@ -171,7 +106,7 @@
 </head>
 <body>
 
-  <!-- 1. شاشة تسجيل الدخول -->
+  <!-- شاشة الدخول -->
   <div id="loginSection" class="login-container">
     <div class="login-card">
       <div class="brand-header">
@@ -179,7 +114,6 @@
         <p class="brand-subtitle">بوابة إدارة العمليات والمخازن المركزية</p>
       </div>
 
-      <!-- لافتة التثبيت التفاعلية لتطبيق الموبايل -->
       <div id="installBanner" class="install-banner">
         <div class="install-banner-text">
           <span>📲 ثبّت تطبيق Emperor Sys</span>
@@ -218,10 +152,9 @@
     </div>
   </div>
 
-  <!-- خلفية مظلمة عند فتح قائمة الموبايل -->
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-  <!-- 2. لوحة التحكم المركزية -->
+  <!-- لوحة التحكم -->
   <div id="dashboardSection" class="dashboard-container">
     <aside id="mainSidebar" class="sidebar">
       <div class="sidebar-header">
@@ -297,7 +230,6 @@
     const installBanner = document.getElementById('installBanner');
     const installAppBtn = document.getElementById('installAppBtn');
 
-    // التقاط إشعار إمكانية التثبيت للموبايل
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
@@ -346,12 +278,13 @@
         }
       }
 
+      // قراءة البريد المحفوظ فقط؛ إذا لم يوجد يظل الحقل فارغاً تماماً
       const savedEmail = localStorage.getItem('emperor_saved_email');
       if (savedEmail) {
         userEmailInput.value = savedEmail;
         userPasswordInput.focus();
       } else {
-        userEmailInput.value = "store.faha@alkarma.com";
+        userEmailInput.value = "";
       }
     });
 
@@ -521,7 +454,8 @@
             <td>${u.assignedProjectId}</td>
             <td><span style="color:${u.status === 'ACTIVE' ? 'green':'red'}; font-weight:bold;">${u.status}</span></td>
             <td>
-              <button onclick="editUser('${u.email}')" style="background:#2563eb; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">تعديل</button>
+              <button onclick="editUser('${u.email}')" style="background:#2563eb; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin-left:4px;">تعديل</button>
+              <button onclick="deleteUser('${u.email}')" style="background:#dc2626; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">حذف</button>
             </td>
           </tr>
         `;
@@ -530,7 +464,11 @@
       workspaceBody.innerHTML = `
         <div class="admin-panel">
           <div class="admin-card">
-            <h3 style="margin-bottom:16px; font-size:16px; font-weight:bold; color:var(--primary);">➕ إضافة / تحديث مستخدم وتعيين الصلاحيات</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h3 id="formTitle" style="font-size:16px; font-weight:bold; color:var(--primary);">➕ إضافة / تحديث مستخدم</h3>
+              <button onclick="resetUserForm()" style="background:#f1f5f9; border:1px solid var(--border); padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">إعادة تعيين الفورم</button>
+            </div>
+            
             <form id="saveUserForm">
               <div class="grid-2">
                 <div class="form-group">
@@ -538,7 +476,7 @@
                   <input type="email" id="targetEmail" class="form-input" placeholder="user@company.com" required>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">كلمة المرور (اتركها فارغة إذا لم ترد تغييرها):</label>
+                  <label class="form-label">كلمة المرور (اتركها فارغة للتعديل دون تغيير):</label>
                   <input type="text" id="targetPass" class="form-input" placeholder="123456">
                 </div>
               </div>
@@ -574,7 +512,7 @@
                 </div>
               </div>
 
-              <button type="submit" id="saveUserBtn" class="btn-submit" style="margin-top:10px;">حفظ واعتماد الصلاحيات في قاعدة البيانات 💾</button>
+              <button type="submit" id="saveUserBtn" class="btn-submit" style="margin-top:10px;">حفظ واعتماد المستخدم 💾</button>
             </form>
           </div>
 
@@ -602,17 +540,57 @@
       document.getElementById('saveUserForm').addEventListener('submit', submitUserSave);
     }
 
+    window.resetUserForm = function() {
+      document.getElementById('formTitle').textContent = "➕ إضافة مستخدم جديد";
+      document.getElementById('targetEmail').value = "";
+      document.getElementById('targetEmail').readOnly = false;
+      document.getElementById('targetPass').value = "";
+      document.getElementById('targetRole').value = "STOREKEEPER";
+      document.getElementById('targetProject').value = "ALL";
+      document.getElementById('targetStatus').value = "ACTIVE";
+    };
+
     window.editUser = function(email) {
       const user = metadataCache.users.find(u => u.email === email);
       if (!user) return;
 
+      document.getElementById('formTitle').textContent = "✏️ تعديل صلاحيات: " + user.email;
       document.getElementById('targetEmail').value = user.email;
       document.getElementById('targetCompany').value = user.companyId;
       document.getElementById('targetRole').value = user.role;
       document.getElementById('targetProject').value = user.assignedProjectId;
       document.getElementById('targetStatus').value = user.status;
+      document.getElementById('targetPass').value = "";
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.deleteUser = async function(email) {
+      if (!confirm(`هل أنت متأكد من رغبتك في حذف المستخدم (${email}) نهائياً من قاعدة البيانات؟`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "DELETE_USER",
+            email: email,
+            adminEmail: currentSession.user.email
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert('✓ ' + data.message);
+          loadAdminUserManagement();
+        } else {
+          alert('خطأ: ' + data.message);
+        }
+      } catch (err) {
+        alert('حدث خطأ أثناء محاولة الحذف.');
+      }
     };
 
     async function submitUserSave(e) {
@@ -654,7 +632,7 @@
         alert('حدث خطأ أثناء الاتصال بالخادم المركزي');
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = 'حفظ واعتماد الصلاحيات في قاعدة البيانات 💾';
+        saveBtn.textContent = 'حفظ واعتماد المستخدم 💾';
       }
     }
 
@@ -667,7 +645,6 @@
     });
   </script>
 
-  <!-- تفعيل PWA Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
