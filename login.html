@@ -31,10 +31,43 @@
 
     /* شاشة تسجيل الدخول */
     .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; overflow-y: auto; }
-    .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 36px 32px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
-    .brand-header { text-align: center; margin-bottom: 24px; }
+    .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+    .brand-header { text-align: center; margin-bottom: 20px; }
     .brand-title { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
     .brand-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+    /* زر ولافتة تثبيت التطبيق */
+    .install-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+    }
+    .install-banner-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e40af;
+      line-height: 1.4;
+    }
+    .btn-install {
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-install:hover { background: #1d4ed8; }
+
     .form-group { margin-bottom: 18px; }
     .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
     .input-wrapper { position: relative; display: flex; align-items: center; }
@@ -52,7 +85,6 @@
     /* لوحة التحكم الرئيسية */
     .dashboard-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
     
-    /* القائمة الجانبية للشاشات الكبيرة */
     .sidebar { 
       width: 280px; 
       background: var(--primary); 
@@ -76,7 +108,6 @@
     .btn-logout { background: transparent; border: 1px solid #475569; color: #cbd5e1; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s; margin-top: auto; }
     .btn-logout:hover { background: #334155; color: #ffffff; }
 
-    /* مساحة العمل */
     .main-content { flex-grow: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; width: 100%; }
     .workspace-header { padding: 12px 16px; background: #ffffff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; min-height: 56px; }
     .header-left { display: flex; align-items: center; gap: 12px; }
@@ -85,7 +116,6 @@
     .workspace-body { flex-grow: 1; padding: 0; height: calc(100vh - 56px); position: relative; overflow-y: auto; width: 100%; }
     .module-iframe { width: 100%; height: 100%; border: none; display: block; }
 
-    /* زر القائمة للموبايل والخلفية المظلمة */
     .menu-toggle-btn {
       display: none;
       background: #f1f5f9;
@@ -108,7 +138,6 @@
       backdrop-filter: blur(2px);
     }
 
-    /* ستايل الموبايل الحاسم (شاشات أقل من 768px) */
     @media (max-width: 768px) {
       .menu-toggle-btn { display: inline-flex; align-items: center; justify-content: center; }
       .sidebar {
@@ -131,7 +160,6 @@
       .workspace-title { font-size: 15px; }
     }
 
-    /* شاشة إدارة المستخدمين */
     .admin-panel { padding: 16px; max-width: 950px; margin: auto; }
     .admin-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 18px; }
     .grid-2 { display: grid; grid-template-columns: 1fr; gap: 14px; }
@@ -149,6 +177,15 @@
       <div class="brand-header">
         <h1 class="brand-title">EMPEROR SYS</h1>
         <p class="brand-subtitle">بوابة إدارة العمليات والمخازن المركزية</p>
+      </div>
+
+      <!-- لافتة التثبيت التفاعلية لتطبيق الموبايل -->
+      <div id="installBanner" class="install-banner">
+        <div class="install-banner-text">
+          <span>📲 ثبّت تطبيق Emperor Sys</span>
+          <div style="font-size: 10px; font-weight: normal; color: #4b5563;">للوصول السريع الميداني من الشاشة الرئيسية</div>
+        </div>
+        <button id="installAppBtn" class="btn-install">تثبيت الآن</button>
       </div>
 
       <div id="alertBox" class="alert alert-danger"></div>
@@ -235,6 +272,7 @@
 
     let currentSession = null;
     let metadataCache = null;
+    let deferredInstallPrompt = null;
 
     const loginForm = document.getElementById('loginForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -256,8 +294,27 @@
     const userPasswordInput = document.getElementById('userPassword');
     const togglePasswordBtn = document.getElementById('togglePasswordBtn');
     const rememberMeCheck = document.getElementById('rememberMe');
+    const installBanner = document.getElementById('installBanner');
+    const installAppBtn = document.getElementById('installAppBtn');
 
-    // التحكم في فتح وإغلاق قائمة الموبايل
+    // التقاط إشعار إمكانية التثبيت للموبايل
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      installBanner.style.display = 'flex';
+    });
+
+    installAppBtn.addEventListener('click', async () => {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          installBanner.style.display = 'none';
+        }
+        deferredInstallPrompt = null;
+      }
+    });
+
     function openSidebar() {
       mainSidebar.classList.add('open');
       sidebarOverlay.classList.add('active');
@@ -615,7 +672,7 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .then((reg) => console.log('PWA جاهز ومسجل بنجاح:', reg.scope))
+          .then((reg) => console.log('PWA جاهز ومسجل:', reg.scope))
           .catch((err) => console.log('PWA فشل تسجيل العامل:', err));
       });
     }
