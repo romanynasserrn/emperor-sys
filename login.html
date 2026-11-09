@@ -27,9 +27,10 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-    .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    /* شاشة تسجيل الدخول */
+    .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; overflow-y: auto; }
     .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 36px 32px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
     .brand-header { text-align: center; margin-bottom: 24px; }
     .brand-title { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
@@ -48,32 +49,95 @@
     .alert { padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: none; }
     .alert-danger { background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
-    /* لوحة التحكم */
-    .dashboard-container { display: none; height: 100vh; overflow: hidden; flex-direction: row; }
-    .sidebar { width: 280px; background: var(--primary); color: #ffffff; display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; }
-    .sidebar-header { padding-bottom: 20px; border-bottom: 1px solid #334155; margin-bottom: 24px; }
+    /* لوحة التحكم الرئيسية */
+    .dashboard-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
+    
+    /* القائمة الجانبية للشاشات الكبيرة */
+    .sidebar { 
+      width: 280px; 
+      background: var(--primary); 
+      color: #ffffff; 
+      display: flex; 
+      flex-direction: column; 
+      padding: 24px 16px; 
+      flex-shrink: 0; 
+      height: 100vh;
+      z-index: 50;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header { padding-bottom: 20px; border-bottom: 1px solid #334155; margin-bottom: 24px; position: relative; }
     .company-badge { font-size: 16px; font-weight: 700; color: #ffffff; }
-    .user-info { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .user-info { font-size: 12px; color: #94a3b8; margin-top: 4px; word-break: break-all; }
     .project-scope-badge { display: inline-block; margin-top: 8px; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
     .modules-nav { list-style: none; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; overflow-y: auto; }
     .module-item { padding: 12px 14px; border-radius: 8px; color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s, color 0.2s; }
     .module-item:hover, .module-item.active { background: #1e293b; color: #ffffff; }
     .btn-logout { background: transparent; border: 1px solid #475569; color: #cbd5e1; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s; margin-top: auto; }
     .btn-logout:hover { background: #334155; color: #ffffff; }
-    .main-content { flex-grow: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
-    .workspace-header { padding: 16px 24px; background: #ffffff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .workspace-title { font-size: 18px; font-weight: 700; color: var(--primary); }
-    .btn-external { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--accent); background: #eff6ff; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 6px; text-decoration: none; }
-    .workspace-body { flex-grow: 1; padding: 0; height: calc(100vh - 65px); position: relative; overflow-y: auto; }
+
+    /* مساحة العمل */
+    .main-content { flex-grow: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; width: 100%; }
+    .workspace-header { padding: 12px 16px; background: #ffffff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; min-height: 56px; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .workspace-title { font-size: 16px; font-weight: 700; color: var(--primary); }
+    .btn-external { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--accent); background: #eff6ff; border: 1px solid #bfdbfe; padding: 6px 10px; border-radius: 6px; text-decoration: none; }
+    .workspace-body { flex-grow: 1; padding: 0; height: calc(100vh - 56px); position: relative; overflow-y: auto; width: 100%; }
     .module-iframe { width: 100%; height: 100%; border: none; display: block; }
 
+    /* زر القائمة للموبايل والخلفية المظلمة */
+    .menu-toggle-btn {
+      display: none;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--primary);
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 40;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ستايل الموبايل الحاسم (شاشات أقل من 768px) */
+    @media (max-width: 768px) {
+      .menu-toggle-btn { display: inline-flex; align-items: center; justify-content: center; }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 82%;
+        max-width: 320px;
+        transform: translateX(100%);
+        box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .sidebar-overlay.active {
+        display: block;
+      }
+      .workspace-header { padding: 10px 14px; }
+      .workspace-title { font-size: 15px; }
+    }
+
     /* شاشة إدارة المستخدمين */
-    .admin-panel { padding: 24px; max-width: 950px; margin: auto; }
-    .admin-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 24px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .admin-panel { padding: 16px; max-width: 950px; margin: auto; }
+    .admin-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 18px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 14px; }
     @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
-    .user-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
-    .user-table th, .user-table td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border); }
+    .user-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 12px; }
+    .user-table th, .user-table td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--border); }
     .user-table th { background: #f8fafc; font-weight: 700; }
   </style>
 </head>
@@ -117,9 +181,12 @@
     </div>
   </div>
 
+  <!-- خلفية مظلمة عند فتح قائمة الموبايل -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
   <!-- 2. لوحة التحكم المركزية -->
   <div id="dashboardSection" class="dashboard-container">
-    <aside class="sidebar">
+    <aside id="mainSidebar" class="sidebar">
       <div class="sidebar-header">
         <div id="displayCompanyName" class="company-badge">-</div>
         <div id="displayUserEmail" class="user-info">-</div>
@@ -135,7 +202,10 @@
 
     <main class="main-content">
       <div class="workspace-header">
-        <h2 id="activeModuleTitle" class="workspace-title">لوحة العمليات</h2>
+        <div class="header-left">
+          <button id="menuToggleBtn" class="menu-toggle-btn" title="القائمة">☰</button>
+          <h2 id="activeModuleTitle" class="workspace-title">لوحة العمليات</h2>
+        </div>
         <a id="externalLinkBtn" href="#" target="_blank" class="btn-external" style="display: none;">فتح بنافذة كاملة ↗</a>
       </div>
       <div id="workspaceBody" class="workspace-body"></div>
@@ -171,6 +241,9 @@
     const alertBox = document.getElementById('alertBox');
     const loginSection = document.getElementById('loginSection');
     const dashboardSection = document.getElementById('dashboardSection');
+    const mainSidebar = document.getElementById('mainSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
     const dynamicNav = document.getElementById('dynamicNav');
     const displayCompanyName = document.getElementById('displayCompanyName');
     const displayUserEmail = document.getElementById('displayUserEmail');
@@ -183,6 +256,19 @@
     const userPasswordInput = document.getElementById('userPassword');
     const togglePasswordBtn = document.getElementById('togglePasswordBtn');
     const rememberMeCheck = document.getElementById('rememberMe');
+
+    // التحكم في فتح وإغلاق قائمة الموبايل
+    function openSidebar() {
+      mainSidebar.classList.add('open');
+      sidebarOverlay.classList.add('active');
+    }
+    function closeSidebar() {
+      mainSidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    }
+
+    menuToggleBtn.addEventListener('click', openSidebar);
+    sidebarOverlay.addEventListener('click', closeSidebar);
 
     togglePasswordBtn.addEventListener('click', () => {
       const isPassword = userPasswordInput.type === 'password';
@@ -208,7 +294,7 @@
         userEmailInput.value = savedEmail;
         userPasswordInput.focus();
       } else {
-        userEmailInput.value = "ceo@emperor-sys.com";
+        userEmailInput.value = "store.faha@alkarma.com";
       }
     });
 
@@ -268,7 +354,6 @@
 
       dynamicNav.innerHTML = '';
 
-      // شاشة إدارة المستخدمين والصلاحيات لحساب SUPER_ADMIN
       if (sessionData.user.role === 'SUPER_ADMIN') {
         const adminLi = document.createElement('li');
         adminLi.className = 'module-item active';
@@ -276,6 +361,7 @@
         adminLi.addEventListener('click', () => {
           document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
           adminLi.classList.add('active');
+          closeSidebar();
           loadAdminUserManagement();
         });
         dynamicNav.appendChild(adminLi);
@@ -291,6 +377,7 @@
         li.addEventListener('click', () => {
           document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
           li.classList.add('active');
+          closeSidebar();
           loadModuleView(moduleKey, moduleInfo);
         });
 
@@ -323,7 +410,7 @@
       } else {
         externalLinkBtn.style.display = 'none';
         workspaceBody.innerHTML = `
-          <div style="padding:40px; background:white; margin:24px; border-radius:12px; border:1px solid var(--border);">
+          <div style="padding:40px; background:white; margin:16px; border-radius:12px; border:1px solid var(--border);">
             <h3>${moduleInfo.name}</h3>
             <p style="color:var(--text-muted); margin-top:8px;">${moduleInfo.desc || 'خدمة مفعلة بالمنظومة'}</p>
           </div>
@@ -331,11 +418,8 @@
       }
     }
 
-    // ==========================================
-    // شاشة تحكم المدير: إضافة وتعديل المستخدمين
-    // ==========================================
     async function loadAdminUserManagement() {
-      activeModuleTitle.textContent = "إدارة المستخدمين والصلاحيات المركزية";
+      activeModuleTitle.textContent = "إدارة المستخدمين والصلاحيات";
       externalLinkBtn.style.display = 'none';
       workspaceBody.innerHTML = `<div style="text-align:center; padding:50px;">⏳ جاري تحميل بيانات الهيكل التنظيمي...</div>`;
 
@@ -526,12 +610,12 @@
     });
   </script>
 
-  <!-- تفعيل محرك التطبيق PWA Service Worker -->
+  <!-- تفعيل PWA Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .then((reg) => console.log('PWA Service Worker جاهز ومسجل بنجاح:', reg.scope))
+          .then((reg) => console.log('PWA جاهز ومسجل بنجاح:', reg.scope))
           .catch((err) => console.log('PWA فشل تسجيل العامل:', err));
       });
     }
