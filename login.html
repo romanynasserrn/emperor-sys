@@ -65,7 +65,6 @@
 
     .dashboard-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
     
-    /* الشريط الجانبي */
     .sidebar { 
       width: 280px; 
       background: var(--primary); 
@@ -79,7 +78,6 @@
       transition: width 0.3s ease, padding 0.3s ease, transform 0.3s ease; 
     }
 
-    /* حالة الإخفاء / الطي للكمبيوتر */
     .sidebar.collapsed {
       width: 0 !important;
       padding-left: 0 !important;
@@ -106,7 +104,6 @@
     .workspace-body { flex-grow: 1; padding: 0; height: calc(100vh - 56px); position: relative; overflow-y: auto; width: 100%; }
     .module-iframe { width: 100%; height: 100%; border: none; display: block; }
 
-    /* زر القائمة متاح دائماً للكمبيوتر والموبايل */
     .menu-toggle-btn { 
       display: inline-flex !important; 
       align-items: center; 
@@ -132,7 +129,6 @@
       backdrop-filter: blur(2px); 
     }
 
-    /* تهيئة أبعاد الموبايل */
     @media (max-width: 768px) {
       .sidebar { 
         position: fixed; 
@@ -316,7 +312,6 @@
       }
     });
 
-    // دالة التبديل للكمبيوتر والموبايل
     function toggleSidebar() {
       const isMobile = window.innerWidth <= 768;
       if (isMobile) {
@@ -481,7 +476,6 @@
       }
     }
 
-    // دالة عرض صفحة التقرير التفاعلية (الجدول الزمني)
     function loadReportView(report) {
       activeModuleTitle.textContent = report.name;
       externalLinkBtn.href = report.fileUrl;
@@ -557,12 +551,14 @@
 
       let usersRows = '';
       meta.users.forEach(u => {
+        const modulesDisplay = Array.isArray(u.allowedModules) ? u.allowedModules.join(', ') : (u.allowedModules || 'INWARD');
         usersRows += `
           <tr>
             <td style="font-weight:bold;">${u.email}</td>
             <td>${u.companyId}</td>
             <td>${u.role}</td>
             <td>${u.assignedProjectId}</td>
+            <td style="color:#2563eb; font-weight:600;">${modulesDisplay}</td>
             <td><span style="color:${u.status === 'ACTIVE' ? 'green':'red'}; font-weight:bold;">${u.status}</span></td>
             <td>
               <button onclick="editUser('${u.email}')" style="background:#2563eb; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin-left:4px;">تعديل</button>
@@ -623,6 +619,26 @@
                 </div>
               </div>
 
+              <!-- خيارات الموديولات والأدوات المتاحة للمستخدم -->
+              <div class="form-group" style="margin-top: 10px;">
+                <label class="form-label">الأدوات والموديولات المتاحة للمستخدم:</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 14px; background: #f8fafc; padding: 14px; border: 1px solid var(--border); border-radius: 8px;">
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    <input type="checkbox" name="userModule" value="INWARD" checked>
+                    📦 إدارة الوارد اليومي
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    <input type="checkbox" name="userModule" value="ALUMINUM">
+                    🏗️ تتبع مصانع الألومنيوم
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    <input type="checkbox" name="userModule" value="OUTWARD">
+                    📑 الصرف ومقايسات البلوكات
+                  </label>
+                </div>
+                <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:4px;">حدد البرامج التي ستظهر في القائمة الجانبية للمستخدم بعد تسجيل دخوله.</small>
+              </div>
+
               <button type="submit" id="saveUserBtn" class="btn-submit" style="margin-top:10px;">حفظ واعتماد المستخدم 💾</button>
             </form>
           </div>
@@ -637,6 +653,7 @@
                     <th>كود الشركة</th>
                     <th>الدور</th>
                     <th>المشروع المتاح</th>
+                    <th>الأدوات المتاحة</th>
                     <th>الحالة</th>
                     <th>إجراء</th>
                   </tr>
@@ -659,6 +676,11 @@
       document.getElementById('targetRole').value = "STOREKEEPER";
       document.getElementById('targetProject').value = "ALL";
       document.getElementById('targetStatus').value = "ACTIVE";
+      
+      // إعادة ضبط مربعات الاختيار للوضع الافتراضي
+      document.querySelectorAll('input[name="userModule"]').forEach(cb => {
+        cb.checked = (cb.value === 'INWARD');
+      });
     };
 
     window.editUser = function(email) {
@@ -667,11 +689,21 @@
 
       document.getElementById('formTitle').textContent = "✏️ تعديل صلاحيات: " + user.email;
       document.getElementById('targetEmail').value = user.email;
+      document.getElementById('targetEmail').readOnly = true;
       document.getElementById('targetCompany').value = user.companyId;
       document.getElementById('targetRole').value = user.role;
       document.getElementById('targetProject').value = user.assignedProjectId;
       document.getElementById('targetStatus').value = user.status;
       document.getElementById('targetPass').value = "";
+
+      // تحديد الموديولات المسجلة للمستخدم
+      const userMods = Array.isArray(user.allowedModules) 
+        ? user.allowedModules 
+        : (user.allowedModules ? String(user.allowedModules).split(',') : ['INWARD']);
+
+      document.querySelectorAll('input[name="userModule"]').forEach(cb => {
+        cb.checked = userMods.includes('ALL') || userMods.includes(cb.value);
+      });
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -707,8 +739,6 @@
     async function submitUserSave(e) {
       e.preventDefault();
       const saveBtn = document.getElementById('saveUserBtn');
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'جاري الحفظ في النواة المركزية...';
 
       const email = document.getElementById('targetEmail').value.trim();
       const password = document.getElementById('targetPass').value.trim();
@@ -716,6 +746,18 @@
       const role = document.getElementById('targetRole').value;
       const assignedProjectId = document.getElementById('targetProject').value;
       const status = document.getElementById('targetStatus').value;
+
+      // جمع الموديولات المختارة
+      const selectedModules = Array.from(document.querySelectorAll('input[name="userModule"]:checked'))
+        .map(cb => cb.value);
+
+      if (role !== 'PROJECT_MANAGER' && selectedModules.length === 0) {
+        alert('يرجى اختيار أداة أو موديول واحد على الأقل للمستخدم.');
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'جاري الحفظ في النواة المركزية...';
 
       try {
         const res = await fetch(SCRIPT_URL, {
@@ -728,7 +770,8 @@
             companyId,
             role,
             assignedProjectId,
-            status
+            status,
+            allowedModules: selectedModules
           })
         });
 
@@ -767,3 +810,4 @@
   </script>
 </body>
 </html>
+```[cite: 1]
