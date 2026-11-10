@@ -236,7 +236,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
 
-    // تعريف شامل لكافة موديولات وأدوات المنظومة
+    // المنظومة الشاملة للموديولات والأدوات وروابطها التشغيلية
     const SYSTEM_MODULES = {
       "TIMELINE_CONTROL": {
         name: "الجدول الزمني",
@@ -248,20 +248,30 @@
       "INWARD": {
         name: "إدارة الوارد اليومي",
         icon: "📦",
+        isReport: false,
         url: "https://script.google.com/macros/s/AKfycbyeE79yBlkUxAXkXJISMeKNx-AMuGqSYjnxd10jbAjXR4n_yvvGRwpClMisBftm6Kq5/exec",
         desc: "تسجيل ومطابقة أذون استلام التوريدات الميدانية والفحص الإداري."
-      },
-      "ALUMINUM": {
-        name: "تتبع مصانع الألومنيوم",
-        icon: "🏗️",
-        url: "",
-        desc: "تتبع مراحل تشغيل وتركيب قطاعات الألومنيوم لقطاع المشاريع."
       },
       "OUTWARD": {
         name: "الصرف ومقايسات البلوكات",
         icon: "📑",
-        url: "",
+        isReport: false,
+        url: "https://script.google.com/macros/s/AKfycbwq37DBYb32Y64H8hSShCL-SMQDkXfWNXgCOl0SvEqgHVlBO8tYTWsrzF7pELckO3FyZQ/exec",
         desc: "حوكمة صرف المواد وفق حدود حارس المقايسة المعتمد لكل بلوك."
+      },
+      "ALUMINUM_MGR": {
+        name: "لوحة متابعة مصانع الألومنيوم (إدارة)",
+        icon: "🏗️",
+        isReport: false,
+        url: "https://script.google.com/macros/s/AKfycbw4wywZAyItVaYWsO76n-KZmjg3lIFGHWoBUO_eHPXA_RgXuoBDfUCrtoXyT8LgOqTeLA/exec?view=manager",
+        desc: "لوحة المتابعة الإدارية ونسب الإنجاز وتدفق قطاعات الألومنيوم."
+      },
+      "ALUMINUM_EXEC": {
+        name: "تسجيل مراحل الألومنيوم (تشغيل)",
+        icon: "⚙️",
+        isReport: false,
+        url: "https://script.google.com/macros/s/AKfycbw4wywZAyItVaYWsO76n-KZmjg3lIFGHWoBUO_eHPXA_RgXuoBDfUCrtoXyT8LgOqTeLA/exec",
+        desc: "تسجيل مراحل التشغيل والتقطيع والتجميع والتسليم الميداني."
       }
     };
 
@@ -430,12 +440,24 @@
         dynamicNav.appendChild(adminLi);
       }
 
-      // 2. عرض الأدوات المحددة لهذا المستخدم حصراً من الشيك بوكس
-      let allowed = sessionData.allowedModules || [];
+      // 2. معالجة وتوافق مصفوفة الموديولات المسموحة
+      let rawAllowed = sessionData.allowedModules || [];
+      let allowed = [];
 
-      // إذا كان مدير مشروع ولم يحدد له شيء، يعطى الجدول الزمني كافتراضي
+      rawAllowed.forEach(m => {
+        let key = String(m).trim().toUpperCase();
+        if (key === 'ALUMINUM') {
+          // التوافق مع التسمية القديمة: تفعيل الرابطين تلقائياً
+          allowed.push('ALUMINUM_MGR');
+          allowed.push('ALUMINUM_EXEC');
+        } else {
+          allowed.push(key);
+        }
+      });
+
+      // إذا كان مدير مشروع ولم يسجل له موديول محدد، يعطى الجدول الزمني ولوحة مدير الألومنيوم
       if (allowed.length === 0 && userRole === 'PROJECT_MANAGER') {
-        allowed = ['TIMELINE_CONTROL'];
+        allowed = ['TIMELINE_CONTROL', 'ALUMINUM_MGR'];
       }
 
       allowed.forEach((moduleKey, idx) => {
@@ -461,7 +483,7 @@
         dynamicNav.appendChild(li);
       });
 
-      // توجيه الشاشة الافتراضية عند الفتح
+      // توجيه الشاشة الافتراضية
       if (userRole === 'SUPER_ADMIN') {
         loadAdminUserManagement();
       } else if (allowed.length > 0) {
@@ -494,7 +516,9 @@
         const assignedProj = currentSession.user.assignedProjectId || 'ALL';
         const projectsParam = encodeURIComponent(JSON.stringify(currentSession.projects || []));
 
-        const parameterizedUrl = `${moduleInfo.url}?cid=${encodeURIComponent(compId)}&cname=${encodeURIComponent(compName)}&uemail=${encodeURIComponent(userEmail)}&role=${encodeURIComponent(userRole)}&assigned_pid=${encodeURIComponent(assignedProj)}&projects=${projectsParam}`;
+        // التحقق مما إذا كان الرابط يحتوي بالفعل على بارامترات مسبقة
+        const separator = moduleInfo.url.includes('?') ? '&' : '?';
+        const parameterizedUrl = `${moduleInfo.url}${separator}cid=${encodeURIComponent(compId)}&cname=${encodeURIComponent(compName)}&uemail=${encodeURIComponent(userEmail)}&role=${encodeURIComponent(userRole)}&assigned_pid=${encodeURIComponent(assignedProj)}&projects=${projectsParam}`;
 
         externalLinkBtn.href = parameterizedUrl;
         externalLinkBtn.style.display = 'inline-flex';
@@ -628,16 +652,20 @@
                     <input type="checkbox" name="userModule" value="INWARD" checked>
                     📦 إدارة الوارد اليومي
                   </label>
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                    <input type="checkbox" name="userModule" value="ALUMINUM">
-                    🏗️ تتبع مصانع الألومنيوم
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #0284c7;">
                     <input type="checkbox" name="userModule" value="OUTWARD">
                     📑 الصرف ومقايسات البلوكات
                   </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #b45309;">
+                    <input type="checkbox" name="userModule" value="ALUMINUM_MGR">
+                    🏗️ متابعة مصانع الألومنيوم (إدارة)
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #475569;">
+                    <input type="checkbox" name="userModule" value="ALUMINUM_EXEC">
+                    ⚙️ تسجيل مراحل الألومنيوم (تشغيل)
+                  </label>
                 </div>
-                <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:4px;">حدد البرامج المتاحة لهذا الحساب حصراً ليتم تفعيلها في شاشته.</small>
+                <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:4px;">حدد البرامج المتاحة لهذا الحساب حصراً لتظهر في قائمته الجانبية.</small>
               </div>
 
               <button type="submit" id="saveUserBtn" class="btn-submit" style="margin-top:10px;">حفظ واعتماد المستخدم 💾</button>
@@ -698,12 +726,20 @@
       document.getElementById('targetStatus').value = user.status;
       document.getElementById('targetPass').value = "";
 
-      const userMods = Array.isArray(user.allowedModules) 
+      let userMods = Array.isArray(user.allowedModules) 
         ? user.allowedModules 
         : (user.allowedModules ? String(user.allowedModules).split(',') : ['INWARD']);
 
+      userMods = userMods.map(m => m.trim().toUpperCase());
+
+      // مطابقة التسميات القديمة للألومنيوم
+      if (userMods.includes('ALUMINUM')) {
+        userMods.push('ALUMINUM_MGR');
+        userMods.push('ALUMINUM_EXEC');
+      }
+
       document.querySelectorAll('input[name="userModule"]').forEach(cb => {
-        cb.checked = userMods.map(m => m.trim().toUpperCase()).includes(cb.value.toUpperCase());
+        cb.checked = userMods.includes(cb.value.toUpperCase());
       });
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
