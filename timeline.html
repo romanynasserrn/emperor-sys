@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة التحكم في المسار الزمني والتسليمات الهندسية</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f1f5f9;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .pulse-badge {
+            animation: pulse-ring 2s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .tab-transition {
+            animation: fadeIn 0.25s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-4 left-4 z-50 flex flex-col gap-3 max-w-md w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- Modal for Blocking / Details -->
+    <div id="systemModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 transform transition-all">
+            <div id="modalHeader" class="px-6 py-4 bg-red-600 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i id="modalIcon" class="fa-solid fa-shield-halved text-xl"></i>
+                    <h3 id="modalTitle" class="font-bold text-lg">منع العمل العشوائي - البند مقفل هندسياً</h3>
+                </div>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white text-xl leading-none">&times;</button>
+            </div>
+            <div id="modalBody" class="p-6 text-slate-700 space-y-4 text-sm leading-relaxed">
+                <!-- Dynamic Modal Content -->
+            </div>
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold text-sm transition">فهمت الإجراء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout Wrapper -->
+    <div class="min-h-screen flex flex-col lg:flex-row">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside class="w-full lg:w-72 bg-navy-900 text-white flex-shrink-0 flex flex-col justify-between shadow-xl z-20">
+            <div>
+                <!-- Brand Header -->
+                <div class="p-5 border-b border-slate-800 flex items-center justify-between lg:justify-start gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <i class="fa-solid fa-diagram-project text-xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base leading-tight text-white">مسار المشروعات</h1>
+                        <p class="text-xs text-blue-400 font-medium">منظومة التحكم الزمني والهندسي</p>
+                    </div>
+                    <!-- Mobile Quick Guide Button -->
+                    <button onclick="triggerQuickTour()" class="lg:hidden px-3 py-1.5 bg-blue-600/20 border border-blue-500/40 text-blue-300 rounded-lg text-xs font-semibold">
+                        <i class="fa-solid fa-bolt ml-1"></i> سيناريو تفاعلي
+                    </button>
+                </div>
+
+                <!-- Project Selector Badge -->
+                <div class="px-4 py-3 mx-3 mt-4 bg-slate-800/90 rounded-xl border border-slate-700/80">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                        <span>المشروع النشط حالياً</span>
+                        <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full text-[10px] font-bold">المرحلة الأولى</span>
+                    </div>
+                    <div class="font-bold text-sm text-white flex items-center gap-2">
+                        <i class="fa-regular fa-building text-blue-400"></i>
+                        <span>مشروع الكرمة كاى - عمارة 4</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-3 space-y-1.5 mt-2">
+                    <button onclick="switchTab('tab-drawings')" id="btn-tab-drawings" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-blue-600 text-white shadow-lg shadow-blue-600/30">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-compass-drafting w-5 text-center"></i>
+                            <span>1. سجل اللوحات (IFC)</span>
+                        </div>
+                        <span id="nav-badge-drawings" class="px-2 py-0.5 text-xs rounded-full bg-white/20 text-white">5</span>
+                    </button>
+
+                    <button onclick="switchTab('tab-schedule')" id="btn-tab-schedule" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-lock-open w-5 text-center"></i>
+                            <span>2. بوابة الجاهزية والجدول</span>
+                        </div>
+                        <span id="nav-badge-schedule" class="px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300">6</span>
+                    </button>
+
+                    <button onclick="switchTab('tab-execution')" id="btn-tab-execution" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-helmet-safety w-5 text-center"></i>
+                            <span>3. شاشة مهندس الموقع</span>
+                        </div>
+                        <span class="px-2 py-0.5 text-[10px] rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">ميداني</span>
+                    </button>
+
+                    <button onclick="switchTab('tab-qc')" id="btn-tab-qc" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-clipboard-check w-5 text-center"></i>
+                            <span>4. الاستلامات والعوائق</span>
+                        </div>
+                        <span id="nav-badge-qc" class="px-2 py-0.5 text-xs rounded-full bg-red-500 text-white font-bold">3</span>
+                    </button>
+
+                    <button onclick="switchTab('tab-matrix')" id="btn-tab-matrix" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-table-cells w-5 text-center"></i>
+                            <span>5. مصفوفة العمارات</span>
+                        </div>
+                        <span class="px-2 py-0.5 text-[10px] rounded-full bg-emerald-500/20 text-emerald-300">بصري</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Interactive Scenario Helper Box -->
+            <div class="hidden lg:block p-4 m-3 bg-gradient-to-b from-blue-950 to-slate-900 rounded-2xl border border-blue-800/50">
+                <div class="flex items-center gap-2 text-blue-400 font-bold text-xs mb-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>تجربة الترابط الهندسي الحي</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                    قم باعتماد لوحة <strong class="text-white">DWG-EL-202</strong> في شاشة 1، أو اعتماد استلام <strong class="text-white">مباني الأول</strong> في شاشة 4، وشاهد كيف ينفتح القفل تلقائياً في شاشة 2 وتتحدث المصفوفة في شاشة 5!
+                </p>
+                <button onclick="resetDemoState()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> إعادة ضبط بيانات التجربة
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+            <!-- Top Executive KPI Header -->
+            <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-4 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-md text-xs font-bold">لوحة تحكم مدير التخطيط</span>
+                            <span class="text-xs text-slate-400">| بدون مخازن أو مشتريات - تركيز هندسي وميداني 100%</span>
+                        </div>
+                        <h2 id="currentScreenTitle" class="text-xl font-extrabold text-slate-800 mt-1">
+                            1. سجل اللوحات والاعتمادات الهندسية (المكتب الفني)
+                        </h2>
+                    </div>
+
+                    <!-- Workflow Stepper Pill -->
+                    <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs font-bold overflow-x-auto">
+                        <span onclick="switchTab('tab-drawings')" class="cursor-pointer px-2.5 py-1 rounded-lg bg-white text-blue-700 shadow-sm whitespace-nowrap">1. اللوحة (IFC)</span>
+                        <i class="fa-solid fa-chevron-left text-[10px] text-slate-400"></i>
+                        <span onclick="switchTab('tab-schedule')" class="cursor-pointer px-2.5 py-1 rounded-lg hover:bg-white text-slate-600 transition whitespace-nowrap">2. فك القفل والجاهزية</span>
+                        <i class="fa-solid fa-chevron-left text-[10px] text-slate-400"></i>
+                        <span onclick="switchTab('tab-execution')" class="cursor-pointer px-2.5 py-1 rounded-lg hover:bg-white text-slate-600 transition whitespace-nowrap">3. الإنتاجية اليومية</span>
+                        <i class="fa-solid fa-chevron-left text-[10px] text-slate-400"></i>
+                        <span onclick="switchTab('tab-qc')" class="cursor-pointer px-2.5 py-1 rounded-lg hover:bg-white text-slate-600 transition whitespace-nowrap">4. استلام الجودة</span>
+                    </div>
+                </div>
+
+                <!-- 4 Dynamic KPIs -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+                    <!-- KPI 1: Actual vs Planned -->
+                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500">الإنجاز الفعلي مقابل المخطط (موزون)</p>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span id="kpiActualProgress" class="text-2xl font-extrabold text-blue-700">64.2%</span>
+                                <span class="text-xs text-slate-500">مقابل مخطط <strong class="text-slate-700">68.0%</strong></span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="kpiProgressBar" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 64.2%"></div>
+                            </div>
+                        </div>
+                        <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg flex-shrink-0">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: IFC Readiness -->
+                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500">جاهزية اللوحات التنفيذية (IFC)</p>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span id="kpiIfcReadiness" class="text-2xl font-extrabold text-emerald-600">60%</span>
+                                <span id="kpiIfcSubtext" class="text-xs text-slate-500">(3 من 5 لوحات جاهزة)</span>
+                            </div>
+                            <p class="text-[11px] text-amber-600 font-semibold mt-1.5 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>أي لوحة غير IFC تغلق بندها بالموقع</span>
+                            </p>
+                        </div>
+                        <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg flex-shrink-0">
+                            <i class="fa-solid fa-file-shield"></i>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Open Site Activities -->
+                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500">البنود المفتوحة والنشطة بالموقع</p>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span id="kpiActiveItems" class="text-2xl font-extrabold text-indigo-600">2</span>
+                                <span class="text-xs text-slate-500">من أصل 6 بنود بالمرحلة</span>
+                            </div>
+                            <p id="kpiLockedSubtext" class="text-[11px] text-slate-500 mt-1.5">
+                                <span class="text-red-600 font-bold">3 بنود مغلقة</span> بانتظار لوحة أو استلام
+                            </p>
+                        </div>
+                        <div class="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg flex-shrink-0">
+                            <i class="fa-solid fa-person-digging"></i>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Pending WIRs & Obstacles -->
+                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500">العوائق وطلبات الاستلام المعلقة</p>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span id="kpiPendingQc" class="text-2xl font-extrabold text-red-600">3</span>
+                                <span class="text-xs text-slate-500">(1 استلام WIR + 2 عائق نشط)</span>
+                            </div>
+                            <p class="text-[11px] text-red-600 font-semibold mt-1.5 flex items-center gap-1">
+                                <i class="fa-regular fa-clock"></i>
+                                <span>إجمالي ساعات التوقف: 38 ساعة</span>
+                            </p>
+                        </div>
+                        <div class="w-11 h-11 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-lg flex-shrink-0 pulse-badge">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Screens Wrapper -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+
+                <!-- ==========================================
+                     SCREEN 1: DRAWINGS & IFC LOG (المكتب الفني)
+                     ========================================== -->
+                <section id="tab-drawings" class="tab-content tab-transition space-y-5">
+                    <!-- Screen Concept Banner -->
+                    <div class="bg-gradient-to-l from-blue-900 via-indigo-900 to-slate-900 text-white p-5 rounded-2xl shadow-md flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2 text-blue-300 text-xs font-bold">
+                                <i class="fa-solid fa-lock"></i>
+                                <span>قفل الأمان الهندسي رقم (1): بوابة المكتب الفني</span>
+                            </div>
+                            <h3 class="text-lg font-bold">لا يُسمح بفتح أي بند للتنفيذ في الموقع إلا بعد تحول حالة اللوحة إلى (IFC - صالح للتنفيذ)</h3>
+                            <p class="text-xs text-slate-300 max-w-3xl">
+                                جرب الآن الضغط على زر <strong class="text-emerald-300">"اعتماد وإصدار IFC للموقع"</strong> للوحة الكهرباء أو المحارة بالأسفل، أو قم بـ <strong class="text-amber-300">"إصدار تعديل جديد Rev+"</strong> لترى كيف يتم إشعار مهندس الموقع فوراً لمنع العمل على لوحة قديمة.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 flex-shrink-0">
+                            <span class="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold">IFC: صالح للتنفيذ</span>
+                            <span class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-bold">Code B: معتمد بملاحظات</span>
+                            <span class="px-3 py-1.5 rounded-xl bg-red-500/20 border border-red-400/30 text-red-300 text-xs font-bold">Code C: مرفوض ويعاد</span>
+                        </div>
+                    </div>
+
+                    <!-- Drawings Table Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-base">سجل اللوحات التنفيذية المربوطة بالجدول الزمني (عمارة 4)</h4>
+                                <p class="text-xs text-slate-500">كل لوحة مرتبطة مباشرة ببند في الجدول الزمني ومكان محدد في المصفوفة</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-500 font-semibold">تصفية التخصص:</span>
+                                <select id="drawingDisciplineFilter" onchange="renderDrawingsTable()" class="bg-white border border-slate-300 text-slate-700 text-xs rounded-xl px-3 py-2 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="ALL">جميع التخصصات الهندسية</option>
+                                    <option value="إنشائي">إنشائي</option>
+                                    <option value="معماري">معماري</option>
+                                    <option value="كهرباء">كهرباء</option>
+                                    <option value="ميكانيكا/سباكة">ميكانيكا / سباكة</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-sm">
+                                <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="py-3.5 px-4">كود اللوحة</th>
+                                        <th class="py-3.5 px-4">التخصص</th>
+                                        <th class="py-3.5 px-4">البند والمنطقة المرتبطة</th>
+                                        <th class="py-3.5 px-4">رقم الإصدار</th>
+                                        <th class="py-3.5 px-4">التسليم (مخطط / فعلي)</th>
+                                        <th class="py-3.5 px-4">حالة الاعتماد</th>
+                                        <th class="py-3.5 px-4 text-center">إجراء المكتب الفني / الاستشاري</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="drawingsTableBody" class="divide-y divide-slate-200">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ====================================================
+                     SCREEN 2: SCHEDULE & GATING ENGINE (بوابة الجاهزية)
+                     ==================================================== -->
+                <section id="tab-schedule" class="tab-content tab-transition hidden space-y-5">
+                    <!-- Explanation Header -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <span class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 text-xs font-bold">نظام القفل والفتح الهندسي الذكي</span>
+                            <h3 class="text-lg font-bold text-slate-800">فحص الجاهزية وتفتيت المهام قبل السماح بنزول الفرق الفنية للموقع</h3>
+                            <p class="text-xs text-slate-500">
+                                يتحقق النظام آلياً من <strong class="text-slate-700">قفل رقم 1 (اعتماد اللوحة IFC)</strong> و <strong class="text-slate-700">قفل رقم 2 (استلام البند السابق فنياً)</strong>. جرب الضغط على <span class="text-slate-800 font-bold">"تفعيل البند للموقع"</span> على البنود المغلقة أو الجاهزة لاختبار استجابة النظام.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 flex-shrink-0">
+                            <div class="text-xs space-y-1">
+                                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> <span class="font-semibold">قفل أخضر:</span> شرط محقق</div>
+                                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> <span class="font-semibold">قفل أحمر:</span> شرط معطل (يمنع البدء)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule Cards Grid -->
+                    <div id="scheduleCardsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                        <!-- Populated via JS -->
+                    </div>
+                </section>
+
+                <!-- ====================================================
+                     SCREEN 3: DAILY SITE EXECUTION (شاشة مهندس الموقع)
+                     ==================================================== -->
+                <section id="tab-execution" class="tab-content tab-transition hidden space-y-5">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                        <!-- Left/Right Column: Mobile-First Engineer Input Form (7 Cols) -->
+                        <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-lg">
+                                        <i class="fa-solid fa-mobile-screen-button"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-base">شاشة النبض اليومي لمهندس الموقع</h3>
+                                        <p class="text-xs text-slate-300">تحديث الإنتاجية الفعلية ومقارنتها بالمعدل المعياري لحظياً</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold">
+                                    متصل بالمسار الحرج
+                                </span>
+                            </div>
+
+                            <div class="p-6 space-y-5">
+                                <!-- Select Active Unlocked Activity -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-2">
+                                        1. اختر البند المفتوح حالياً بالموقع (يظهر فقط ما اجتاز أقفال الأمان):
+                                    </label>
+                                    <select id="siteActivitySelect" onchange="updateExecutionCalculator()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                                        <!-- Populated dynamically with ACTIVE items -->
+                                    </select>
+                                </div>
+
+                                <!-- Reference Benchmarks Strip -->
+                                <div id="selectedItemBenchmark" class="grid grid-cols-3 gap-3 bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 text-center">
+                                    <div>
+                                        <span class="text-[11px] text-slate-500 block">إجمالي كمية البند</span>
+                                        <strong id="execTotalQty" class="text-sm font-extrabold text-slate-800">120 م3</strong>
+                                    </div>
+                                    <div class="border-x border-blue-200">
+                                        <span class="text-[11px] text-slate-500 block">المعدل اليومي المطلوب</span>
+                                        <strong id="execReqRate" class="text-sm font-extrabold text-blue-700">20 م3 / يوم</strong>
+                                    </div>
+                                    <div>
+                                        <span class="text-[11px] text-slate-500 block">العمالة القياسية المطلوبة</span>
+                                        <strong id="execReqLabor" class="text-sm font-extrabold text-slate-800">16 عامل</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Input Sliders / Numbers -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <label class="text-xs font-bold text-slate-700">الكمية المنفذة اليوم فعلياً:</label>
+                                            <span id="unitLabelDisplay" class="text-xs font-bold text-blue-600">م3</span>
+                                        </div>
+                                        <input type="number" id="inputTodayQty" value="12" min="0" max="500" oninput="updateExecutionCalculator()" class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-lg font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                                        <div class="flex gap-2 mt-2">
+                                            <button type="button" onclick="setQuickRate('low')" class="flex-1 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-[11px] font-bold transition">إنتاجية ضعيفة (60%)</button>
+                                            <button type="button" onclick="setQuickRate('target')" class="flex-1 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg text-[11px] font-bold transition">مطابق للجدول (100%)</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <label class="text-xs font-bold text-slate-700">عدد العمالة الفعلية بالموقع اليوم:</label>
+                                            <span class="text-xs font-bold text-slate-500">صنايعي + مساعد</span>
+                                        </div>
+                                        <input type="number" id="inputTodayLabor" value="10" min="1" max="100" oninput="updateExecutionCalculator()" class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-lg font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                                        <p class="text-[11px] text-slate-500 mt-2">
+                                            المقاول المنفذ: <strong id="execContractorName" class="text-slate-700">شركة البناء الحديث</strong>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Live Smart Predictor Alert Box -->
+                                <div id="ratePredictorBox" class="p-4 rounded-2xl border-2 transition-all">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+
+                                <!-- Submit Daily Report & Quick Obstacle Actions -->
+                                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                                    <button onclick="saveDailyProgress()" class="flex-1 py-3 px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2 text-sm">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                        <span>اعتماد التقدم اليومي وتحديث المسار الزمني</span>
+                                    </button>
+                                    <button onclick="switchTab('tab-qc')" class="py-3 px-4 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold rounded-xl transition flex items-center justify-center gap-2 text-xs">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        <span>تسجيل عائق هندسي / طلب استلام</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Left Column: Recent Daily Logs & Productivity Analysis (5 Cols) -->
+                        <div class="lg:col-span-5 space-y-4">
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                                <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                                    <i class="fa-solid fa-gauge-high text-blue-600"></i>
+                                    <span>سجل الإدخالات الميدانية الأخيرة</span>
+                                </h4>
+                                <div id="dailyLogsFeed" class="space-y-3">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-md">
+                                <h4 class="font-bold text-sm text-amber-400 mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                    <span>كيف يحمي هذا المحرك الجدول الزمني؟</span>
+                                </h4>
+                                <ul class="text-xs text-slate-300 space-y-2 leading-relaxed list-disc pr-4">
+                                    <li>بدلاً من انتظار نهاية الأسبوع لاكتشاف التأخير، يقسم النظام كمية البند على أيامه لاستخراج <strong>المعدل اليومي الحرج</strong>.</li>
+                                    <li>عند تسجيل إنتاجية أقل في أول يوم، يحسب النظام تلقائياً <strong>عدد أيام التأخير المتوقعة</strong> وعدد الصنايعية الإضافيين المطلوبين فوراً للتعويض.</li>
+                                    <li>يرتبط التقدم المسجل هنا بالوزن النسبي للبند ليعدل نسبة إنجاز المشروع الكلية في الشريط العلوي.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ====================================================
+                     SCREEN 4: QC HANDOVER & OBSTACLES (الاستلامات والعوائق)
+                     ==================================================== -->
+                <section id="tab-qc" class="tab-content tab-transition hidden space-y-6">
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                        <!-- Right 7 Cols: WIR Handover Requests + Obstacles List -->
+                        <div class="lg:col-span-7 space-y-6">
+
+                            <!-- Box 1: WIR Handover Requests (قفل رقم 2) -->
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                                    <div>
+                                        <span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">المتحكم في قفل الأمان رقم (2)</span>
+                                        <h3 class="font-bold text-slate-800 text-base mt-1">طلبات استلام الأعمال الهندسية (WIR)</h3>
+                                    </div>
+                                    <span class="text-xs text-slate-500">اعتماد الاستلام يفتح البند التالي تلقائياً</span>
+                                </div>
+                                <div id="wirListContainer" class="divide-y divide-slate-200 p-4 space-y-3">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Box 2: Active Site Obstacles & RFIs -->
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                    <div>
+                                        <h3 class="font-bold text-slate-800 text-base">سجل العوائق الميدانية وطلبات الاستفسار (RFI)</h3>
+                                        <p class="text-xs text-slate-500">تتبع لحظي لعداد ساعات التوقف وتحديد المتسبب في تعطيل المسار</p>
+                                    </div>
+                                    <button onclick="toggleNewObstacleForm()" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 self-start sm:self-auto">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>تسجيل عائق توقف جديد</span>
+                                    </button>
+                                </div>
+
+                                <!-- Collapsible Add Obstacle Form -->
+                                <div id="newObstacleForm" class="hidden p-5 bg-red-50/60 border-b border-red-200 space-y-3">
+                                    <h4 class="font-bold text-xs text-red-800">تسجيل توقف إجباري أو استفسار هندسي (RFI)</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="text-xs font-bold text-slate-700 block mb-1">المنطقة والبند المتأثر:</label>
+                                            <select id="obsItemSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold">
+                                                <option value="تأسيس سباكة - الدور الأول">تأسيس سباكة - الدور الأول</option>
+                                                <option value="نجارة وحدادة سقف الدور الثاني">نجارة وحدادة سقف الدور الثاني</option>
+                                                <option value="محارة داخلية - الدور الأول">محارة داخلية - الدور الأول</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-bold text-slate-700 block mb-1">سبب التوقف (الجهة المتسببة):</label>
+                                            <select id="obsReasonSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold">
+                                                <option value="مكتب فني|تعارض في اللوحات التنفيذية يحتاج RFI">تعارض لوحات - انتظار رد المكتب الفني</option>
+                                                <option value="جودة واستشاري|تأخر المهندس الاستشاري في استلام البند">تأخر استلام المهندس الاستشاري</option>
+                                                <option value="مقاول تنفيذ|نقص حاد في أعداد العمالة الفنية بالموقع">نقص عمالة من طرف مقاول البند</option>
+                                                <option value="جودة واستشاري|ملاحظات جودة قيد الإصلاح (إعادة عمل)">ملاحظات جودة قيد الإصلاح (إعادة عمل)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end gap-2 pt-1">
+                                        <button onclick="toggleNewObstacleForm()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">إلغاء</button>
+                                        <button onclick="addNewObstacle()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold">إضافة العائق وبدء عداد التوقف</button>
+                                    </div>
+                                </div>
+
+                                <div id="obstaclesListContainer" class="divide-y divide-slate-200 p-4 space-y-3">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Left 5 Cols: Delay Attribution & Root Cause Analytics -->
+                        <div class="lg:col-span-5 space-y-6">
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
+                                <div>
+                                    <span class="px-2.5 py-0.5 bg-amber-100 text-amber-800 rounded-md text-xs font-bold">فصل المسؤوليات الهندسية</span>
+                                    <h3 class="font-bold text-slate-800 text-base mt-1">تحليل المتسبب في انحراف الجدول الزمني</h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">يُحسب تلقائياً بناءً على ساعات التوقف وحالة اعتماد اللوحات والاستلامات</p>
+                                </div>
+
+                                <!-- Breakdown Bars -->
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1">
+                                            <span class="text-slate-700"><i class="fa-solid fa-compass-drafting text-blue-600 ml-1"></i> المكتب الفني (تأخر لوحات IFC / تعارضات RFI)</span>
+                                            <span id="delayTechOfficePct" class="text-blue-700">48% (24 ساعة)</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                            <div id="barTechOffice" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 48%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1">
+                                            <span class="text-slate-700"><i class="fa-solid fa-users-gear text-amber-600 ml-1"></i> مقاولي التنفيذ (ضعف معدلات الإنتاجية / نقص عمالة)</span>
+                                            <span id="delayContractorPct" class="text-amber-700">34% (17 ساعة)</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                            <div id="barContractor" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 34%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1">
+                                            <span class="text-slate-700"><i class="fa-solid fa-user-check text-purple-600 ml-1"></i> الاستشاري / الجودة (زمن استجابة الاستلام WIR)</span>
+                                            <span id="delayConsultantPct" class="text-purple-700">18% (9 ساعات)</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                            <div id="barConsultant" class="bg-purple-600 h-full rounded-full transition-all duration-500" style="width: 18%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 leading-relaxed">
+                                    <strong class="text-slate-800 block mb-1"><i class="fa-solid fa-circle-info text-blue-600 ml-1"></i> توصية مدير التخطيط الآلية:</strong>
+                                    أكبر نقطة اختناق حالياً هي <span class="text-red-600 font-bold">تأخر إصدار لوحة IFC لبند محارة الدور الأول (Code C)</span> بالإضافة إلى انتظار اعتماد استلام مباني الدور الأول لفتح جبهة عمل للكهرباء.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ====================================================
+                     SCREEN 5: BUILDING & FLOOR MATRIX (مصفوفة العمارات)
+                     ==================================================== -->
+                <section id="tab-matrix" class="tab-content tab-transition hidden space-y-5">
+
+                    <!-- Matrix Header & Color Legend -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                        <div>
+                            <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-md text-xs font-bold">لوحة القيادة البصرية للإدارة العليا</span>
+                            <h3 class="text-lg font-bold text-slate-800 mt-1">مصفوفة تتبع الأدوار وتتابع البنود الهندسية (عمارة 4)</h3>
+                            <p class="text-xs text-slate-500">اضغط على أي خلية في المصفوفة لعرض البطاقة الهندسية الكاملة (حالة اللوحة، المقاول، نسبة الإنجاز، وأسباب التوقف)</p>
+                        </div>
+
+                        <!-- Traffic Light Legend -->
+                        <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
+                            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500"></span> منتهي ومعتمد
+                            </span>
+                            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-800 border border-blue-200">
+                                <span class="w-3 h-3 rounded-full bg-blue-500"></span> جاري العمل (مطابق)
+                            </span>
+                            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 text-red-800 border border-red-200">
+                                <span class="w-3 h-3 rounded-full bg-red-500"></span> متأخر عن المسار
+                            </span>
+                            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200">
+                                <span class="w-3 h-3 rounded-full bg-amber-500"></span> متوقف لعائق / لوحة
+                            </span>
+                            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-300">
+                                <span class="w-3 h-3 rounded-full bg-slate-400"></span> مغلق هندسياً
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                        <!-- Visual Matrix Table (8 Cols) -->
+                        <div class="xl:col-span-8 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-center text-xs border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-900 text-white font-bold">
+                                            <th class="py-3.5 px-3 text-right border-l border-slate-700 w-28">الدور / البند</th>
+                                            <th class="py-3.5 px-2">1. خرسانات</th>
+                                            <th class="py-3.5 px-2">2. مباني</th>
+                                            <th class="py-3.5 px-2">3. تأسيس كهرباء</th>
+                                            <th class="py-3.5 px-2">4. تأسيس سباكة</th>
+                                            <th class="py-3.5 px-2">5. محارة داخلية</th>
+                                            <th class="py-3.5 px-2">6. ألومنيوم وواجهات</th>
+                                            <th class="py-3.5 px-2">7. سيراميك</th>
+                                            <th class="py-3.5 px-2">8. دهانات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="buildingMatrixBody" class="divide-y divide-slate-200 font-semibold">
+                                        <!-- Populated via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Cell Inspection Details Panel (4 Cols) -->
+                        <div id="matrixInspectorCard" class="xl:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden sticky top-4">
+                            <!-- Populated dynamically when clicking a cell -->
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Application State & Logic -->
+    <script>
+        // =========================================================================
+        // 1. CENTRALIZED APPLICATION STATE (Interconnected Engineering Data)
+        // =========================================================================
+        let appState = {};
+
+        function getInitialState() {
+            return {
+                // Table 1: Drawings & IFC Log
+                drawings: [
+                    {
+                        code: 'DWG-ST-102',
+                        discipline: 'إنشائي',
+                        title: 'نجارة وحدادة سقف الدور الثاني',
+                        floor: 'الدور الثاني',
+                        rev: 2,
+                        plannedDate: '2025-05-01',
+                        actualDate: '2025-05-01',
+                        status: 'IFC', // IFC, A, B, C
+                        linkedActivityId: 'ACT-01'
+                    },
+                    {
+                        code: 'DWG-AR-101',
+                        discipline: 'معماري',
+                        title: 'مباني تقسيمات الدور الأول',
+                        floor: 'الدور الأول',
+                        rev: 1,
+                        plannedDate: '2025-04-20',
+                        actualDate: '2025-04-21',
+                        status: 'IFC',
+                        linkedActivityId: 'ACT-02'
+                    },
+                    {
+                        code: 'DWG-EL-202',
+                        discipline: 'كهرباء',
+                        title: 'مخطط تأسيس كهرباء الدور الأول',
+                        floor: 'الدور الأول',
+                        rev: 1,
+                        plannedDate: '2025-05-05',
+                        actualDate: '2025-05-08',
+                        status: 'B', // Needs upgrade to IFC to unlock ACT-03!
+                        linkedActivityId: 'ACT-03'
+                    },
+                    {
+                        code: 'DWG-PL-204',
+                        discipline: 'ميكانيكا/سباكة',
+                        title: 'تأسيس سباكة وصرف الدور الأول',
+                        floor: 'الدور الأول',
+                        rev: 1,
+                        plannedDate: '2025-05-06',
+                        actualDate: '2025-05-06',
+                        status: 'IFC',
+                        linkedActivityId: 'ACT-04'
+                    },
+                    {
+                        code: 'DWG-AR-305',
+                        discipline: 'معماري',
+                        title: 'تفاصيل محارة وبؤج الدور الأول',
+                        floor: 'الدور الأول',
+                        rev: 1,
+                        plannedDate: '2025-05-10',
+                        actualDate: 'متأخرة',
+                        status: 'C', // Revise & resubmit
+                        linkedActivityId: 'ACT-05'
+                    }
+                ],
+
+                // Table 2: Schedule & Gating Engine Activities
+                activities: [
+                    {
+                        id: 'ACT-02',
+                        name: 'مباني الدور الأول',
+                        zone: 'عمارة 4 - الدور الأول',
+                        floorKey: 'الأول',
+                        tradeKey: 'مباني',
+                        drawingCode: 'DWG-AR-101',
+                        predecessorId: null,
+                        predecessorName: 'خرسانة الدور الأول (معتمد)',
+                        predecessorApproved: true,
+                        totalQty: 180,
+                        executedQty: 180,
+                        unit: 'م2',
+                        durationDays: 6,
+                        reqDailyRate: 30,
+                        reqLabor: 12,
+                        weight: 12,
+                        contractor: 'مقاولات التعمير - أ. حسن',
+                        siteStatus: 'WIR_PENDING', // ACTIVE, LOCKED, WIR_PENDING, COMPLETED
+                        isDelayed: false
+                    },
+                    {
+                        id: 'ACT-01',
+                        name: 'نجارة وحدادة سقف الدور الثاني',
+                        zone: 'عمارة 4 - الدور الثاني',
+                        floorKey: 'الثاني',
+                        tradeKey: 'خرسانات',
+                        drawingCode: 'DWG-ST-102',
+                        predecessorId: null,
+                        predecessorName: 'أعمدة الدور الثاني (معتمد)',
+                        predecessorApproved: true,
+                        totalQty: 120,
+                        executedQty: 72,
+                        unit: 'م3',
+                        durationDays: 6,
+                        reqDailyRate: 20,
+                        reqLabor: 16,
+                        weight: 18,
+                        contractor: 'شركة البناء الحديث',
+                        siteStatus: 'ACTIVE',
+                        isDelayed: true // Currently behind daily rate
+                    },
+                    {
+                        id: 'ACT-03',
+                        name: 'تأسيس كهرباء الدور الأول',
+                        zone: 'عمارة 4 - الدور الأول',
+                        floorKey: 'الأول',
+                        tradeKey: 'كهرباء',
+                        drawingCode: 'DWG-EL-202', // Currently Status B
+                        predecessorId: 'ACT-02',
+                        predecessorName: 'مباني الدور الأول',
+                        predecessorApproved: false, // Waiting for WIR-101 approval!
+                        totalQty: 400,
+                        executedQty: 0,
+                        unit: 'م.ط',
+                        durationDays: 8,
+                        reqDailyRate: 50,
+                        reqLabor: 8,
+                        weight: 10,
+                        contractor: 'النور للأعمال الكهروميكانيكية',
+                        siteStatus: 'LOCKED',
+                        isDelayed: false
+                    },
+                    {
+                        id: 'ACT-04',
+                        name: 'تأسيس سباكة الدور الأول',
+                        zone: 'عمارة 4 - الدور الأول',
+                        floorKey: 'الأول',
+                        tradeKey: 'سباكة',
+                        drawingCode: 'DWG-PL-204', // Already IFC!
+                        predecessorId: 'ACT-02',
+                        predecessorName: 'مباني الدور الأول',
+                        predecessorApproved: false, // Waiting ONLY for WIR-101 approval!
+                        totalQty: 16,
+                        executedQty: 0,
+                        unit: 'حمام/مطبخ',
+                        durationDays: 4,
+                        reqDailyRate: 4,
+                        reqLabor: 6,
+                        weight: 8,
+                        contractor: 'الرواد للأنظمة الصحية',
+                        siteStatus: 'LOCKED',
+                        isDelayed: false
+                    },
+                    {
+                        id: 'ACT-05',
+                        name: 'محارة داخلية الدور الأول',
+                        zone: 'عمارة 4 - الدور الأول',
+                        floorKey: 'الأول',
+                        tradeKey: 'محارة',
+                        drawingCode: 'DWG-AR-305', // Currently Code C
+                        predecessorId: 'ACT-03',
+                        predecessorName: 'تأسيس كهرباء وسباكة الأول',
+                        predecessorApproved: false,
+                        totalQty: 600,
+                        executedQty: 0,
+                        unit: 'م2',
+                        durationDays: 10,
+                        reqDailyRate: 60,
+                        reqLabor: 14,
+                        weight: 14,
+                        contractor: 'مؤسسة الدقة للتشطيبات',
+                        siteStatus: 'LOCKED',
+                        isDelayed: false
+                    },
+                    {
+                        id: 'ACT-06',
+                        name: 'محارة داخلية الدور الأرضي',
+                        zone: 'عمارة 4 - الدور الأرضي',
+                        floorKey: 'الأرضي',
+                        tradeKey: 'محارة',
+                        drawingCode: 'DWG-AR-101',
+                        predecessorId: null,
+                        predecessorName: 'تأسيسات الأرضي (معتمد)',
+                        predecessorApproved: true,
+                        totalQty: 500,
+                        executedQty: 350,
+                        unit: 'م2',
+                        durationDays: 10,
+                        reqDailyRate: 50,
+                        reqLabor: 12,
+                        weight: 12,
+                        contractor: 'مؤسسة الدقة للتشطيبات',
+                        siteStatus: 'ACTIVE',
+                        isDelayed: false
+                    }
+                ],
+
+                // Table 3: Daily Site Logs
+                dailyLogs: [
+                    {
+                        date: 'اليوم - 10:30 ص',
+                        activityName: 'نجارة وحدادة سقف الدور الثاني',
+                        qty: '12 م3 (المطلوب 20 م3)',
+                        labor: '10 عمال',
+                        status: 'متأخر عن المعدل اليومي (-40%)'
+                    },
+                    {
+                        date: 'أمس - 04:15 م',
+                        activityName: 'محارة داخلية الدور الأرضي',
+                        qty: '52 م2 (المطلوب 50 م2)',
+                        labor: '12 عامل',
+                        status: 'مطابق للمسار الزمني (+4%)'
+                    }
+                ],
+
+                // Table 4: WIR Requests & Obstacles
+                wirs: [
+                    {
+                        id: 'WIR-101',
+                        activityId: 'ACT-02',
+                        activityName: 'مباني الدور الأول',
+                        zone: 'عمارة 4 - الدور الأول',
+                        contractor: 'مقاولات التعمير - أ. حسن',
+                        submittedSince: 'منذ 6 ساعات',
+                        status: 'PENDING', // PENDING, APPROVED, REJECTED
+                        unlocksText: 'تأسيس كهرباء الدور الأول + تأسيس سباكة الدور الأول'
+                    }
+                ],
+
+                obstacles: [
+                    {
+                        id: 'OBS-01',
+                        item: 'تأسيس كهرباء الدور الأول',
+                        category: 'مكتب فني',
+                        reason: 'اللوحة DWG-EL-202 معتمدة بملاحظات (Code B) ولم تصدر كنسخة IFC للتنفيذ بعد',
+                        hours: 24,
+                        status: 'OPEN'
+                    },
+                    {
+                        id: 'OBS-02',
+                        item: 'نجارة وحدادة سقف الدور الثاني',
+                        category: 'مقاول تنفيذ',
+                        reason: 'نقص عدد النجارين والحدادين بالموقع عن المعدل القياسي (10 بدلاً من 16)',
+                        hours: 14,
+                        status: 'OPEN'
+                    }
+                ],
+
+                // Table 5: Building Matrix Cells (Floors x Trades)
+                matrixFloors: ['السطح', 'الثالث', 'الثاني', 'الأول', 'الأرضي', 'البدروم'],
+                matrixTrades: [
+                    { key: 'خرسانات', label: '1. خرسانات' },
+                    { key: 'مباني', label: '2. مباني' },
+                    { key: 'كهرباء', label: '3. تأسيس كهرباء' },
+                    { key: 'سباكة', label: '4. تأسيس سباكة' },
+                    { key: 'محارة', label: '5. محارة داخلية' },
+                    { key: 'واجهات', label: '6. ألومنيوم وواجهات' },
+                    { key: 'سيراميك', label: '7. سيراميك' },
+                    { key: 'دهانات', label: '8. دهانات' }
+                ]
+            };
+        }
+
+        // =========================================================================
+        // 2. INITIALIZATION & NAVIGATION
+        // =========================================================================
+        window.onload = function() {
+            appState = getInitialState();
+            refreshAllViews();
+            inspectMatrixCell('الأول', 'كهرباء'); // Default matrix inspector card
+        };
+
+        function resetDemoState() {
+            appState = getInitialState();
+            refreshAllViews();
+            inspectMatrixCell('الأول', 'كهرباء');
+            showToast('تمت إعادة ضبط بيانات النموذج التفاعلي للوضع الافتراضي', 'info');
+        }
+
+        function refreshAllViews() {
+            updateTopKPIs();
+            renderDrawingsTable();
+            renderScheduleCards();
+            populateSiteExecutionDropdown();
+            renderDailyLogs();
+            renderWirsAndObstacles();
+            renderBuildingMatrix();
+        }
+
+        const screenTitles = {
+            'tab-drawings': '1. سجل اللوحات والاعتمادات الهندسية (المكتب الفني)',
+            'tab-schedule': '2. بوابة الجاهزية والجدول الزمني (نظام القفل والفتح الهندسي)',
+            'tab-execution': '3. شاشة مهندس الموقع اليومية (الإنتاجية والتنبؤ بالمسار)',
+            'tab-qc': '4. الاستلامات الهندسية (WIR) وسجل العوائق الميدانية',
+            'tab-matrix': '5. مصفوفة العمارات والأدوار البصرية (لوحة القيادة)'
+        };
+
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Update active button style
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = 'nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 hover:text-white transition-all';
+            });
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.className = 'nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-blue-600 text-white shadow-lg shadow-blue-600/30';
+            }
+
+            // Update Header Title
+            document.getElementById('currentScreenTitle').innerText = screenTitles[tabId] || '';
+        }
+
+        function triggerQuickTour() {
+            showToast('نصيحة: اعتمد لوحة الكهرباء في شاشة 1، ثم استلم مباني الأول في شاشة 4 لفتح البنود المغلقة!', 'info');
+        }
+
+        // =========================================================================
+        // 3. TOP KPI CALCULATIONS
+        // =========================================================================
+        function updateTopKPIs() {
+            // 1. IFC Readiness
+            const totalDrawings = appState.drawings.length;
+            const ifcDrawings = appState.drawings.filter(d => d.status === 'IFC').length;
+            const ifcPct = Math.round((ifcDrawings / totalDrawings) * 100);
+            document.getElementById('kpiIfcReadiness').innerText = ifcPct + '%';
+            document.getElementById('kpiIfcSubtext').innerText = `(${ifcDrawings} من ${totalDrawings} لوحات جاهزة)`;
+
+            // 2. Active vs Locked Activities
+            const activeCount = appState.activities.filter(a => a.siteStatus === 'ACTIVE').length;
+            const lockedCount = appState.activities.filter(a => a.siteStatus === 'LOCKED').length;
+            document.getElementById('kpiActiveItems').innerText = activeCount;
+            document.getElementById('kpiLockedSubtext').innerHTML = `<span class="text-red-600 font-bold">${lockedCount} بنود مغلقة</span> بانتظار لوحة أو استلام`;
+
+            // 3. Weighted Actual Progress
+            let earnedWeight = 38.0; // Base completed floors weight
+            appState.activities.forEach(act => {
+                const ratio = Math.min(1, act.executedQty / act.totalQty);
+                earnedWeight += ratio * (act.weight * 0.45);
+            });
+            const finalPct = earnedWeight.toFixed(1);
+            document.getElementById('kpiActualProgress').innerText = finalPct + '%';
+            document.getElementById('kpiProgressBar').style.width = finalPct + '%';
+
+            // 4. Pending WIRs & Obstacles
+            const pendingWirs = appState.wirs.filter(w => w.status === 'PENDING').length;
+            const openObs = appState.obstacles.filter(o => o.status === 'OPEN').length;
+            const totalPending = pendingWirs + openObs;
+            document.getElementById('kpiPendingQc').innerText = totalPending;
+            document.getElementById('nav-badge-qc').innerText = totalPending;
+        }
+
+        // =========================================================================
+        // 4. SCREEN 1: DRAWINGS & IFC LOG LOGIC
+        // =========================================================================
+        function getStatusBadgeHTML(status) {
+            switch (status) {
+                case 'IFC':
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                <i class="fa-solid fa-circle-check text-emerald-600"></i> IFC - صالح للتنفيذ
+                            </span>`;
+                case 'A':
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                                <i class="fa-solid fa-check"></i> A - معتمد
+                            </span>`;
+                case 'B':
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                <i class="fa-solid fa-circle-exclamation text-amber-600"></i> B - معتمد بملاحظات
+                            </span>`;
+                case 'C':
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300">
+                                <i class="fa-solid fa-ban text-red-600"></i> C - مرفوض ويعاد التقديم
+                            </span>`;
+            }
+        }
+
+        function renderDrawingsTable() {
+            const filter = document.getElementById('drawingDisciplineFilter').value;
+            const tbody = document.getElementById('drawingsTableBody');
+            tbody.innerHTML = '';
+
+            const filtered = appState.drawings.filter(d => filter === 'ALL' || d.discipline === filter);
+
+            filtered.forEach(dwg => {
+                const isIfc = dwg.status === 'IFC';
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-50 transition';
+                row.innerHTML = `
+                    <td class="py-4 px-4 font-extrabold text-slate-900">${dwg.code}</td>
+                    <td class="py-4 px-4">
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold">${dwg.discipline}</span>
+                    </td>
+                    <td class="py-4 px-4">
+                        <div class="font-bold text-slate-800">${dwg.title}</div>
+                        <div class="text-xs text-slate-500">${dwg.floor}</div>
+                    </td>
+                    <td class="py-4 px-4">
+                        <span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 font-bold text-xs border border-indigo-200">
+                            Rev 0${dwg.rev}
+                        </span>
+                    </td>
+                    <td class="py-4 px-4 text-xs">
+                        <div class="text-slate-500">مخطط: <strong class="text-slate-700">${dwg.plannedDate}</strong></div>
+                        <div class="${dwg.actualDate === 'متأخرة' ? 'text-red-600 font-bold' : 'text-slate-500'}">فعلي: ${dwg.actualDate}</div>
+                    </td>
+                    <td class="py-4 px-4">${getStatusBadgeHTML(dwg.status)}</td>
+                    <td class="py-4 px-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            ${!isIfc ? `
+                                <button onclick="approveDrawingToIFC('${dwg.code}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-file-circle-check"></i>
+                                    <span>اعتماد وإصدار IFC للموقع</span>
+                                </button>
+                            ` : `
+                                <span class="text-xs font-bold text-emerald-700 px-2 py-1 bg-emerald-50 rounded-lg">
+                                    <i class="fa-solid fa-unlock ml-1"></i> قفل اللوحة مفتوح
+                                </span>
+                            `}
+                            <button onclick="issueNewDrawingRevision('${dwg.code}')" title="إصدار تعديل جديد وإشعار الموقع" class="px-2.5 py-1.5 bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-800 border border-slate-300 rounded-xl text-xs font-bold transition">
+                                <i class="fa-solid fa-code-branch ml-1"></i> Rev+
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function approveDrawingToIFC(dwgCode) {
+            const dwg = appState.drawings.find(d => d.code === dwgCode);
+            if (!dwg) return;
+
+            dwg.status = 'IFC';
+            dwg.actualDate = 'تم الاعتماد اليوم';
+
+            // Auto-resolve related drawing obstacle if exists
+            appState.obstacles.forEach(obs => {
+                if (obs.reason.includes(dwgCode)) {
+                    obs.status = 'RESOLVED';
+                }
+            });
+
+            refreshAllViews();
+
+            const linkedAct = appState.activities.find(a => a.drawingCode === dwgCode);
+            showToast(
+                `تم إصدار اللوحة (${dwgCode}) كنسخة صالحة للتنفيذ (IFC). تم فتح القفل الهندسي رقم (1) لبند: "${linkedAct ? linkedAct.name : ''}"!`,
+                'success'
+            );
+        }
+
+        function issueNewDrawingRevision(dwgCode) {
+            const dwg = appState.drawings.find(d => d.code === dwgCode);
+            if (!dwg) return;
+
+            dwg.rev += 1;
+            refreshAllViews();
+
+            showToast(
+                `حماية الإصدارات: تم رفع الإصدار (Rev 0${dwg.rev}) للوحة ${dwgCode}. أرسل النظام تنبيهاً لحظياً لهاتف مهندس الموقع بإلغاء النسخة السابقة (Rev 0${dwg.rev - 1}) لمنع التكسير وإعادة العمل.`,
+                'warning'
+            );
+        }
+
+        // =========================================================================
+        // 5. SCREEN 2: SCHEDULE & GATING ENGINE (أقفال الأمان الهندسية)
+        // =========================================================================
+        function getDrawingByCode(code) {
+            return appState.drawings.find(d => d.code === code);
+        }
+
+        function renderScheduleCards() {
+            const container = document.getElementById('scheduleCardsContainer');
+            container.innerHTML = '';
+
+            appState.activities.forEach(act => {
+                const dwg = getDrawingByCode(act.drawingCode);
+                const lock1Open = dwg && dwg.status === 'IFC';
+                const lock2Open = act.predecessorApproved === true;
+                const bothLocksOpen = lock1Open && lock2Open;
+
+                let statusBadge = '';
+                if (act.siteStatus === 'COMPLETED') {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">منتهي ومعتمد 100%</span>`;
+                } else if (act.siteStatus === 'WIR_PENDING') {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">منتهي بانتظار استلام الجودة (WIR)</span>`;
+                } else if (act.siteStatus === 'ACTIVE') {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300"><i class="fa-solid fa-spinner fa-spin ml-1"></i> مفتوح وجاري العمل بالموقع</span>`;
+                } else {
+                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700"><i class="fa-solid fa-lock ml-1"></i> مغلق بالموقع</span>`;
+                }
+
+                const progressPct = Math.round((act.executedQty / act.totalQty) * 100);
+
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-2xl border-2 p-5 shadow-sm transition-all ${
+                    act.siteStatus === 'ACTIVE' ? 'border-blue-500/60' :
+                    bothLocksOpen && act.siteStatus === 'LOCKED' ? 'border-emerald-500/70' : 'border-slate-200'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex flex-wrap items-start justify-between gap-2 pb-3 border-b border-slate-100">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-slate-400">${act.id}</span>
+                                <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">${act.zone}</span>
+                            </div>
+                            <h4 class="text-base font-extrabold text-slate-800 mt-1">${act.name}</h4>
+                        </div>
+                        ${statusBadge}
+                    </div>
+
+                    <!-- Two Engineering Safety Locks -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4">
+                        <!-- Lock 1: IFC Drawing -->
+                        <div class="p-3 rounded-xl border ${lock1Open ? 'bg-emerald-50/60 border-emerald-200' : 'bg-red-50/70 border-red-200'}">
+                            <div class="flex items-center justify-between text-xs font-bold mb-1">
+                                <span class="${lock1Open ? 'text-emerald-800' : 'text-red-800'}">قفل 1: اللوحة التنفيذية</span>
+                                <i class="fa-solid ${lock1Open ? 'fa-lock-open text-emerald-600' : 'fa-lock text-red-600'}"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-700">${act.drawingCode} (${dwg ? 'Rev 0' + dwg.rev : ''})</p>
+                            <p class="text-[11px] mt-1 font-bold ${lock1Open ? 'text-emerald-600' : 'text-red-600'}">
+                                ${lock1Open ? '✓ صالحة للتنفيذ (IFC)' : `✗ غير جاهزة (الحالة: ${dwg ? dwg.status : 'N/A'})`}
+                            </p>
+                        </div>
+
+                        <!-- Lock 2: Predecessor QC Handover -->
+                        <div class="p-3 rounded-xl border ${lock2Open ? 'bg-emerald-50/60 border-emerald-200' : 'bg-red-50/70 border-red-200'}">
+                            <div class="flex items-center justify-between text-xs font-bold mb-1">
+                                <span class="${lock2Open ? 'text-emerald-800' : 'text-red-800'}">قفل 2: استلام البند السابق</span>
+                                <i class="fa-solid ${lock2Open ? 'fa-lock-open text-emerald-600' : 'fa-lock text-red-600'}"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-700">${act.predecessorName}</p>
+                            <p class="text-[11px] mt-1 font-bold ${lock2Open ? 'text-emerald-600' : 'text-red-600'}">
+                                ${lock2Open ? '✓ تم الاستلام الهندسي' : '✗ في انتظار اعتماد محضر WIR'}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Quantities, Daily Rate & Weight -->
+                    <div class="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-center text-xs mb-4">
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">الكمية الكلية</span>
+                            <strong class="text-slate-800">${act.totalQty} ${act.unit}</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">المدة المخططة</span>
+                            <strong class="text-slate-800">${act.durationDays} أيام</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">المعدل اليومي</span>
+                            <strong class="text-blue-700">${act.reqDailyRate} ${act.unit}/يوم</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">الوزن النسبي</span>
+                            <strong class="text-indigo-700">${act.weight}%</strong>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="flex items-center justify-between gap-3 pt-1">
+                        <div class="flex-1">
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-slate-500">نسبة الإنجاز التراكمية:</span>
+                                <span class="text-slate-800">${progressPct}% (${act.executedQty}/${act.totalQty} ${act.unit})</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div class="bg-blue-600 h-full rounded-full" style="width: ${progressPct}%"></div>
+                            </div>
+                        </div>
+
+                        ${act.siteStatus === 'LOCKED' ? `
+                            <button onclick="attemptUnlockActivity('${act.id}')" class="px-4 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 flex-shrink-0 ${
+                                bothLocksOpen
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20'
+                                    : 'bg-slate-800 hover:bg-red-700 text-white'
+                            }">
+                                <i class="fa-solid ${bothLocksOpen ? 'fa-play' : 'fa-shield-halved'}"></i>
+                                <span>تفعيل البند للموقع</span>
+                            </button>
+                        ` : act.siteStatus === 'ACTIVE' ? `
+                            <button onclick="openExecutionForActivity('${act.id}')" class="px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl font-bold text-xs transition flex-shrink-0">
+                                تسجيل إنتاجية اليوم &larr;
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function attemptUnlockActivity(actId) {
+            const act = appState.activities.find(a => a.id === actId);
+            if (!act) return;
+
+            const dwg = getDrawingByCode(act.drawingCode);
+            const lock1Open = dwg && dwg.status === 'IFC';
+            const lock2Open = act.predecessorApproved === true;
+
+            if (lock1Open && lock2Open) {
+                act.siteStatus = 'ACTIVE';
+                refreshAllViews();
+                showToast(`تم تفعيل وفتح بند "${act.name}" للموقع بنجاح بعد التحقق من أقفال الأمان الهندسية!`, 'success');
+                return;
+            }
+
+            // Build Detailed Blocking Modal
+            let reasonsHTML = `<p class="font-bold text-slate-800">رفض النظام فتح بند <span class="text-red-600">(${act.name})</span> في الموقع لمنع العمل العشوائي للأسباب التالية:</p><ul class="space-y-2.5 mt-3">`;
+
+            if (!lock1Open) {
+                reasonsHTML += `
+                    <li class="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-xmark text-red-600 text-base mt-0.5"></i>
+                        <div>
+                            <strong class="text-red-800 block text-xs">قفل الأمان رقم (1) مغلق - المكتب الفني:</strong>
+                            <span class="text-xs text-slate-600">اللوحة المرتبطة <strong>(${act.drawingCode})</strong> حالتها الحالية <strong>(${dwg ? dwg.status : ''})</strong> وليست (IFC - صالحة للتنفيذ).</span>
+                            <div class="mt-2">
+                                <button onclick="closeModal(); switchTab('tab-drawings');" class="px-3 py-1 bg-red-600 text-white rounded-lg text-[11px] font-bold">الذهاب لشاشة اللوحات لاعتمادها &larr;</button>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            }
+
+            if (!lock2Open) {
+                reasonsHTML += `
+                    <li class="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-xmark text-amber-600 text-base mt-0.5"></i>
+                        <div>
+                            <strong class="text-amber-900 block text-xs">قفل الأمان رقم (2) مغلق - استلامات الجودة:</strong>
+                            <span class="text-xs text-slate-600">لم يتم اعتماد محضر استلام البند السابق <strong>(${act.predecessorName})</strong> هندسياً حتى الآن.</span>
+                            <div class="mt-2">
+                                <button onclick="closeModal(); switchTab('tab-qc');" class="px-3 py-1 bg-amber-600 text-white rounded-lg text-[11px] font-bold">الذهاب لشاشة الاستلامات (WIR) لاعتماده &larr;</button>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            }
+
+            reasonsHTML += `</ul>`;
+            openModal('منع العمل العشوائي - البند مقفل هندسياً', reasonsHTML, 'red');
+        }
+
+        function openExecutionForActivity(actId) {
+            switchTab('tab-execution');
+            const select = document.getElementById('siteActivitySelect');
+            select.value = actId;
+            updateExecutionCalculator();
+        }
+
+        // =========================================================================
+        // 6. SCREEN 3: DAILY SITE EXECUTION & PREDICTOR
+        // =========================================================================
+        function populateSiteExecutionDropdown() {
+            const select = document.getElementById('siteActivitySelect');
+            const currentVal = select.value;
+            select.innerHTML = '';
+
+            const activeActs = appState.activities.filter(a => a.siteStatus === 'ACTIVE');
+            activeActs.forEach(act => {
+                const opt = document.createElement('option');
+                opt.value = act.id;
+                opt.innerText = `${act.name} (${act.zone}) - المعدل المطلوب: ${act.reqDailyRate} ${act.unit}/يوم`;
+                select.appendChild(opt);
+            });
+
+            if (currentVal && activeActs.some(a => a.id === currentVal)) {
+                select.value = currentVal;
+            }
+            updateExecutionCalculator();
+        }
+
+        function setQuickRate(mode) {
+            const select = document.getElementById('siteActivitySelect');
+            const act = appState.activities.find(a => a.id === select.value);
+            if (!act) return;
+
+            if (mode === 'low') {
+                document.getElementById('inputTodayQty').value = Math.round(act.reqDailyRate * 0.6);
+                document.getElementById('inputTodayLabor').value = Math.max(2, Math.round(act.reqLabor * 0.65));
+            } else {
+                document.getElementById('inputTodayQty').value = act.reqDailyRate;
+                document.getElementById('inputTodayLabor').value = act.reqLabor;
+            }
+            updateExecutionCalculator();
+        }
+
+        function updateExecutionCalculator() {
+            const select = document.getElementById('siteActivitySelect');
+            const act = appState.activities.find(a => a.id === select.value);
+            if (!act) return;
+
+            document.getElementById('execTotalQty').innerText = `${act.totalQty} ${act.unit}`;
+            document.getElementById('execReqRate').innerText = `${act.reqDailyRate} ${act.unit} / يوم`;
+            document.getElementById('execReqLabor').innerText = `${act.reqLabor} عامل`;
+            document.getElementById('unitLabelDisplay').innerText = act.unit;
+            document.getElementById('execContractorName').innerText = act.contractor;
+
+            const todayQty = parseFloat(document.getElementById('inputTodayQty').value) || 0;
+            const todayLabor = parseInt(document.getElementById('inputTodayLabor').value) || 1;
+            const predictorBox = document.getElementById('ratePredictorBox');
+
+            const remainingQty = Math.max(0, act.totalQty - act.executedQty);
+            const plannedRemainingDays = Math.ceil(remainingQty / act.reqDailyRate);
+
+            if (todayQty <= 0) {
+                predictorBox.className = 'p-4 rounded-2xl border-2 bg-red-50 border-red-300 text-red-900';
+                predictorBox.innerHTML = `
+                    <div class="font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-pause text-red-600 text-lg"></i>
+                        <span>توقف كامل في إنتاجية اليوم (0 ${act.unit})</span>
+                    </div>
+                    <p class="text-xs mt-1">يرجى تسجيل سبب العائق الهندسي فوراً ليظهر على شاشة مدير التخطيط.</p>
+                `;
+                return;
+            }
+
+            if (todayQty < act.reqDailyRate) {
+                const actualRemainingDays = Math.ceil(remainingQty / todayQty);
+                const delayDays = Math.max(1, actualRemainingDays - plannedRemainingDays);
+                const deficitPct = Math.round(((act.reqDailyRate - todayQty) / act.reqDailyRate) * 100);
+                const extraLaborNeeded = Math.max(2, Math.ceil((act.reqDailyRate - todayQty) / (todayQty / todayLabor)));
+
+                predictorBox.className = 'p-4 rounded-2xl border-2 bg-red-50/90 border-red-400 text-slate-800';
+                predictorBox.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center flex-shrink-0 text-lg mt-0.5">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-red-600 text-white rounded text-[10px] font-bold">إنذار مبكر للمسار الحرج</span>
+                                <span class="text-xs font-bold text-red-700">انخفاض الإنتاجية بنسبة ${deficitPct}% عن المخطط</span>
+                            </div>
+                            <p class="text-sm font-extrabold text-slate-900">
+                                بهذا المعدل اليومي (${todayQty} ${act.unit}/يوم)، سيتأخر تسليم البند لمدة <span class="text-red-600 underline">${delayDays} أيام عمل</span>!
+                            </p>
+                            <p class="text-xs text-slate-700">
+                                <i class="fa-solid fa-wrench text-red-600 ml-1"></i>
+                                <strong>الإجراء التصحيحي المطلوب غداً:</strong> دعم الفرقة بـ <strong class="text-red-700">${extraLaborNeeded} صنايعية إضافيين</strong> (${deficitPct + 15}% زيادة) للعودة للمسار الزمني.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const surplusPct = Math.round(((todayQty - act.reqDailyRate) / act.reqDailyRate) * 100);
+                predictorBox.className = 'p-4 rounded-2xl border-2 bg-emerald-50/90 border-emerald-400 text-slate-800';
+                predictorBox.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 text-lg mt-0.5">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold">إيقاع تنفيذ آمن</span>
+                            <p class="text-sm font-extrabold text-slate-900">
+                                المعدل اليومي المسجل (${todayQty} ${act.unit}/يوم) مطابق أو متقدم على الجدول الزمني (${surplusPct >= 0 ? '+' + surplusPct + '%' : ''}).
+                            </p>
+                            <p class="text-xs text-slate-600">سيتم إنهاء البند في موعده المخطط وفتح الجبهة للبند التالي دون تأخير.</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function saveDailyProgress() {
+            const select = document.getElementById('siteActivitySelect');
+            const act = appState.activities.find(a => a.id === select.value);
+            if (!act) return;
+
+            const todayQty = parseFloat(document.getElementById('inputTodayQty').value) || 0;
+            const todayLabor = parseInt(document.getElementById('inputTodayLabor').value) || 0;
+
+            act.executedQty = Math.min(act.totalQty, act.executedQty + todayQty);
+            act.isDelayed = todayQty < act.reqDailyRate;
+
+            appState.dailyLogs.unshift({
+                date: 'الآن - تحديث فوري',
+                activityName: act.name,
+                qty: `${todayQty} ${act.unit} (المطلوب ${act.reqDailyRate} ${act.unit})`,
+                labor: `${todayLabor} عامل`,
+                status: act.isDelayed ? 'أبطأ من المعدل المخطط' : 'مطابق للمسار الزمني'
+            });
+
+            refreshAllViews();
+            showToast(`تم تسجيل التقدم اليومي لبند "${act.name}" وتحديث نسبة الإنجاز الموزونة وحالة المصفوفة!`, 'success');
+        }
+
+        function renderDailyLogs() {
+            const feed = document.getElementById('dailyLogsFeed');
+            feed.innerHTML = '';
+
+            appState.dailyLogs.slice(0, 4).forEach(log => {
+                const isLate = log.status.includes('متأخر') || log.status.includes('أبطأ');
+                const item = document.createElement('div');
+                item.className = 'p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1';
+                item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <strong class="text-slate-800">${log.activityName}</strong>
+                        <span class="text-[11px] text-slate-400">${log.date}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>الكمية: <strong>${log.qty}</strong></span>
+                        <span>العمالة: <strong>${log.labor}</strong></span>
+                    </div>
+                    <div class="pt-1">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isLate ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+                            ${log.status}
+                        </span>
+                    </div>
+                `;
+                feed.appendChild(item);
+            });
+        }
+
+        // =========================================================================
+        // 7. SCREEN 4: QC HANDOVER (WIR) & OBSTACLES
+        // =========================================================================
+        function renderWirsAndObstacles() {
+            // Render WIRs
+            const wirContainer = document.getElementById('wirListContainer');
+            wirContainer.innerHTML = '';
+
+            appState.wirs.forEach(wir => {
+                const isPending = wir.status === 'PENDING';
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border ${isPending ? 'bg-amber-50/50 border-amber-300' : 'bg-emerald-50/40 border-emerald-200'}`;
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-white text-xs font-bold">${wir.id}</span>
+                                <span class="text-xs font-bold text-slate-500">${wir.zone}</span>
+                                <span class="text-xs text-amber-700 font-semibold"><i class="fa-regular fa-clock ml-1"></i>${wir.submittedSince}</span>
+                            </div>
+                            <h4 class="font-extrabold text-slate-800 text-sm">استلام أعمال: ${wir.activityName}</h4>
+                            <p class="text-xs text-slate-600">
+                                <i class="fa-solid fa-diagram-next text-blue-600 ml-1"></i>
+                                البنود المنتظرة لهذا الاعتماد: <strong class="text-slate-800">${wir.unlocksText}</strong>
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            ${isPending ? `
+                                <button onclick="approveWIR('${wir.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-check-double"></i>
+                                    <span>اعتماد واستلام (فتح البند التالي)</span>
+                                </button>
+                                <button onclick="rejectWIR('${wir.id}')" class="px-3 py-2 bg-white hover:bg-red-50 text-red-600 border border-red-300 rounded-xl text-xs font-bold transition">
+                                    رفض بملاحظات
+                                </button>
+                            ` : `
+                                <span class="px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold border border-emerald-300">
+                                    ✓ تم الاستلام وفتح قفل البنود التالية
+                                </span>
+                            `}
+                        </div>
+                    </div>
+                `;
+                wirContainer.appendChild(card);
+            });
+
+            // Render Obstacles
+            const obsContainer = document.getElementById('obstaclesListContainer');
+            obsContainer.innerHTML = '';
+
+            appState.obstacles.forEach(obs => {
+                const isOpen = obs.status === 'OPEN';
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-xl border ${isOpen ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-200 opacity-60'}`;
+                item.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                                    obs.category.includes('مكتب') ? 'bg-blue-100 text-blue-800' :
+                                    obs.category.includes('مقاول') ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'
+                                }">مسؤولية: ${obs.category}</span>
+                                <span class="font-bold text-slate-800 text-xs">${obs.item}</span>
+                            </div>
+                            <p class="text-xs text-slate-600">${obs.reason}</p>
+                        </div>
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            <div class="text-left">
+                                <span class="text-[10px] text-slate-400 block">عداد التوقف</span>
+                                <strong class="text-xs ${isOpen ? 'text-red-600' : 'text-slate-500'}">${obs.hours} ساعة</strong>
+                            </div>
+                            ${isOpen ? `
+                                <button onclick="resolveObstacle('${obs.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition">
+                                    إنهاء العائق
+                                </button>
+                            ` : `
+                                <span class="text-xs font-bold text-emerald-600">تم الحل</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+                obsContainer.appendChild(item);
+            });
+        }
+
+        function approveWIR(wirId) {
+            const wir = appState.wirs.find(w => w.id === wirId);
+            if (!wir) return;
+
+            wir.status = 'APPROVED';
+
+            // Update current activity to COMPLETED
+            const parentAct = appState.activities.find(a => a.id === wir.activityId);
+            if (parentAct) parentAct.siteStatus = 'COMPLETED';
+
+            // Unlock Lock #2 for all dependent activities!
+            let unlockedNames = [];
+            appState.activities.forEach(act => {
+                if (act.predecessorId === wir.activityId) {
+                    act.predecessorApproved = true;
+                    // Check if Lock #1 (IFC Drawing) is also open, auto-highlight
+                    const dwg = getDrawingByCode(act.drawingCode);
+                    if (dwg && dwg.status === 'IFC') {
+                        unlockedNames.push(act.name);
+                    }
+                }
+            });
+
+            refreshAllViews();
+
+            showToast(
+                `تم اعتماد محضر استلام "${wir.activityName}" هندسياً! تم فتح القفل رقم (2) تلقائياً لبنود الكهرباء والسباكة في شاشة الجاهزية.`,
+                'success'
+            );
+        }
+
+        function rejectWIR(wirId) {
+            appState.obstacles.unshift({
+                id: 'OBS-' + Math.floor(Math.random() * 90 + 10),
+                item: 'مباني الدور الأول',
+                category: 'مقاول تنفيذ',
+                reason: 'رفض استلام WIR-101 لوجود ملاحظات جودة في استواء الحوائط (إعادة عمل)',
+                hours: 4,
+                status: 'OPEN'
+            });
+            refreshAllViews();
+            showToast('تم رفض الاستلام وتسجيل عائق "ملاحظات جودة قيد الإصلاح" مع استمرار قفل البنود التالية.', 'error');
+        }
+
+        function toggleNewObstacleForm() {
+            const form = document.getElementById('newObstacleForm');
+            form.classList.toggle('hidden');
+        }
+
+        function addNewObstacle() {
+            const item = document.getElementById('obsItemSelect').value;
+            const rawReason = document.getElementById('obsReasonSelect').value.split('|');
+
+            appState.obstacles.unshift({
+                id: 'OBS-' + Math.floor(Math.random() * 90 + 10),
+                item: item,
+                category: rawReason[0],
+                reason: rawReason[1],
+                hours: 2,
+                status: 'OPEN'
+            });
+
+            toggleNewObstacleForm();
+            refreshAllViews();
+            showToast('تم تسجيل العائق الميداني وبدء عداد ساعات التوقف على لوحة مدير التخطيط.', 'warning');
+        }
+
+        function resolveObstacle(obsId) {
+            const obs = appState.obstacles.find(o => o.id === obsId);
+            if (obs) {
+                obs.status = 'RESOLVED';
+                refreshAllViews();
+                showToast('تم إغلاق العائق الهندسي وتحديث سجل التوقفات.', 'success');
+            }
+        }
+
+        // =========================================================================
+        // 8. SCREEN 5: VISUAL BUILDING & FLOOR MATRIX
+        // =========================================================================
+        function getCellData(floor, tradeKey) {
+            // Check if this cell matches one of our live interactive activities
+            const liveAct = appState.activities.find(a => a.floorKey === floor && a.tradeKey === tradeKey);
+            if (liveAct) {
+                const dwg = getDrawingByCode(liveAct.drawingCode);
+                const lock1Open = dwg && dwg.status === 'IFC';
+                const lock2Open = liveAct.predecessorApproved;
+                const pct = Math.round((liveAct.executedQty / liveAct.totalQty) * 100);
+
+                if (liveAct.siteStatus === 'COMPLETED') {
+                    return {
+                        state: 'COMPLETED',
+                        label: 'منتهي 100%',
+                        bg: 'bg-emerald-500 text-white hover:bg-emerald-600',
+                        title: liveAct.name,
+                        contractor: liveAct.contractor,
+                        dwgStatus: `${liveAct.drawingCode} (IFC)`,
+                        pct: 100,
+                        note: 'تم الاستلام الهندسي وإغلاق البند.'
+                    };
+                }
+                if (liveAct.siteStatus === 'WIR_PENDING') {
+                    return {
+                        state: 'WIR',
+                        label: 'انتظار WIR (100%)',
+                        bg: 'bg-amber-500 text-white hover:bg-amber-600',
+                        title: liveAct.name,
+                        contractor: liveAct.contractor,
+                        dwgStatus: `${liveAct.drawingCode} (IFC)`,
+                        pct: 100,
+                        note: 'تم إنهاء الأعمال بالموقع وفي انتظار توقيع استلام الجودة لفتح البند التالي.'
+                    };
+                }
+                if (liveAct.siteStatus === 'ACTIVE') {
+                    if (liveAct.isDelayed) {
+                        return {
+                            state: 'DELAYED',
+                            label: `متأخر (${pct}%)`,
+                            bg: 'bg-red-600 text-white hover:bg-red-700',
+                            title: liveAct.name,
+                            contractor: liveAct.contractor,
+                            dwgStatus: `${liveAct.drawingCode} (IFC)`,
+                            pct: pct,
+                            note: 'الإنتاجية اليومية أقل من المعدل المطلوب بالجدول الزمني.'
+                        };
+                    }
+                    return {
+                        state: 'ACTIVE',
+                        label: `جاري (${pct}%)`,
+                        bg: 'bg-blue-600 text-white hover:bg-blue-700',
+                        title: liveAct.name,
+                        contractor: liveAct.contractor,
+                        dwgStatus: `${liveAct.drawingCode} (IFC)`,
+                        pct: pct,
+                        note: 'العمل يسير وفق المعدل اليومي المخطط.'
+                    };
+                }
+                // LOCKED states
+                if (!lock1Open) {
+                    return {
+                        state: 'BLOCKED_DWG',
+                        label: `لوحة (${dwg ? dwg.status : ''})`,
+                        bg: 'bg-amber-400 text-slate-950 hover:bg-amber-500',
+                        title: liveAct.name,
+                        contractor: liveAct.contractor,
+                        dwgStatus: `${liveAct.drawingCode} (الحالة: ${dwg ? dwg.status : ''})`,
+                        pct: 0,
+                        note: 'متوقف هندسياً لأن اللوحة لم تصدر كنسخة صالحة للتنفيذ IFC.'
+                    };
+                }
+                if (!lock2Open) {
+                    return {
+                        state: 'LOCKED_PRED',
+                        label: 'انتظار بند سابق',
+                        bg: 'bg-slate-200 text-slate-700 hover:bg-slate-300',
+                        title: liveAct.name,
+                        contractor: liveAct.contractor,
+                        dwgStatus: `${liveAct.drawingCode} (IFC جاهزة)`,
+                        pct: 0,
+                        note: `اللوحة جاهزة، ولكن البند مقفل لحين استلام (${liveAct.predecessorName}).`
+                    };
+                }
+                return {
+                    state: 'READY_TO_UNLOCK',
+                    label: 'جاهز للتفعيل!',
+                    bg: 'bg-emerald-100 text-emerald-900 border-2 border-emerald-500 hover:bg-emerald-200',
+                    title: liveAct.name,
+                    contractor: liveAct.contractor,
+                    dwgStatus: `${liveAct.drawingCode} (IFC جاهزة)`,
+                    pct: 0,
+                    note: 'جميع أقفال الأمان مفتوحة! يمكنك تفعيله للموقع من شاشة الجاهزية.'
+                };
+            }
+
+            // Static realistic matrix data for other floors
+            if (floor === 'البدروم') {
+                return {
+                    state: 'COMPLETED', label: 'منتهي 100%', bg: 'bg-emerald-500 text-white',
+                    title: `${tradeKey} - البدروم`, contractor: 'شركة البناء الحديث', dwgStatus: 'IFC معتمد', pct: 100, note: 'مكتمل ومستلم هندسياً.'
+                };
+            }
+            if (floor === 'الأرضي') {
+                if (['خرسانات', 'مباني', 'كهرباء', 'سباكة'].includes(tradeKey)) {
+                    return {
+                        state: 'COMPLETED', label: 'منتهي 100%', bg: 'bg-emerald-500 text-white',
+                        title: `${tradeKey} - الدور الأرضي`, contractor: 'مقاول معتمد', dwgStatus: 'IFC معتمد', pct: 100, note: 'مكتمل ومستلم هندسياً.'
+                    };
+                }
+                if (tradeKey === 'واجهات') {
+                    return {
+                        state: 'ACTIVE', label: 'جاري (45%)', bg: 'bg-blue-600 text-white',
+                        title: 'ألومنيوم وواجهات - الأرضي', contractor: 'شركة كريستال للواجهات', dwgStatus: 'IFC معتمد', pct: 45, note: 'جاري تركيب الحلوق وفق الجدول.'
+                    };
+                }
+            }
+            if (floor === 'الأول' && tradeKey === 'خرسانات') {
+                return {
+                    state: 'COMPLETED', label: 'منتهي 100%', bg: 'bg-emerald-500 text-white',
+                    title: 'خرسانات الدور الأول', contractor: 'شركة البناء الحديث', dwgStatus: 'IFC معتمد', pct: 100, note: 'تم صب واستلام السقف.'
+                };
+            }
+
+            return {
+                state: 'LOCKED', label: 'مغلق زمنياً', bg: 'bg-slate-100 text-slate-400 hover:bg-slate-200',
+                title: `${tradeKey} - الدور ${floor}`, contractor: 'لم يبدأ بعد', dwgStatus: 'قيد التجهيز بالخطة', pct: 0, note: 'مغلق لحين انتهاء البنود والأدوار السابقة في المسار الهندسي.'
+            };
+        }
+
+        function renderBuildingMatrix() {
+            const tbody = document.getElementById('buildingMatrixBody');
+            tbody.innerHTML = '';
+
+            appState.matrixFloors.forEach(floor => {
+                const tr = document.createElement('tr');
+                let rowHTML = `<td class="py-3.5 px-3 text-right font-extrabold text-slate-800 bg-slate-50 border-l border-slate-200">${floor}</td>`;
+
+                appState.matrixTrades.forEach(trade => {
+                    const cell = getCellData(floor, trade.key);
+                    rowHTML += `
+                        <td class="p-1.5">
+                            <button onclick="inspectMatrixCell('${floor}', '${trade.key}')" class="w-full py-2.5 px-2 rounded-xl text-[11px] font-bold transition shadow-sm ${cell.bg}">
+                                ${cell.label}
+                            </button>
+                        </td>
+                    `;
+                });
+
+                tr.innerHTML = rowHTML;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function inspectMatrixCell(floor, tradeKey) {
+            const cell = getCellData(floor, tradeKey);
+            const card = document.getElementById('matrixInspectorCard');
+
+            card.innerHTML = `
+                <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] text-blue-400 font-bold block">بطاقة الفحص الهندسي للخلية</span>
+                        <h4 class="font-bold text-base mt-0.5">${cell.title}</h4>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-bold">الدور ${floor}</span>
+                </div>
+                <div class="p-5 space-y-4 text-xs">
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span class="text-slate-500">حالة اللوحة التنفيذية:</span>
+                        <strong class="text-slate-800">${cell.dwgStatus}</strong>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span class="text-slate-500">المقاول / الفرقة المسؤولة:</span>
+                        <strong class="text-slate-800">${cell.contractor}</strong>
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold mb-1">
+                            <span class="text-slate-500">نسبة الإنجاز الفعلية:</span>
+                            <span class="text-blue-700">${cell.pct}%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-blue-600 h-full rounded-full" style="width: ${cell.pct}%"></div>
+                        </div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 leading-relaxed">
+                        <strong class="text-slate-800 block mb-1">التشخيص الهندسي والمسار الزمني:</strong>
+                        <p class="text-slate-600">${cell.note}</p>
+                    </div>
+                    <div class="pt-1 flex gap-2">
+                        <button onclick="switchTab('tab-schedule')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">
+                            فحص أقفال الجاهزية
+                        </button>
+                        <button onclick="switchTab('tab-drawings')" class="flex-1 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl font-bold transition">
+                            سجل اللوحات
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // 9. UI HELPERS (Toast & Modal)
+        // =========================================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+
+            const styles = {
+                success: 'bg-emerald-900 border-emerald-500 text-white',
+                warning: 'bg-amber-900 border-amber-400 text-white',
+                error: 'bg-red-900 border-red-500 text-white',
+                info: 'bg-slate-900 border-blue-500 text-white'
+            };
+            const icons = {
+                success: 'fa-circle-check text-emerald-400',
+                warning: 'fa-bell text-amber-400',
+                error: 'fa-triangle-exclamation text-red-400',
+                info: 'fa-bolt text-blue-400'
+            };
+
+            toast.className = `pointer-events-auto p-4 rounded-2xl border-r-4 shadow-2xl flex items-start gap-3 text-xs leading-relaxed transform transition-all duration-300 ${styles[type] || styles.info}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icons[type] || icons.info} text-base mt-0.5"></i>
+                <div class="flex-1 font-semibold">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-white/60 hover:text-white">&times;</button>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast && toast.parentElement) toast.remove();
+            }, 6000);
+        }
+
+        function openModal(title, bodyHTML, color = 'red') {
+            const modal = document.getElementById('systemModal');
+            const header = document.getElementById('modalHeader');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerHTML = bodyHTML;
+
+            header.className = `px-6 py-4 text-white flex justify-between items-center ${color === 'red' ? 'bg-red-600' : 'bg-blue-600'}`;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('systemModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    </script>
+</body>
+</html>
