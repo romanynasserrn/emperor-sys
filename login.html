@@ -185,7 +185,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
 
-    // مصفوفة التقارير التنفيذية المتاحة لمدير المشروعات والإدارة العليا
+    // مصفوفة التقارير التنفيذية المتاحة لمدير المشروعات
     const SYSTEM_REPORTS = [
       {
         id: "TIMELINE_CONTROL",
@@ -197,12 +197,6 @@
     ];
 
     const SYSTEM_MODULES = {
-      "REPORTS_CENTER": {
-        name: "الجدول الزمني",
-        icon: "⏱️",
-        isReport: true,
-        desc: "لوحة التحكم التنفيذية للجدول الزمني والمسار الهندسي."
-      },
       "INWARD": {
         name: "إدارة الوارد اليومي",
         icon: "📦",
@@ -314,7 +308,7 @@
       submitBtn.textContent = 'جاري التحقق...';
 
       const email = userEmailInput.value.trim();
-      const password = userPasswordInput.value;
+      const password = userPasswordInput.value.trim();
 
       try {
         const response = await fetch(SCRIPT_URL, {
@@ -363,7 +357,7 @@
 
       dynamicNav.innerHTML = '';
 
-      const userRole = sessionData.user.role;
+      const userRole = (sessionData.user.role || '').toUpperCase();
       const isProjectManager = (userRole === 'PROJECT_MANAGER' || userRole === 'DIRECTOR');
 
       // 1. صلاحيات المدير العام
@@ -380,7 +374,7 @@
         dynamicNav.appendChild(adminLi);
       }
 
-      // 2. إضافة موديول "الجدول الزمني" لمدير المشروعات أو للمدير العام
+      // 2. موديول الجدول الزمني (حصري وأساسي لمدير المشروعات والمدير العام)
       if (isProjectManager || userRole === 'SUPER_ADMIN') {
         const reportLi = document.createElement('li');
         reportLi.className = 'module-item' + (isProjectManager ? ' active' : '');
@@ -394,12 +388,8 @@
         dynamicNav.appendChild(reportLi);
       }
 
-      // 3. الموديولات التشغيلية الأخرى
-      let allowed = sessionData.allowedModules || [];
-      if (isProjectManager) {
-        // حجب شاشات الإدخال الميداني عن مدير المشروعات واقتصارها على التقارير
-        allowed = [];
-      }
+      // 3. الموديولات الميدانية (تُحجب بالكامل عن مدير المشروعات)
+      let allowed = isProjectManager ? [] : (sessionData.allowedModules || []);
 
       allowed.forEach((moduleKey, idx) => {
         const moduleInfo = SYSTEM_MODULES[moduleKey] || { name: moduleKey, icon: "📦", url: "" };
@@ -417,7 +407,7 @@
         dynamicNav.appendChild(li);
       });
 
-      // التوجيه الافتراضي حسب الدور فور تسجيل الدخول
+      // توجيه الشاشة الافتراضية بدقة
       if (isProjectManager) {
         loadReportView(SYSTEM_REPORTS[0]);
       } else if (userRole === 'SUPER_ADMIN') {
@@ -713,3 +703,4 @@
   </script>
 </body>
 </html>
+```[cite: 1]
