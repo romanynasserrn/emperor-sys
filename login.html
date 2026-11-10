@@ -185,19 +185,39 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
 
+    // مصفوفة التقارير التنفيذية المتاحة لمدير المشروعات والإدارة العليا
+    const SYSTEM_REPORTS = [
+      {
+        id: "TIMELINE_CONTROL",
+        name: "الجدول الزمني",
+        icon: "⏱️",
+        fileUrl: "timeline.html",
+        desc: "منظومة التحكم في المسار الزمني والتسليمات الهندسية وأقفال الأمان."
+      }
+    ];
+
     const SYSTEM_MODULES = {
+      "REPORTS_CENTER": {
+        name: "الجدول الزمني",
+        icon: "⏱️",
+        isReport: true,
+        desc: "لوحة التحكم التنفيذية للجدول الزمني والمسار الهندسي."
+      },
       "INWARD": {
         name: "إدارة الوارد اليومي",
+        icon: "📦",
         url: "https://script.google.com/macros/s/AKfycbyeE79yBlkUxAXkXJISMeKNx-AMuGqSYjnxd10jbAjXR4n_yvvGRwpClMisBftm6Kq5/exec",
         desc: "تسجيل ومطابقة أذون استلام التوريدات الميدانية والفحص الإداري."
       },
       "ALUMINUM": {
         name: "تتبع مصانع الألومنيوم",
+        icon: "🏗️",
         url: "",
         desc: "تتبع مراحل تشغيل وتركيب قطاعات الألومنيوم لقطاع المشاريع."
       },
       "OUTWARD": {
         name: "الصرف ومقايسات البلوكات",
+        icon: "📑",
         url: "",
         desc: "حوكمة صرف المواد وفق حدود حارس المقايسة المعتمد لكل بلوك."
       }
@@ -278,7 +298,6 @@
         }
       }
 
-      // قراءة البريد المحفوظ فقط؛ إذا لم يوجد يظل الحقل فارغاً تماماً
       const savedEmail = localStorage.getItem('emperor_saved_email');
       if (savedEmail) {
         userEmailInput.value = savedEmail;
@@ -344,7 +363,11 @@
 
       dynamicNav.innerHTML = '';
 
-      if (sessionData.user.role === 'SUPER_ADMIN') {
+      const userRole = sessionData.user.role;
+      const isProjectManager = (userRole === 'PROJECT_MANAGER' || userRole === 'DIRECTOR');
+
+      // 1. صلاحيات المدير العام
+      if (userRole === 'SUPER_ADMIN') {
         const adminLi = document.createElement('li');
         adminLi.className = 'module-item active';
         adminLi.innerHTML = '<span>🛡️</span> <span>إدارة الصلاحيات والمستخدمين</span>';
@@ -357,12 +380,32 @@
         dynamicNav.appendChild(adminLi);
       }
 
-      const allowed = sessionData.allowedModules || [];
+      // 2. إضافة موديول "الجدول الزمني" لمدير المشروعات أو للمدير العام
+      if (isProjectManager || userRole === 'SUPER_ADMIN') {
+        const reportLi = document.createElement('li');
+        reportLi.className = 'module-item' + (isProjectManager ? ' active' : '');
+        reportLi.innerHTML = '<span>⏱️</span> <span>الجدول الزمني</span>';
+        reportLi.addEventListener('click', () => {
+          document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
+          reportLi.classList.add('active');
+          closeSidebar();
+          loadReportView(SYSTEM_REPORTS[0]);
+        });
+        dynamicNav.appendChild(reportLi);
+      }
+
+      // 3. الموديولات التشغيلية الأخرى
+      let allowed = sessionData.allowedModules || [];
+      if (isProjectManager) {
+        // حجب شاشات الإدخال الميداني عن مدير المشروعات واقتصارها على التقارير
+        allowed = [];
+      }
+
       allowed.forEach((moduleKey, idx) => {
-        const moduleInfo = SYSTEM_MODULES[moduleKey] || { name: moduleKey, url: "" };
+        const moduleInfo = SYSTEM_MODULES[moduleKey] || { name: moduleKey, icon: "📦", url: "" };
         const li = document.createElement('li');
-        li.className = 'module-item' + (sessionData.user.role !== 'SUPER_ADMIN' && idx === 0 ? ' active' : '');
-        li.innerHTML = `<span>📦</span> <span>${moduleInfo.name}</span>`;
+        li.className = 'module-item' + (!isProjectManager && userRole !== 'SUPER_ADMIN' && idx === 0 ? ' active' : '');
+        li.innerHTML = `<span>${moduleInfo.icon || '📦'}</span> <span>${moduleInfo.name}</span>`;
 
         li.addEventListener('click', () => {
           document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
@@ -374,11 +417,24 @@
         dynamicNav.appendChild(li);
       });
 
-      if (sessionData.user.role === 'SUPER_ADMIN') {
+      // التوجيه الافتراضي حسب الدور فور تسجيل الدخول
+      if (isProjectManager) {
+        loadReportView(SYSTEM_REPORTS[0]);
+      } else if (userRole === 'SUPER_ADMIN') {
         loadAdminUserManagement();
       } else if (allowed.length > 0) {
         loadModuleView(allowed[0], SYSTEM_MODULES[allowed[0]]);
       }
+    }
+
+    // دالة عرض صفحة التقرير التفاعلية (الجدول الزمني)
+    function loadReportView(report) {
+      activeModuleTitle.textContent = report.name;
+      externalLinkBtn.href = report.fileUrl;
+      externalLinkBtn.style.display = 'inline-flex';
+      externalLinkBtn.textContent = 'فتح بملء الشاشة ↗';
+
+      workspaceBody.innerHTML = `<iframe class="module-iframe" src="${report.fileUrl}"></iframe>`;
     }
 
     function loadModuleView(moduleKey, moduleInfo) {
@@ -396,6 +452,7 @@
 
         externalLinkBtn.href = parameterizedUrl;
         externalLinkBtn.style.display = 'inline-flex';
+        externalLinkBtn.textContent = 'فتح بنافذة كاملة ↗';
         workspaceBody.innerHTML = `<iframe class="module-iframe" src="${parameterizedUrl}" allow="camera; microphone; geolocation"></iframe>`;
       } else {
         externalLinkBtn.style.display = 'none';
