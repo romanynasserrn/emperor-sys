@@ -236,7 +236,6 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
 
-    // مصفوفة التقارير التنفيذية المتاحة لمدير المشروعات
     const SYSTEM_REPORTS = [
       {
         id: "TIMELINE_CONTROL",
@@ -366,7 +365,7 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'جاري التحقق...';
 
-      const email = userEmailInput.value.trim();
+      const email = userEmailInput.value.trim().toLowerCase();
       const password = userPasswordInput.value.trim();
 
       try {
@@ -433,7 +432,7 @@
         dynamicNav.appendChild(adminLi);
       }
 
-      // 2. موديول الجدول الزمني (حصري وأساسي لمدير المشروعات والمدير العام)
+      // 2. موديول الجدول الزمني (حصري لمدير المشروعات والمدير العام)
       if (isProjectManager || userRole === 'SUPER_ADMIN') {
         const reportLi = document.createElement('li');
         reportLi.className = 'module-item' + (isProjectManager ? ' active' : '');
@@ -447,11 +446,14 @@
         dynamicNav.appendChild(reportLi);
       }
 
-      // 3. الموديولات الميدانية (تُحجب بالكامل عن مدير المشروعات)
+      // 3. الموديولات الميدانية المحددة للمستخدم فقط
       let allowed = isProjectManager ? [] : (sessionData.allowedModules || []);
 
       allowed.forEach((moduleKey, idx) => {
-        const moduleInfo = SYSTEM_MODULES[moduleKey] || { name: moduleKey, icon: "📦", url: "" };
+        const key = moduleKey.trim().toUpperCase();
+        if (!SYSTEM_MODULES[key]) return;
+
+        const moduleInfo = SYSTEM_MODULES[key];
         const li = document.createElement('li');
         li.className = 'module-item' + (!isProjectManager && userRole !== 'SUPER_ADMIN' && idx === 0 ? ' active' : '');
         li.innerHTML = `<span>${moduleInfo.icon || '📦'}</span> <span>${moduleInfo.name}</span>`;
@@ -460,19 +462,20 @@
           document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
           li.classList.add('active');
           closeSidebar();
-          loadModuleView(moduleKey, moduleInfo);
+          loadModuleView(key, moduleInfo);
         });
 
         dynamicNav.appendChild(li);
       });
 
-      // توجيه الشاشة الافتراضية بدقة
+      // توجيه الشاشة الافتراضية
       if (isProjectManager) {
         loadReportView(SYSTEM_REPORTS[0]);
       } else if (userRole === 'SUPER_ADMIN') {
         loadAdminUserManagement();
       } else if (allowed.length > 0) {
-        loadModuleView(allowed[0], SYSTEM_MODULES[allowed[0]]);
+        const firstKey = allowed[0].trim().toUpperCase();
+        loadModuleView(firstKey, SYSTEM_MODULES[firstKey] || { name: firstKey, url: "" });
       }
     }
 
@@ -481,7 +484,6 @@
       externalLinkBtn.href = report.fileUrl;
       externalLinkBtn.style.display = 'inline-flex';
       externalLinkBtn.textContent = 'فتح بملء الشاشة ↗';
-
       workspaceBody.innerHTML = `<iframe class="module-iframe" src="${report.fileUrl}"></iframe>`;
     }
 
@@ -619,9 +621,8 @@
                 </div>
               </div>
 
-              <!-- خيارات الموديولات والأدوات المتاحة للمستخدم -->
               <div class="form-group" style="margin-top: 10px;">
-                <label class="form-label">الأدوات والموديولات المتاحة للمستخدم:</label>
+                <label class="form-label">الأدوات والموديولات المصرح بها للمستخدم:</label>
                 <div style="display: flex; flex-wrap: wrap; gap: 14px; background: #f8fafc; padding: 14px; border: 1px solid var(--border); border-radius: 8px;">
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
                     <input type="checkbox" name="userModule" value="INWARD" checked>
@@ -636,7 +637,7 @@
                     📑 الصرف ومقايسات البلوكات
                   </label>
                 </div>
-                <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:4px;">حدد البرامج التي ستظهر في القائمة الجانبية للمستخدم بعد تسجيل دخوله.</small>
+                <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:4px;">حدد البرامج المتاحة لهذا الحساب حصراً.</small>
               </div>
 
               <button type="submit" id="saveUserBtn" class="btn-submit" style="margin-top:10px;">حفظ واعتماد المستخدم 💾</button>
@@ -653,7 +654,7 @@
                     <th>كود الشركة</th>
                     <th>الدور</th>
                     <th>المشروع المتاح</th>
-                    <th>الأدوات المتاحة</th>
+                    <th>الأدوات المصرح بها</th>
                     <th>الحالة</th>
                     <th>إجراء</th>
                   </tr>
@@ -677,32 +678,30 @@
       document.getElementById('targetProject').value = "ALL";
       document.getElementById('targetStatus').value = "ACTIVE";
       
-      // إعادة ضبط مربعات الاختيار للوضع الافتراضي
       document.querySelectorAll('input[name="userModule"]').forEach(cb => {
         cb.checked = (cb.value === 'INWARD');
       });
     };
 
     window.editUser = function(email) {
-      const user = metadataCache.users.find(u => u.email === email);
+      const user = metadataCache.users.find(u => u.email.trim().toLowerCase() === email.trim().toLowerCase());
       if (!user) return;
 
       document.getElementById('formTitle').textContent = "✏️ تعديل صلاحيات: " + user.email;
-      document.getElementById('targetEmail').value = user.email;
-      document.getElementById('targetEmail').readOnly = true;
+      document.getElementById('targetEmail').value = user.email.trim().toLowerCase();
+      document.getElementById('targetEmail').readOnly = true; // منع تغيير الإيميل أثناء التعديل
       document.getElementById('targetCompany').value = user.companyId;
       document.getElementById('targetRole').value = user.role;
       document.getElementById('targetProject').value = user.assignedProjectId;
       document.getElementById('targetStatus').value = user.status;
       document.getElementById('targetPass').value = "";
 
-      // تحديد الموديولات المسجلة للمستخدم
       const userMods = Array.isArray(user.allowedModules) 
         ? user.allowedModules 
         : (user.allowedModules ? String(user.allowedModules).split(',') : ['INWARD']);
 
       document.querySelectorAll('input[name="userModule"]').forEach(cb => {
-        cb.checked = userMods.includes('ALL') || userMods.includes(cb.value);
+        cb.checked = userMods.map(m => m.trim().toUpperCase()).includes(cb.value.toUpperCase());
       });
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -719,7 +718,7 @@
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: "DELETE_USER",
-            email: email,
+            email: email.trim().toLowerCase(),
             adminEmail: currentSession.user.email
           })
         });
@@ -740,14 +739,13 @@
       e.preventDefault();
       const saveBtn = document.getElementById('saveUserBtn');
 
-      const email = document.getElementById('targetEmail').value.trim();
+      const email = document.getElementById('targetEmail').value.trim().toLowerCase();
       const password = document.getElementById('targetPass').value.trim();
       const companyId = document.getElementById('targetCompany').value;
       const role = document.getElementById('targetRole').value;
       const assignedProjectId = document.getElementById('targetProject').value;
       const status = document.getElementById('targetStatus').value;
 
-      // جمع الموديولات المختارة
       const selectedModules = Array.from(document.querySelectorAll('input[name="userModule"]:checked'))
         .map(cb => cb.value);
 
@@ -778,6 +776,7 @@
         const data = await res.json();
         if (data.success) {
           alert('✓ ' + data.message);
+          resetUserForm();
           loadAdminUserManagement();
         } else {
           alert('خطأ: ' + data.message);
@@ -811,3 +810,11 @@
 </body>
 </html>
 ```[cite: 1]
+
+---
+
+### خطوة التنفيذ والتحقق:
+1. استبدل الدالتين في سكربت النواة `Code.gs` واعمل **Deploy > New deployment**.
+2. افتح شيت `TBL_USERS`؛ إذا وجدت صفوفاً مكررة لنفس البريد قم بحذف الصف المكرر يدوياً واترك صفاً واحداً فقط.
+3. استبدل كود `login.html` في GitHub واعمل `Commit changes`[cite: 1].
+4. عند دخولك للتعديل، اضغط على زر **تعديل** لأي مستخدم، حدد موديول "الوارد اليومي" فقط واضغط حفظ[cite: 1]؛ ستجده قام بتحديث نفس الصف في الشيت، وحين يسجل أمين المخزن دخوله ستظهر له أداة الوارد اليومي حصراً[cite: 1].
