@@ -29,8 +29,30 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-    .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; overflow-y: auto; }
-    .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+    .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; overflow-y: auto; position: relative; }
+    .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); position: relative; }
+    
+    .btn-back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 20px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      transition: all 0.2s;
+    }
+    .btn-back-home:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: #eff6ff;
+    }
+
     .brand-header { text-align: center; margin-bottom: 20px; }
     .brand-title { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
     .brand-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
@@ -63,6 +85,10 @@
     .alert { padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: none; }
     .alert-danger { background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
+    .card-footer-nav { text-align: center; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+    .footer-home-link { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 600; }
+    .footer-home-link:hover { text-decoration: underline; }
+
     .dashboard-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
     
     .sidebar { 
@@ -93,7 +119,11 @@
     .modules-nav { list-style: none; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; overflow-y: auto; white-space: nowrap; }
     .module-item { padding: 12px 14px; border-radius: 8px; color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s, color 0.2s; }
     .module-item:hover, .module-item.active { background: #1e293b; color: #ffffff; }
-    .btn-logout { background: transparent; border: 1px solid #475569; color: #cbd5e1; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s; margin-top: auto; white-space: nowrap; }
+    
+    .sidebar-bottom-actions { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+    .btn-portal-home { background: transparent; border: 1px dashed #475569; color: #94a3b8; padding: 8px; border-radius: 8px; font-size: 12px; text-decoration: none; text-align: center; transition: all 0.2s; }
+    .btn-portal-home:hover { border-color: #38bdf8; color: #ffffff; background: #1e293b; }
+    .btn-logout { background: transparent; border: 1px solid #475569; color: #cbd5e1; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
     .btn-logout:hover { background: #334155; color: #ffffff; }
 
     .main-content { flex-grow: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; width: 100%; }
@@ -160,6 +190,13 @@
   <!-- شاشة الدخول -->
   <div id="loginSection" class="login-container">
     <div class="login-card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="index.html" class="btn-back-home">
+          <span>➔</span>
+          <span>الرئيسية</span>
+        </a>
+      </div>
+
       <div class="brand-header">
         <h1 class="brand-title">EMPEROR SYS</h1>
         <p class="brand-subtitle">بوابة إدارة العمليات والمخازن المركزية</p>
@@ -200,6 +237,10 @@
 
         <button type="submit" id="submitBtn" class="btn-submit">تسجيل الدخول للمنظومة</button>
       </form>
+
+      <div class="card-footer-nav">
+        <a href="index.html" class="footer-home-link">العودة إلى الصفحة الرئيسية للتعريف بالمنظومة ←</a>
+      </div>
     </div>
   </div>
 
@@ -218,7 +259,10 @@
         <ul id="dynamicNav" class="modules-nav"></ul>
       </nav>
 
-      <button id="logoutBtn" class="btn-logout">تسجيل الخروج</button>
+      <div class="sidebar-bottom-actions">
+        <a href="index.html" class="btn-portal-home">🌐 الصفحة الرئيسية للمنظومة</a>
+        <button id="logoutBtn" class="btn-logout">تسجيل الخروج</button>
+      </div>
     </aside>
 
     <main class="main-content">
@@ -236,7 +280,6 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
 
-    // المنظومة الشاملة للموديولات والأدوات وروابطها التشغيلية
     const SYSTEM_MODULES = {
       "TIMELINE_CONTROL": {
         name: "الجدول الزمني",
@@ -331,10 +374,8 @@
     }
 
     function closeSidebar() {
-      if (window.innerWidth <= 768) {
-        mainSidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('active');
-      }
+      mainSidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
     }
 
     menuToggleBtn.addEventListener('click', toggleSidebar);
@@ -426,7 +467,6 @@
 
       const userRole = (sessionData.user.role || '').toUpperCase();
 
-      // 1. صلاحيات المدير العام
       if (userRole === 'SUPER_ADMIN') {
         const adminLi = document.createElement('li');
         adminLi.className = 'module-item active';
@@ -440,14 +480,12 @@
         dynamicNav.appendChild(adminLi);
       }
 
-      // 2. معالجة وتوافق مصفوفة الموديولات المسموحة
       let rawAllowed = sessionData.allowedModules || [];
       let allowed = [];
 
       rawAllowed.forEach(m => {
         let key = String(m).trim().toUpperCase();
         if (key === 'ALUMINUM') {
-          // التوافق مع التسمية القديمة: تفعيل الرابطين تلقائياً
           allowed.push('ALUMINUM_MGR');
           allowed.push('ALUMINUM_EXEC');
         } else {
@@ -455,7 +493,6 @@
         }
       });
 
-      // إذا كان مدير مشروع ولم يسجل له موديول محدد، يعطى الجدول الزمني ولوحة مدير الألومنيوم
       if (allowed.length === 0 && userRole === 'PROJECT_MANAGER') {
         allowed = ['TIMELINE_CONTROL', 'ALUMINUM_MGR'];
       }
@@ -483,7 +520,6 @@
         dynamicNav.appendChild(li);
       });
 
-      // توجيه الشاشة الافتراضية
       if (userRole === 'SUPER_ADMIN') {
         loadAdminUserManagement();
       } else if (allowed.length > 0) {
@@ -516,7 +552,6 @@
         const assignedProj = currentSession.user.assignedProjectId || 'ALL';
         const projectsParam = encodeURIComponent(JSON.stringify(currentSession.projects || []));
 
-        // التحقق مما إذا كان الرابط يحتوي بالفعل على بارامترات مسبقة
         const separator = moduleInfo.url.includes('?') ? '&' : '?';
         const parameterizedUrl = `${moduleInfo.url}${separator}cid=${encodeURIComponent(compId)}&cname=${encodeURIComponent(compName)}&uemail=${encodeURIComponent(userEmail)}&role=${encodeURIComponent(userRole)}&assigned_pid=${encodeURIComponent(assignedProj)}&projects=${projectsParam}`;
 
@@ -732,7 +767,6 @@
 
       userMods = userMods.map(m => m.trim().toUpperCase());
 
-      // مطابقة التسميات القديمة للألومنيوم
       if (userMods.includes('ALUMINUM')) {
         userMods.push('ALUMINUM_MGR');
         userMods.push('ALUMINUM_EXEC');
@@ -828,9 +862,16 @@
       }
     }
 
+    // زر تسجيل الخروج مع إغلاق القائمة والغطاء الشفاف وتفريغ المحتوى بالكامل
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('emperor_session');
       currentSession = null;
+      
+      closeSidebar();
+      mainSidebar.classList.remove('collapsed');
+      
+      workspaceBody.innerHTML = '';
+      
       dashboardSection.style.display = 'none';
       loginSection.style.display = 'flex';
       userPasswordInput.value = '';
