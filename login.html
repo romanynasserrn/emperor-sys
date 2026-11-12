@@ -545,7 +545,7 @@
       externalLinkBtn.href = report.url;
       externalLinkBtn.style.display = 'inline-flex';
       externalLinkBtn.textContent = 'فتح بملء الشاشة ↗';
-      workspaceBody.innerHTML = `<iframe class="module-iframe" src="${report.url}"></iframe>`;
+      workspaceBody.innerHTML = `<iframe class="module-iframe" src="${report.url}" allow="downloads; fullscreen; clipboard-read; clipboard-write"></iframe>`;
     }
 
     function loadModuleView(moduleKey, moduleInfo) {
@@ -565,7 +565,7 @@
         externalLinkBtn.href = parameterizedUrl;
         externalLinkBtn.style.display = 'inline-flex';
         externalLinkBtn.textContent = 'فتح بنافذة كاملة ↗';
-        workspaceBody.innerHTML = `<iframe class="module-iframe" src="${parameterizedUrl}" allow="camera; microphone; geolocation"></iframe>`;
+        workspaceBody.innerHTML = `<iframe class="module-iframe" src="${parameterizedUrl}" allow="camera; microphone; geolocation; downloads; fullscreen"></iframe>`;
       } else {
         externalLinkBtn.style.display = 'none';
         workspaceBody.innerHTML = `
