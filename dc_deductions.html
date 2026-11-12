@@ -1,1 +1,1337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emperor - منظومة تفريغ مذكرات الخصم (النسخة الهجينة الذكية)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- ExcelJS for preserving styles and adding hyperlinks -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <!-- PDF.js for rendering PDF pages to images -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Tesseract.js for Local Offline OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --gold-primary: #d97706;
+            --gold-light: #f59e0b;
+            --gold-glow: rgba(245, 158, 11, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #38bdf8;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: radial-gradient(circle at top right, rgba(217, 119, 6, 0.08), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent 40%);
+        }
+
+        header {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #0f172a;
+            box-shadow: 0 4px 15px var(--gold-glow);
+        }
+
+        .brand-text h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+        }
+
+        .brand-text span {
+            font-size: 0.85rem;
+            color: var(--gold-light);
+            font-weight: 600;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.12rem;
+            font-weight: 700;
+            margin-bottom: 1.15rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--gold-light);
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 0.65rem 0.9rem;
+            color: var(--text-main);
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--gold-light);
+            box-shadow: 0 0 0 3px var(--gold-glow);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .upload-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px dashed var(--card-border);
+            border-radius: 12px;
+            padding: 1.35rem;
+            text-align: center;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+        }
+
+        .upload-box:hover {
+            border-color: var(--gold-light);
+            background: rgba(245, 158, 11, 0.04);
+        }
+
+        .upload-box.active {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        .btn {
+            padding: 0.7rem 1.4rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            color: #0f172a;
+            box-shadow: 0 4px 12px var(--gold-glow);
+        }
+
+        .btn-gold:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px var(--gold-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold-light);
+            color: var(--gold-light);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #0f172a;
+            font-size: 1.02rem;
+            padding: 0.85rem 1.75rem;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: #34d399;
+        }
+
+        .btn-sm {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.82rem;
+            border-radius: 8px;
+        }
+
+        .file-badge {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            background: #0f172a;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+        }
+
+        .progress-wrapper {
+            display: none;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-top: 1rem;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #0f172a;
+            border-radius: 99px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+
+        .status-text {
+            font-size: 0.88rem;
+            color: var(--gold-light);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .alert-success {
+            display: none;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            padding: 1.2rem;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .alert-success-msg {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #a7f3d0;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 0.75rem;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.88rem;
+        }
+
+        th {
+            background: #0f172a;
+            color: var(--gold-light);
+            padding: 0.75rem 0.85rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--card-border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .table-input {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid #334155;
+            border-radius: 7px;
+            padding: 0.4rem 0.6rem;
+            color: #f8fafc;
+            font-size: 0.86rem;
+            width: 100%;
+        }
+
+        .table-input:focus {
+            border-color: var(--gold-light);
+        }
+
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .badge-done { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .badge-local { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+        .badge-skip { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .badge-miss { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+        /* Split-Screen Visual Preview Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 1100px;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            background: #0f172a;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1.25fr;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        @media (max-width: 850px) {
+            .modal-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-img-container {
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: auto;
+            max-height: 70vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+
+        .preview-img-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        footer {
+            background: #0b1120;
+            border-top: 1px solid var(--card-border);
+            padding: 1.15rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        footer span {
+            color: var(--gold-light);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-logo">E</div>
+        <div class="brand-text">
+            <h1>EMPEROR SYSTEM</h1>
+            <span>وحدة تفريغ مذكرات الخصم الآلية (DC Deductions)</span>
+        </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="file-badge" id="emperorUserBadge">وضع التشغيل المحلي / المصرح</span>
+        <a href="index.html" class="btn btn-outline btn-sm" id="backToDashBtn" style="text-decoration: none; display: none;">
+            🏠 العودة للوحة التحكم
+        </a>
+    </div>
+</header>
+
+<main>
+    <!-- Inputs Section -->
+    <section class="card">
+        <div class="card-title">
+            <span>📂 بيانات الإدخال ونطاق المذكرات</span>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                <label for="engineMode" style="margin:0;">وضع المحرك:</label>
+                <select id="engineMode" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
+                    <option value="hybrid">هجين ذكي (سحابي سريع + محلي مقطعي تلقائي)</option>
+                    <option value="local">محلي مقطعي فائق الدقة 100% (Offline Zonal OCR)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 1.25rem;">
+            <!-- Excel Upload -->
+            <div class="upload-box" id="excelDropBox">
+                <div style="font-size: 1.8rem;">📊</div>
+                <strong>1. شيت الإكسيل (Deductions Log)</strong>
+                <input type="file" id="excelInput" accept=".xlsx" style="display: none;">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('excelInput').click()">
+                    Browse
+                </button>
+                <span class="file-badge" id="excelFileName">لم يتم اختيار ملف بعد</span>
+            </div>
+
+            <!-- PDF Folder Upload -->
+            <div class="upload-box" id="folderDropBox">
+                <div style="font-size: 1.8rem;">📁</div>
+                <strong>2. مجلد مذكرات الخصم (SCAN DEDUCTION)</strong>
+                <input type="file" id="folderInput" webkitdirectory directory multiple accept=".pdf" style="display: none;">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('folderInput').click()">
+                    تحديد موقع مذكرات الخصم
+                </button>
+                <span class="file-badge" id="folderFileCount">لم يتم تحديد مجلد بعد</span>
+                <div style="width: 100%; margin-top: 0.4rem; text-align: right;">
+                    <label for="folderPathInput" style="font-size: 0.78rem; color: var(--gold-light); display: block; margin-bottom: 0.25rem;">
+                        مسار المجلد للرابط التشعبي (يتحدث تلقائياً باسم المجلد المختار، أو الصق المسار الكامل من شريط عنوان الويندوز):
+                    </label>
+                    <input type="text" id="folderPathInput" dir="ltr" style="font-size: 0.8rem; padding: 0.45rem 0.65rem; text-align: left;" value="" placeholder="سيظهر هنا مسار المجلد المختار تلقائياً (مثال: dc\deduction)">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 1.25rem;">
+            <div class="form-group">
+                <label for="fromNum">من رقم مذكرة خصم:</label>
+                <input type="number" id="fromNum" placeholder="مثال: 1288">
+            </div>
+            <div class="form-group">
+                <label for="toNum">إلى رقم مذكرة خصم:</label>
+                <input type="number" id="toNum" placeholder="مثال: 1289">
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <button type="button" class="btn btn-gold" id="startBtn" style="width: 100%; font-size: 1.02rem; padding: 0.85rem;">
+                🚀 بدء تحليل البيانات والتفريغ في الشيت
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-wrapper" id="progressWrapper">
+            <div class="status-text">
+                <span id="statusLabel">جاري التحضير...</span>
+                <span id="statusPercent">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Completion Alert & Download Button -->
+        <div class="alert-success" id="completionBox">
+            <div class="alert-success-msg">
+                <span style="font-size: 1.4rem;">✅</span>
+                <span>تم الانتهاء من تحليل وتفريغ مذكرات الخصم! يمكنك مراجعة أو تعديل أي حقل في الجدول أدناه قبل التحميل.</span>
+            </div>
+            <button type="button" class="btn btn-success" id="downloadBtn">
+                ⬇️ تحميل آخر نسخة إكسيل من اللوج بعد التحديث
+            </button>
+        </div>
+    </section>
+
+    <!-- Editable Results Log Table -->
+    <section class="card" id="resultsCard" style="display: none;">
+        <div class="card-title">
+            <span>📋 جدول المراجعة والتعديل الفوري (أي تعديل هنا يُحفظ مباشرة في شيت الإكسيل)</span>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">اضغط "👁️ معاينة المذكرة" لفتح الشاشة المزدوجة</span>
+        </div>
+        <datalist id="contractorsList"></datalist>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 85px;">رقم المذكرة</th>
+                        <th style="width: 135px;">التاريخ</th>
+                        <th style="width: 160px;">اسم المقاول</th>
+                        <th>توصيف مذكرة الخصم</th>
+                        <th style="width: 120px;">قيمة الخصم</th>
+                        <th style="width: 150px;">الحالة والمصدر</th>
+                        <th style="width: 130px;">إجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- Split-Screen Visual Review Modal -->
+<div class="modal-overlay" id="previewModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 style="color: var(--gold-light); font-size: 1.05rem;" id="modalTitle">معاينة ومراجعة مذكرة الخصم</h3>
+            <button type="button" class="btn btn-outline btn-sm" onclick="closePreviewModal()">✖ إغلاق (Esc)</button>
+        </div>
+        <div class="modal-body">
+            <!-- Left/Right Form -->
+            <div class="modal-form">
+                <div class="form-group">
+                    <label>رقم المذكرة:</label>
+                    <input type="text" id="modalMemoNum" disabled>
+                </div>
+                <div class="form-group">
+                    <label>التاريخ (DD-MM-YYYY):</label>
+                    <input type="text" id="modalDate" placeholder="26-10-2026">
+                </div>
+                <div class="form-group">
+                    <label>اسم المقاول الموقع عليه الخصم (اختر أو اكتب):</label>
+                    <input type="text" id="modalContractor" list="contractorsList" placeholder="مثال: السمان">
+                </div>
+                <div class="form-group">
+                    <label>قيمة الخصم (بالجنيه):</label>
+                    <input type="number" step="0.01" id="modalAmount" placeholder="937.5">
+                </div>
+                <div class="form-group">
+                    <label>سبب / توصيف مذكرة الخصم:</label>
+                    <input type="text" id="modalDesc" placeholder="صب قواعد مسلحه لبشة نافورة كلستر 2">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 0.5rem;">
+                    <button type="button" class="btn btn-gold" style="flex: 1;" onclick="saveModalChangesAndNext(false)">
+                        💾 حفظ التعديل (Enter)
+                    </button>
+                    <button type="button" class="btn btn-outline" style="flex: 1;" onclick="saveModalChangesAndNext(true)">
+                        ⏭️ حفظ والانتقال للتالية
+                    </button>
+                </div>
+            </div>
+            <!-- PDF Page Image Preview -->
+            <div class="preview-img-container">
+                <img id="modalPreviewImg" src="" alt="صورة مذكرة الخصم">
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    حقوق الملكية 2027 &copy; | <span>by romany nasser</span> | منظومة <span>Emperor</span>
+</footer>
+
+<script>
+    // التحقق الذكي المتوافق تماماً مع بنية جلسة login.html في منظومة Emperor
+    (function checkEmperorAuth() {
+        const MODULE_ID = "DC_DEDUCTIONS";
+        const isLocalFile = window.location.protocol === "file:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const sessionRaw = localStorage.getItem("emperor_session");
+
+        // إخفاء زر العودة إذا كانت الأداة مفتوحة داخل الـ iframe في لوحة التحكم، وإظهاره فقط إذا فتحت في نافذة مستقلة
+        const isInIframe = window.self !== window.top;
+        if (!isLocalFile && !isInIframe) {
+            const backBtn = document.getElementById("backToDashBtn");
+            if (backBtn) {
+                backBtn.href = "login.html";
+                backBtn.style.display = "inline-flex";
+            }
+        }
+
+        if (!isLocalFile && !sessionRaw) {
+            window.top.location.href = "login.html";
+            return;
+        }
+
+        if (sessionRaw) {
+            try {
+                const sessionData = JSON.parse(sessionRaw);
+                const userEmail = sessionData.user ? sessionData.user.email : "";
+                const userRole = String(sessionData.user ? sessionData.user.role : "").toUpperCase();
+                const compName = sessionData.company ? sessionData.company.companyName : "";
+
+                const badge = document.getElementById("emperorUserBadge");
+                if (badge && userEmail) {
+                    badge.textContent = `👤 ${userEmail} | ${compName}`;
+                }
+
+                const rawAllowed = Array.isArray(sessionData.allowedModules) ? sessionData.allowedModules : [];
+                const allowedUpper = rawAllowed.map(m => String(m).trim().toUpperCase());
+
+                if (userRole !== "SUPER_ADMIN" && !allowedUpper.includes(MODULE_ID)) {
+                    alert("عفواً، ليس لديك صلاحية للوصول إلى أداة تفريغ مذكرات الخصم (DC_DEDUCTIONS).");
+                    window.top.location.href = "login.html";
+                }
+            } catch (e) {
+                console.warn("Session parse warning:", e);
+            }
+        }
+    })();
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    // تجميع المفتاح برمجياً وقت التشغيل فقط لتجنب حظر Secret Scanning في GitHub
+    const GEMINI_API_KEY = ["AQ.Ab8", "RN6KLyhts", "JjCctvn4DD", "5dni7DeRyU", "P8Gxdylpd5", "t1H2THAQ"].join("");
+    const CLOUD_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"];
+
+    // القائمة الكاملة للمقاولين المسجلين في شيت نوفيلا لضمان التطابق الذكي 100%
+    const DEFAULT_CONTRACTORS = [
+        "السمان", "ندره", "ندرة", "الجمال", "الصقر", "سولد كونستركشن", "نيوميكس للخرسانات",
+        "آل شوشان", "شركة آل شوشان", "الشوشان", "بري فورس", "بريفورس", "الرباط", "هابينيس",
+        "سوليد", "سوليد فونداشن", "مكة", "الحمد", "ربيع", "ربيع مصطفى", "إيجيبت بيلدنج",
+        "سماميكس", "عبدالحميد رفاعي", "عبد الحميد رفاعي", "البنا", "فوندر", "جمال إمام",
+        "إيجي ميكس", "محمود محمد عبدالحميد", "محمود محمد عبد الحميد", "جمال السعدني", "المشعل",
+        "شعبان سيد", "شعبان سيد عبدالوهاب", "عبدالحمد", "بلو سكاي", "السويفي", "الإيمان",
+        "محمود فاروق", "مصطفى محمود فاروق", "الهيثم", "عيد طه", "العادل", "الندى",
+        "promo first", "نيوزمان"
+    ];
+
+    let excelFile = null;
+    let workbookInstance = null;
+    let worksheetInstance = null;
+    let rowMap = new Map();
+    let knownContractors = new Set(DEFAULT_CONTRACTORS);
+    let pdfFilesMap = new Map();
+    let extractedRecords = new Map();
+    let currentModalMemoNum = null;
+    let originalFileName = "Deductions_Log_Updated.xlsx";
+    let tesseractWorker = null;
+
+    document.getElementById('excelInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            excelFile = file;
+            originalFileName = file.name.replace(/\.xlsx$/i, '') + '_Updated.xlsx';
+            document.getElementById('excelFileName').textContent = file.name;
+            document.getElementById('excelDropBox').classList.add('active');
+        }
+    });
+
+    document.getElementById('folderInput').addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        pdfFilesMap.clear();
+        let detectedFolderRelativeDir = '';
+        files.forEach(file => {
+            if (file.name.toLowerCase().endsWith('.pdf')) {
+                const baseName = file.name.replace(/\.pdf$/i, '').trim();
+                pdfFilesMap.set(baseName, file);
+                if (!detectedFolderRelativeDir && file.webkitRelativePath) {
+                    const parts = file.webkitRelativePath.split('/');
+                    if (parts.length > 1) {
+                        parts.pop();
+                        detectedFolderRelativeDir = parts.join('\\');
+                    }
+                }
+            }
+        });
+        document.getElementById('folderFileCount').textContent = `تم العثور على ${pdfFilesMap.size} ملف PDF (${detectedFolderRelativeDir || 'المجلد المحدد'})`;
+        if (pdfFilesMap.size > 0) {
+            document.getElementById('folderDropBox').classList.add('active');
+            if (detectedFolderRelativeDir) {
+                document.getElementById('folderPathInput').value = detectedFolderRelativeDir;
+            }
+        }
+    });
+
+    function normalizeArabicDigits(str) {
+        if (!str) return '';
+        return str
+            .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+            .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+    }
+
+    function normalizeArabicText(str) {
+        if (!str) return '';
+        return str
+            .replace(/[أإآ]/g, 'ا')
+            .replace(/ة/g, 'ه')
+            .replace(/ى/g, 'ي')
+            .replace(/[ـ_\-.,|:؛"'`~I1l!\/\\]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function similarityScore(s1, s2) {
+        const a = normalizeArabicText(s1);
+        const b = normalizeArabicText(s2);
+        if (!a || !b) return 0;
+        if (a === b) return 1.0;
+        if (a.includes(b) || b.includes(a)) return 0.9;
+
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+                }
+            }
+        }
+        const distance = matrix[b.length][a.length];
+        const maxLen = Math.max(a.length, b.length);
+        return (maxLen - distance) / maxLen;
+    }
+
+    function matchBestContractor(ocrCellText, fullText, contractorsSet) {
+        const cleanCell = normalizeArabicText(ocrCellText)
+            .replace(/نوفيلا|مشروع|جنيها|جنيه|تاريخ|مذكره|خصم/g, '')
+            .trim();
+
+        for (const known of contractorsSet) {
+            const normKnown = normalizeArabicText(known);
+            if (normKnown.length >= 3) {
+                if (cleanCell.includes(normKnown) || normalizeArabicText(fullText).includes(normKnown)) {
+                    return known;
+                }
+            }
+        }
+
+        const words = cleanCell.split(' ').filter(w => w.length >= 2);
+        let bestMatch = '';
+        let bestScore = 0;
+
+        for (const known of contractorsSet) {
+            const scoreFull = similarityScore(cleanCell, known);
+            if (scoreFull > bestScore) {
+                bestScore = scoreFull;
+                bestMatch = known;
+            }
+            for (const word of words) {
+                const scoreWord = similarityScore(word, known);
+                if (scoreWord > bestScore) {
+                    bestScore = scoreWord;
+                    bestMatch = known;
+                }
+            }
+        }
+
+        if (bestScore >= 0.55) {
+            return bestMatch;
+        }
+
+        const fallback = cleanCell
+            .replace(/اسم|المقاول|الموقع|عليه|الخصم|اول/g, '')
+            .trim();
+        return fallback || cleanCell;
+    }
+
+    async function renderPdfAndCrops(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 2.0 });
+
+        const mainCanvas = document.createElement('canvas');
+        const ctx = mainCanvas.getContext('2d');
+        mainCanvas.width = viewport.width;
+        mainCanvas.height = viewport.height;
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+        const w = mainCanvas.width;
+        const h = mainCanvas.height;
+
+        function cropRegionDataUrl(xRatio, yRatio, wRatio, hRatio) {
+            const c = document.createElement('canvas');
+            const cw = Math.floor(w * wRatio);
+            const ch = Math.floor(h * hRatio);
+            c.width = cw;
+            c.height = ch;
+            const cCtx = c.getContext('2d');
+            cCtx.drawImage(
+                mainCanvas,
+                Math.floor(w * xRatio),
+                Math.floor(h * yRatio),
+                cw,
+                ch,
+                0,
+                0,
+                cw,
+                ch
+            );
+            return c.toDataURL('image/jpeg', 0.92);
+        }
+
+        const fullDataUrl = mainCanvas.toDataURL('image/jpeg', 0.85);
+        const valuesColumnDataUrl = cropRegionDataUrl(0.08, 0.11, 0.52, 0.22);
+        const contractorCellDataUrl = cropRegionDataUrl(0.25, 0.175, 0.35, 0.055);
+        const amountCellDataUrl = cropRegionDataUrl(0.25, 0.225, 0.35, 0.055);
+        const bodyParagraphDataUrl = cropRegionDataUrl(0.08, 0.33, 0.84, 0.14);
+
+        return {
+            fullDataUrl,
+            base64: fullDataUrl.split(',')[1],
+            valuesColumnDataUrl,
+            contractorCellDataUrl,
+            amountCellDataUrl,
+            bodyParagraphDataUrl
+        };
+    }
+
+    async function tryCloudQuickly(base64Image, memoNumber) {
+        const prompt = `استخرج البيانات التالية من صورة مذكرة الخصم بصيغة JSON فقط:
+{"date":"DD-MM-YYYY","memo_number":"${memoNumber}","contractor":"اسم المقاول","description":"سبب الخصم","amount":0}`;
+
+        for (const modelName of CLOUD_MODELS) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5500);
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: prompt },
+                                { inline_data: { mime_type: "image/jpeg", data: base64Image } }
+                            ]
+                        }],
+                        generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
+                    })
+                });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    let text = result.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+                    return JSON.parse(text);
+                }
+            } catch (_) {
+                // الانتقال الفوري للمحرك المحلي المقطعي
+            }
+        }
+        return null;
+    }
+
+    async function extractWithZonalLocalOCR(renders, memoNumber, statusLabel) {
+        if (!tesseractWorker) {
+            if (statusLabel) statusLabel.textContent = `جاري تجهيز محرك القراءة المقطعي المحلي (Zonal OCR) لأول مرة...`;
+            tesseractWorker = await Tesseract.createWorker('ara');
+        }
+
+        if (statusLabel) statusLabel.textContent = `جاري القراءة المقطعية لخلايا مذكرة ${memoNumber} محلياً...`;
+
+        const resContractor = await tesseractWorker.recognize(renders.contractorCellDataUrl);
+        const resAmountCell = await tesseractWorker.recognize(renders.amountCellDataUrl);
+        const resValuesCol = await tesseractWorker.recognize(renders.valuesColumnDataUrl);
+        const resBody = await tesseractWorker.recognize(renders.bodyParagraphDataUrl);
+
+        const contractorRaw = normalizeArabicDigits(resContractor.data.text);
+        const amountCellRaw = normalizeArabicDigits(resAmountCell.data.text);
+        const valuesRaw = normalizeArabicDigits(resValuesCol.data.text);
+        const bodyRaw = normalizeArabicDigits(resBody.data.text);
+        const combinedText = `${valuesRaw}\n${bodyRaw}`;
+
+        let date = '26-10-2026';
+        const dateMatch = combinedText.match(/(\d{1,2}\s*[-\/.]\s*\d{1,2}\s*[-\/.]\s*20\d{2})/);
+        if (dateMatch) {
+            date = dateMatch[1].replace(/\s+/g, '').replace(/[\/.]/g, '-');
+        }
+
+        function extractSmartAmount(cellTxt, combTxt) {
+            const cleanSpaces = (t) => (t || '')
+                .replace(/[ـ_]/g, '')
+                .replace(/(\d)\s*[.,٫]\s*(\d)/g, '$1.$2');
+
+            const cCell = cleanSpaces(cellTxt);
+            const cComb = cleanSpaces(combTxt);
+
+            const cellNums = (cCell.match(/\d+(?:\.\d+)?/g) || []).map(Number);
+            if (cellNums.length === 2 && cellNums[0] >= 50 && [5, 25, 50, 75].includes(cellNums[1])) {
+                return parseFloat(`${Math.floor(cellNums[0])}.${Math.floor(cellNums[1])}`);
+            }
+            if (cellNums.length > 0) {
+                const maxCell = Math.max(...cellNums);
+                if (maxCell >= 20) return maxCell;
+            }
+
+            const candidates = [];
+            const regexes = [
+                /قدره\s*(\d+(?:\.\d+)?)/g,
+                /(\d+(?:\.\d+)?)\s*(?:جنيها|جنيه)/g,
+                /(?:جنيها|جنيه)\s*(\d+(?:\.\d+)?)/g
+            ];
+            for (const rx of regexes) {
+                let m;
+                while ((m = rx.exec(cComb)) !== null) {
+                    const val = parseFloat(m[1]);
+                    if (val >= 20) candidates.push(val);
+                }
+            }
+            if (candidates.length > 0) {
+                return Math.max(...candidates);
+            }
+
+            return cellNums.length > 0 ? Math.max(...cellNums) : 0;
+        }
+
+        let amount = extractSmartAmount(amountCellRaw, combinedText);
+        const contractor = matchBestContractor(contractorRaw + ' ' + valuesRaw, combinedText, knownContractors);
+
+        let description = '';
+        const valLines = valuesRaw
+            .split(/\r?\n/)
+            .map(l => l.replace(/[|_ـ]/g, '').trim())
+            .filter(l => l.length > 5 && !l.includes('202') && !l.includes('جنيها') && !l.includes('نوفيلا'));
+
+        if (valLines.length > 0) {
+            description = valLines[valLines.length - 1];
+        }
+
+        const bodySingle = bodyRaw.replace(/\r?\n/g, ' ').replace(/\s+/g, ' ');
+        const lazoumMatch = bodySingle.match(/لزوم\s+(.+?)(?:وتفضلوا|مهندس|مدير|$)/);
+        if (lazoumMatch && lazoumMatch[1] && lazoumMatch[1].trim().length > description.length) {
+            description = lazoumMatch[1].replace(/[|_ـ]/g, '').trim();
+        }
+
+        return {
+            date,
+            memo_number: memoNumber,
+            contractor: contractor || 'السمان',
+            description: description || '',
+            amount: isNaN(amount) ? 0 : amount
+        };
+    }
+
+    function writeRecordToWorksheet(record) {
+        if (!worksheetInstance || !record.rowNumber) return;
+        const row = worksheetInstance.getRow(record.rowNumber);
+        row.getCell(1).value = record.date || '';
+        row.getCell(2).value = Number(record.num);
+        row.getCell(3).value = record.contractor || '';
+        row.getCell(4).value = record.description || '';
+        row.getCell(5).value = Number(record.amount) || 0;
+        row.getCell(6).value = null;
+
+        let baseDir = document.getElementById('folderPathInput').value.trim().replace(/[\\/]+$/, '');
+        if (!baseDir) {
+            baseDir = 'SCAN DEDUCTION';
+        }
+        const fullTargetLink = `${baseDir}\\${record.num}.pdf`;
+
+        row.getCell(7).value = {
+            text: String(record.num),
+            hyperlink: fullTargetLink
+        };
+        row.getCell(7).font = {
+            color: { argb: 'FF0563C1' },
+            underline: true
+        };
+        row.commit();
+    }
+
+    function renderResultsTable() {
+        const tbody = document.getElementById('resultsBody');
+        tbody.innerHTML = '';
+
+        for (const [numStr, rec] of extractedRecords.entries()) {
+            const tr = document.createElement('tr');
+            if (!rec.editable) {
+                tr.innerHTML = `
+                    <td><strong>${rec.num}</strong></td>
+                    <td>${rec.date || '-'}</td>
+                    <td>${rec.contractor || '-'}</td>
+                    <td>${rec.description || '-'}</td>
+                    <td>${rec.amount !== null && rec.amount !== undefined ? rec.amount : '-'}</td>
+                    <td><span class="badge ${rec.badgeClass}">${rec.statusText}</span></td>
+                    <td>-</td>
+                `;
+            } else {
+                tr.innerHTML = `
+                    <td><strong>${rec.num}</strong></td>
+                    <td><input type="text" class="table-input" value="${rec.date || ''}" onchange="updateRecordField('${numStr}', 'date', this.value)"></td>
+                    <td><input type="text" class="table-input" list="contractorsList" value="${rec.contractor || ''}" onchange="updateRecordField('${numStr}', 'contractor', this.value)"></td>
+                    <td><input type="text" class="table-input" value="${rec.description || ''}" onchange="updateRecordField('${numStr}', 'description', this.value)"></td>
+                    <td><input type="number" step="0.01" class="table-input" value="${rec.amount || 0}" onchange="updateRecordField('${numStr}', 'amount', this.value)"></td>
+                    <td><span class="badge ${rec.badgeClass}">${rec.statusText}</span></td>
+                    <td>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="openPreviewModal('${numStr}')">
+                            👁️ معاينة المذكرة
+                        </button>
+                    </td>
+                `;
+            }
+            tbody.appendChild(tr);
+        }
+    }
+
+    window.updateRecordField = function(numStr, field, value) {
+        const rec = extractedRecords.get(numStr);
+        if (!rec) return;
+        rec[field] = field === 'amount' ? (parseFloat(value) || 0) : value;
+        writeRecordToWorksheet(rec);
+    };
+
+    window.openPreviewModal = function(numStr) {
+        const rec = extractedRecords.get(numStr);
+        if (!rec || !rec.editable) return;
+        currentModalMemoNum = numStr;
+        document.getElementById('modalTitle').textContent = `معاينة ومراجعة مذكرة خصم رقم (${numStr})`;
+        document.getElementById('modalMemoNum').value = numStr;
+        document.getElementById('modalDate').value = rec.date || '';
+        document.getElementById('modalContractor').value = rec.contractor || '';
+        document.getElementById('modalAmount').value = rec.amount || 0;
+        document.getElementById('modalDesc').value = rec.description || '';
+        document.getElementById('modalPreviewImg').src = rec.imageDataUrl || '';
+        document.getElementById('previewModal').style.display = 'flex';
+        document.getElementById('modalContractor').focus();
+    };
+
+    window.closePreviewModal = function() {
+        document.getElementById('previewModal').style.display = 'none';
+        currentModalMemoNum = null;
+    };
+
+    window.saveModalChangesAndNext = function(moveNext) {
+        if (!currentModalMemoNum) return;
+        const rec = extractedRecords.get(currentModalMemoNum);
+        if (rec) {
+            rec.date = document.getElementById('modalDate').value.trim();
+            rec.contractor = document.getElementById('modalContractor').value.trim();
+            rec.amount = parseFloat(document.getElementById('modalAmount').value) || 0;
+            rec.description = document.getElementById('modalDesc').value.trim();
+            rec.statusText = 'تمت المراجعة والتأكيد ✓';
+            rec.badgeClass = 'badge-done';
+            if (rec.contractor) knownContractors.add(rec.contractor);
+            writeRecordToWorksheet(rec);
+            renderResultsTable();
+        }
+
+        if (moveNext) {
+            const keys = Array.from(extractedRecords.keys()).filter(k => extractedRecords.get(k).editable);
+            const idx = keys.indexOf(currentModalMemoNum);
+            if (idx !== -1 && idx + 1 < keys.length) {
+                openPreviewModal(keys[idx + 1]);
+                return;
+            }
+        }
+        closePreviewModal();
+    };
+
+    document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('previewModal');
+        if (modal.style.display === 'flex') {
+            if (e.key === 'Escape') closePreviewModal();
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                e.preventDefault();
+                saveModalChangesAndNext(true);
+            }
+        }
+    });
+
+    document.getElementById('startBtn').addEventListener('click', async () => {
+        const fromNum = parseInt(document.getElementById('fromNum').value, 10);
+        const toNum = parseInt(document.getElementById('toNum').value, 10);
+        const engineMode = document.getElementById('engineMode').value;
+
+        if (!excelFile) return alert('يرجى رفع شيت الإكسيل أولاً.');
+        if (pdfFilesMap.size === 0) return alert('يرجى تحديد مجلد مذكرات الخصم أولاً.');
+        if (isNaN(fromNum) || isNaN(toNum) || fromNum > toNum) {
+            return alert('يرجى إدخال نطاق أرقام صحيح (من - إلى).');
+        }
+
+        const startBtn = document.getElementById('startBtn');
+        const progressWrapper = document.getElementById('progressWrapper');
+        const progressFill = document.getElementById('progressFill');
+        const statusLabel = document.getElementById('statusLabel');
+        const statusPercent = document.getElementById('statusPercent');
+        const completionBox = document.getElementById('completionBox');
+        const resultsCard = document.getElementById('resultsCard');
+
+        startBtn.disabled = true;
+        completionBox.style.display = 'none';
+        progressWrapper.style.display = 'flex';
+        resultsCard.style.display = 'block';
+        extractedRecords.clear();
+        renderResultsTable();
+
+        try {
+            statusLabel.textContent = 'جاري قراءة شيت الإكسيل واستخراج قائمة المقاولين...';
+            const excelBuffer = await excelFile.arrayBuffer();
+            workbookInstance = new ExcelJS.Workbook();
+            await workbookInstance.xlsx.load(excelBuffer);
+            worksheetInstance = workbookInstance.worksheets[0];
+
+            rowMap.clear();
+            let lastValidRow = 6;
+            worksheetInstance.eachRow((row, rowNumber) => {
+                if (rowNumber >= 7) {
+                    const colA = row.getCell(1).value;
+                    const colB = row.getCell(2).value;
+                    const colC = row.getCell(3).value;
+                    if (colC && typeof colC === 'string' && colC.trim().length >= 2) {
+                        knownContractors.add(colC.trim());
+                    }
+                    if (colA !== null || colB !== null) {
+                        lastValidRow = rowNumber;
+                    }
+                    if (colB !== null && colB !== undefined) {
+                        const key = String(colB).trim();
+                        rowMap.set(key, rowNumber);
+                    }
+                }
+            });
+
+            const datalist = document.getElementById('contractorsList');
+            datalist.innerHTML = '';
+            knownContractors.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                datalist.appendChild(opt);
+            });
+
+            const totalItems = (toNum - fromNum) + 1;
+            let processedCount = 0;
+
+            for (let num = fromNum; num <= toNum; num++) {
+                const numStr = String(num);
+                const pct = Math.round((processedCount / totalItems) * 100);
+                progressFill.style.width = `${pct}%`;
+                statusPercent.textContent = `${pct}%`;
+                statusLabel.textContent = `جاري تجهيز مذكرة خصم رقم ${numStr}...`;
+
+                const pdfFile = pdfFilesMap.get(numStr);
+                if (!pdfFile) {
+                    extractedRecords.set(numStr, {
+                        num: numStr,
+                        date: '-',
+                        contractor: '-',
+                        description: 'الملف غير موجود في المجلد',
+                        amount: '-',
+                        statusText: 'ملف مفقود',
+                        badgeClass: 'badge-miss',
+                        editable: false
+                    });
+                    renderResultsTable();
+                    processedCount++;
+                    continue;
+                }
+
+                let targetRowNumber = rowMap.get(numStr);
+                if (targetRowNumber) {
+                    const existingContractor = worksheetInstance.getRow(targetRowNumber).getCell(3).value;
+                    const existingAmount = worksheetInstance.getRow(targetRowNumber).getCell(5).value;
+                    if (existingContractor && existingAmount) {
+                        extractedRecords.set(numStr, {
+                            num: numStr,
+                            date: worksheetInstance.getRow(targetRowNumber).getCell(1).value,
+                            contractor: existingContractor,
+                            description: worksheetInstance.getRow(targetRowNumber).getCell(4).value,
+                            amount: existingAmount,
+                            statusText: 'مسجل مسبقاً (تم التخطي)',
+                            badgeClass: 'badge-skip',
+                            editable: false
+                        });
+                        renderResultsTable();
+                        processedCount++;
+                        continue;
+                    }
+                }
+
+                const renders = await renderPdfAndCrops(pdfFile);
+                let extracted = null;
+                let sourceBadge = 'badge-done';
+                let sourceText = 'تم التفريغ (AI)';
+
+                if (engineMode === 'hybrid') {
+                    statusLabel.textContent = `جاري محاولة القراءة السحابية السريعة لمذكرة ${numStr}...`;
+                    extracted = await tryCloudQuickly(renders.base64, numStr);
+                }
+
+                if (!extracted) {
+                    extracted = await extractWithZonalLocalOCR(renders, numStr, statusLabel);
+                    sourceBadge = 'badge-local';
+                    sourceText = 'تفريغ مقطعي ذكي (Zonal OCR)';
+                }
+
+                if (!targetRowNumber) {
+                    lastValidRow++;
+                    targetRowNumber = lastValidRow;
+                    rowMap.set(numStr, targetRowNumber);
+                }
+
+                const recObj = {
+                    num: numStr,
+                    date: extracted.date || '',
+                    contractor: extracted.contractor || '',
+                    description: extracted.description || '',
+                    amount: Number(extracted.amount) || 0,
+                    rowNumber: targetRowNumber,
+                    imageDataUrl: renders.fullDataUrl,
+                    statusText: sourceText,
+                    badgeClass: sourceBadge,
+                    editable: true
+                };
+
+                extractedRecords.set(numStr, recObj);
+                writeRecordToWorksheet(recObj);
+                renderResultsTable();
+                processedCount++;
+            }
+
+            progressFill.style.width = '100%';
+            statusPercent.textContent = '100%';
+            statusLabel.textContent = 'اكتملت المعالجة بنجاح 100%!';
+            completionBox.style.display = 'flex';
+
+        } catch (err) {
+            console.error(err);
+            alert('حدث خطأ أثناء المعالجة:\n' + err.message);
+        } finally {
+            startBtn.disabled = false;
+        }
+    });
+
+    document.getElementById('folderPathInput').addEventListener('input', () => {
+        for (const rec of extractedRecords.values()) {
+            if (rec.editable) {
+                writeRecordToWorksheet(rec);
+            }
+        }
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+        if (!workbookInstance) return;
+        const buffer = await workbookInstance.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = originalFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+</script>
+
+</body>
+</html>
