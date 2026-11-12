@@ -1323,13 +1323,30 @@
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+
+        // تمرير التحميل إلى النافذة الأب (window.top) لتخطي حظر التحميل داخل الـ iframe
+        let targetDoc = document;
+        try {
+            if (window.top && window.top.document) {
+                targetDoc = window.top.document;
+            }
+        } catch (e) {
+            targetDoc = document;
+        }
+
+        const a = targetDoc.createElement('a');
         a.href = url;
         a.download = originalFileName;
-        document.body.appendChild(a);
+        a.style.display = 'none';
+        targetDoc.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+
+        setTimeout(() => {
+            if (a.parentNode) {
+                a.parentNode.removeChild(a);
+            }
+            URL.revokeObjectURL(url);
+        }, 1500);
     });
 </script>
 
