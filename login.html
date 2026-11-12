@@ -315,6 +315,13 @@
         isReport: false,
         url: "https://script.google.com/macros/s/AKfycbw4wywZAyItVaYWsO76n-KZmjg3lIFGHWoBUO_eHPXA_RgXuoBDfUCrtoXyT8LgOqTeLA/exec",
         desc: "تسجيل مراحل التشغيل والتقطيع والتجميع والتسليم الميداني."
+      },
+      "DC_DEDUCTIONS": {
+        name: "تفريغ مذكرات الخصم (DC)",
+        icon: "📄",
+        isReport: true,
+        url: "dc_deductions.html",
+        desc: "المنظومة الهجينة لتفريغ مذكرات الخصم الممسوحة ضوئياً وتحديث شيت اللوج والروابط تلقائياً."
       }
     };
 
@@ -654,6 +661,7 @@
                   <label class="form-label">الدور الوظيفي (Role):</label>
                   <select id="targetRole" class="form-select">
                     <option value="STOREKEEPER">أمين مخزن (STOREKEEPER)</option>
+                    <option value="DOC_CONTROL">منسق مستندات (DOC_CONTROL)</option>
                     <option value="PROJECT_MANAGER">مدير مشروع (PROJECT_MANAGER)</option>
                     <option value="DIRECTOR">مدير قطاع / إدارة (DIRECTOR)</option>
                     <option value="SUPER_ADMIN">مدير عام المنظومة (SUPER_ADMIN)</option>
@@ -698,6 +706,10 @@
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #475569;">
                     <input type="checkbox" name="userModule" value="ALUMINUM_EXEC">
                     ⚙️ تسجيل مراحل الألومنيوم (تشغيل)
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #059669;">
+                    <input type="checkbox" name="userModule" value="DC_DEDUCTIONS">
+                    📄 تفريغ مذكرات الخصم (DC)
                   </label>
                 </div>
                 <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:4px;">حدد البرامج المتاحة لهذا الحساب حصراً لتظهر في قائمته الجانبية.</small>
