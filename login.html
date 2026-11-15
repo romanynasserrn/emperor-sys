@@ -176,13 +176,15 @@
       .workspace-title { font-size: 15px; }
     }
 
-    .admin-panel { padding: 16px; max-width: 950px; margin: auto; }
+    .admin-panel { padding: 16px; max-width: 1000px; margin: auto; }
     .admin-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 18px; }
     .grid-2 { display: grid; grid-template-columns: 1fr; gap: 14px; }
     @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
     .user-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 12px; }
     .user-table th, .user-table td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--border); }
     .user-table th { background: #f8fafc; font-weight: 700; }
+    .badge-success { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 11px; }
+    .badge-failed { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 11px; }
   </style>
 </head>
 <body>
@@ -477,7 +479,7 @@
       if (userRole === 'SUPER_ADMIN') {
         const adminLi = document.createElement('li');
         adminLi.className = 'module-item active';
-        adminLi.innerHTML = '<span>🛡️</span> <span>إدارة الصلاحيات والمستخدمين</span>';
+        adminLi.innerHTML = '<span>🛡️</span> <span>إدارة الصلاحيات وسجل الدخول</span>';
         adminLi.addEventListener('click', () => {
           document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
           adminLi.classList.add('active');
@@ -578,9 +580,9 @@
     }
 
     async function loadAdminUserManagement() {
-      activeModuleTitle.textContent = "إدارة المستخدمين والصلاحيات";
+      activeModuleTitle.textContent = "إدارة المستخدمين وسجل الدخول";
       externalLinkBtn.style.display = 'none';
-      workspaceBody.innerHTML = `<div style="text-align:center; padding:50px;">⏳ جاري تحميل بيانات الهيكل التنظيمي...</div>`;
+      workspaceBody.innerHTML = `<div style="text-align:center; padding:50px;">⏳ جاري تحميل بيانات الهيكل التنظيمي وسجل الدخول...</div>`;
 
       try {
         const res = await fetch(SCRIPT_URL, {
@@ -631,6 +633,28 @@
           </tr>
         `;
       });
+
+      let logsRows = '';
+      if (meta.loginLogs && meta.loginLogs.length > 0) {
+        meta.loginLogs.forEach(log => {
+          const isSuccess = log.status === 'SUCCESS';
+          const badge = isSuccess 
+            ? `<span class="badge-success">ناجح</span>` 
+            : `<span class="badge-failed">مرفوض</span>`;
+          logsRows += `
+            <tr>
+              <td dir="ltr" style="text-align:right; color:var(--text-muted);">${log.time}</td>
+              <td style="font-weight:bold;">${log.email}</td>
+              <td>${log.role}</td>
+              <td>${log.project}</td>
+              <td>${badge}</td>
+              <td>${log.details}</td>
+            </tr>
+          `;
+        });
+      } else {
+        logsRows = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:16px;">لا توجد حركات دخول مسجلة حتى الآن.</td></tr>`;
+      }
 
       workspaceBody.innerHTML = `
         <div class="admin-panel">
@@ -735,6 +759,28 @@
                   </tr>
                 </thead>
                 <tbody>${usersRows}</tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h3 style="font-size:15px; font-weight:bold;">🔔 سجل مراقبة وحركات تسجيل الدخول (آخر 20 حركة)</h3>
+              <button onclick="loadAdminUserManagement()" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">🔄 تحديث السجل</button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>التوقيت</th>
+                    <th>المستخدم</th>
+                    <th>الدور</th>
+                    <th>المشروع</th>
+                    <th>الحالة</th>
+                    <th>التفاصيل</th>
+                  </tr>
+                </thead>
+                <tbody>${logsRows}</tbody>
               </table>
             </div>
           </div>
