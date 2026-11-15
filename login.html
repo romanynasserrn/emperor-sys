@@ -297,6 +297,13 @@
         url: "https://script.google.com/macros/s/AKfycbyeE79yBlkUxAXkXJISMeKNx-AMuGqSYjnxd10jbAjXR4n_yvvGRwpClMisBftm6Kq5/exec",
         desc: "تسجيل ومطابقة أذون استلام التوريدات الميدانية والفحص الإداري."
       },
+      "INWARD_DASHBOARD": {
+        name: "لوحة متابعة ومسار التوريدات اليومية",
+        icon: "📊",
+        isReport: false,
+        url: "https://script.google.com/macros/s/AKfycbyeE79yBlkUxAXkXJISMeKNx-AMuGqSYjnxd10jbAjXR4n_yvvGRwpClMisBftm6Kq5/exec?page=dashboard",
+        desc: "متابعة مسار التوريدات اليومية وحالات الاعتماد والفحص والرصيد."
+      },
       "OUTWARD": {
         name: "الصرف ومقايسات البلوكات",
         icon: "📑",
@@ -718,6 +725,10 @@
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
                     <input type="checkbox" name="userModule" value="INWARD" checked>
                     📦 إدارة الوارد اليومي
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #0f766e;">
+                    <input type="checkbox" name="userModule" value="INWARD_DASHBOARD">
+                    📊 لوحة متابعة ومسار التوريدات اليومية
                   </label>
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #0284c7;">
                     <input type="checkbox" name="userModule" value="OUTWARD">
