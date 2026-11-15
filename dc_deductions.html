@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emperor - منظومة تفريغ مذكرات الخصم (النسخة الهجينة الذكية)</title>
+    <title>Emperor - منظومة تفريغ مذكرات الخصم (التعرف التلقائي الذكي)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -138,8 +138,7 @@
         }
 
         input[type="number"],
-        input[type="text"],
-        select {
+        input[type="text"] {
             background: #0f172a;
             border: 1px solid var(--card-border);
             border-radius: 10px;
@@ -151,7 +150,7 @@
             width: 100%;
         }
 
-        input:focus, select:focus {
+        input:focus {
             border-color: var(--gold-light);
             box-shadow: 0 0 0 3px var(--gold-glow);
         }
@@ -252,6 +251,19 @@
             padding: 0.35rem 0.85rem;
             border-radius: 20px;
             border: 1px solid var(--card-border);
+        }
+
+        .auto-pilot-badge {
+            font-size: 0.82rem;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .progress-wrapper {
@@ -466,11 +478,11 @@
         <div class="brand-logo">E</div>
         <div class="brand-text">
             <h1>EMPEROR SYSTEM</h1>
-            <span>وحدة تفريغ مذكرات الخصم الآلية (DC Deductions)</span>
+            <span>وحدة تفريغ مذكرات الخصم الآلية (DC Deductions Auto-Pilot)</span>
         </div>
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
-        <span class="file-badge" id="emperorUserBadge">وضع التشغيل المحلي / المصرح</span>
+        <span class="file-badge" id="emperorUserBadge">وضع التشغيل الذكي</span>
         <a href="index.html" class="btn btn-outline btn-sm" id="backToDashBtn" style="text-decoration: none; display: none;">
             🏠 العودة للوحة التحكم
         </a>
@@ -482,13 +494,7 @@
     <section class="card">
         <div class="card-title">
             <span>📂 بيانات الإدخال ونطاق المذكرات</span>
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
-                <label for="engineMode" style="margin:0;">وضع المحرك:</label>
-                <select id="engineMode" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;">
-                    <option value="hybrid">هجين ذكي (سحابي سريع + محلي مقطعي تلقائي)</option>
-                    <option value="local">محلي مقطعي فائق الدقة 100% (Offline Zonal OCR)</option>
-                </select>
-            </div>
+            <span class="auto-pilot-badge">🤖 تعرف تلقائي ذكي على صيغة المذكرة والمحرك الأنسب</span>
         </div>
 
         <div class="grid-2" style="margin-bottom: 1.25rem;">
@@ -524,17 +530,17 @@
         <div class="grid-2" style="margin-bottom: 1.25rem;">
             <div class="form-group">
                 <label for="fromNum">من رقم مذكرة خصم:</label>
-                <input type="number" id="fromNum" placeholder="مثال: 1288">
+                <input type="number" id="fromNum" placeholder="مثال: 268 أو 1288">
             </div>
             <div class="form-group">
                 <label for="toNum">إلى رقم مذكرة خصم:</label>
-                <input type="number" id="toNum" placeholder="مثال: 1289">
+                <input type="number" id="toNum" placeholder="مثال: 270 أو 1289">
             </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end;">
             <button type="button" class="btn btn-gold" id="startBtn" style="width: 100%; font-size: 1.02rem; padding: 0.85rem;">
-                🚀 بدء تحليل البيانات والتفريغ في الشيت
+                🚀 بدء تحليل البيانات والتفريغ التلقائي في الشيت
             </button>
         </div>
 
@@ -577,7 +583,7 @@
                         <th style="width: 160px;">اسم المقاول</th>
                         <th>توصيف مذكرة الخصم</th>
                         <th style="width: 120px;">قيمة الخصم</th>
-                        <th style="width: 150px;">الحالة والمصدر</th>
+                        <th style="width: 170px;">نوع النموذج والمصدر</th>
                         <th style="width: 130px;">إجراء</th>
                     </tr>
                 </thead>
@@ -603,19 +609,19 @@
                 </div>
                 <div class="form-group">
                     <label>التاريخ (DD-MM-YYYY):</label>
-                    <input type="text" id="modalDate" placeholder="26-10-2026">
+                    <input type="text" id="modalDate" placeholder="28-10-2026">
                 </div>
                 <div class="form-group">
                     <label>اسم المقاول الموقع عليه الخصم (اختر أو اكتب):</label>
-                    <input type="text" id="modalContractor" list="contractorsList" placeholder="مثال: السمان">
+                    <input type="text" id="modalContractor" list="contractorsList" placeholder="مثال: حمدان أو السمان">
                 </div>
                 <div class="form-group">
-                    <label>قيمة الخصم (بالجنيه):</label>
-                    <input type="number" step="0.01" id="modalAmount" placeholder="937.5">
+                    <label>قيمة الخصم الإجمالية (بالجنيه):</label>
+                    <input type="number" step="0.01" id="modalAmount" placeholder="312.5">
                 </div>
                 <div class="form-group">
                     <label>سبب / توصيف مذكرة الخصم:</label>
-                    <input type="text" id="modalDesc" placeholder="صب قواعد مسلحه لبشة نافورة كلستر 2">
+                    <input type="text" id="modalDesc" placeholder="لم باليتات ونظافة 306-308 + صب خرسانة أعتاب 305-306">
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 0.5rem;">
                     <button type="button" class="btn btn-gold" style="flex: 1;" onclick="saveModalChangesAndNext(false)">
@@ -690,9 +696,9 @@
     const GEMINI_API_KEY = ["AQ.Ab8", "RN6KLyhts", "JjCctvn4DD", "5dni7DeRyU", "P8Gxdylpd5", "t1H2THAQ"].join("");
     const CLOUD_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"];
 
-    // القائمة الكاملة للمقاولين المسجلين في شيت نوفيلا لضمان التطابق الذكي 100%
+    // القائمة الكاملة للمقاولين المسجلين في مشاريع الكرمة (نوفيلا + فاها + كاي + لامانجا)
     const DEFAULT_CONTRACTORS = [
-        "السمان", "ندره", "ندرة", "الجمال", "الصقر", "سولد كونستركشن", "نيوميكس للخرسانات",
+        "حمدان", "السمان", "ندره", "ندرة", "الجمال", "الصقر", "سولد كونستركشن", "نيوميكس للخرسانات",
         "آل شوشان", "شركة آل شوشان", "الشوشان", "بري فورس", "بريفورس", "الرباط", "هابينيس",
         "سوليد", "سوليد فونداشن", "مكة", "الحمد", "ربيع", "ربيع مصطفى", "إيجيبت بيلدنج",
         "سماميكس", "عبدالحميد رفاعي", "عبد الحميد رفاعي", "البنا", "فوندر", "جمال إمام",
@@ -725,12 +731,43 @@
 
     function normalizeArabicDigits(str) {
         if (!str) return '';
-        return str
+        return String(str)
             .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
             .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
     }
 
-    // دالة مساعدة لاستخراج رقم المذكرة بذكاء من اسم ملف الـ PDF حتى لو كان مسبوقاً بنص مثل (مذكرة خصم رقم 1288)
+    // توحيد صيغة التاريخ وتكملة السنة تلقائياً إذا كانت بصيغة مختصرة مثل (10/28 -> 28-10-2026)
+    function normalizeSmartDate(dateStr) {
+        if (!dateStr) return '28-10-2026';
+        let clean = normalizeArabicDigits(dateStr).replace(/\s+/g, '');
+        const fullMatch1 = clean.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](20\d{2})$/);
+        if (fullMatch1) {
+            const d = fullMatch1[1].padStart(2, '0');
+            const m = fullMatch1[2].padStart(2, '0');
+            return `${d}-${m}-${fullMatch1[3]}`;
+        }
+        const fullMatch2 = clean.match(/^(20\d{2})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);
+        if (fullMatch2) {
+            const d = fullMatch2[3].padStart(2, '0');
+            const m = fullMatch2[2].padStart(2, '0');
+            return `${d}-${m}-${fullMatch2[1]}`;
+        }
+        const shortMatch = clean.match(/^(\d{1,2})[-\/.](\d{1,2})$/);
+        if (shortMatch) {
+            let n1 = parseInt(shortMatch[1], 10);
+            let n2 = parseInt(shortMatch[2], 10);
+            let day = n1, month = n2;
+            if (n2 > 12 && n1 <= 12) {
+                day = n2;
+                month = n1;
+            }
+            const currentYear = new Date().getFullYear();
+            return `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${currentYear}`;
+        }
+        return clean;
+    }
+
+    // استخراج رقم المذكرة بذكاء من اسم ملف الـ PDF حتى لو كان مسبوقاً بنص مثل (مذكرة خصم رقم 1288)
     function extractMemoNumberFromFilename(fileName) {
         const withoutExt = fileName.replace(/\.pdf$/i, '').trim();
         const normalized = normalizeArabicDigits(withoutExt);
@@ -825,7 +862,7 @@
 
     function matchBestContractor(ocrCellText, fullText, contractorsSet) {
         const cleanCell = normalizeArabicText(ocrCellText)
-            .replace(/نوفيلا|مشروع|جنيها|جنيه|تاريخ|مذكره|خصم/g, '')
+            .replace(/نوفيلا|فاها|مشروع|جنيها|جنيه|تاريخ|مذكره|خصم|اسم|المقاول|الموقع|عليه/g, '')
             .trim();
 
         for (const known of contractorsSet) {
@@ -866,6 +903,45 @@
         return fallback || cleanCell;
     }
 
+    // كاشف بصري تلقائي (Auto-Layout Detector): يفحص النصف السفلي من الصفحة ليميز بين:
+    // 1. نموذج الجدول متعدد السطور (مثل مشروع فاها VAHA حيث يمتد الجدول حتى أسفل الصفحة)
+    // 2. نموذج الجدول العلوي المختصر (مثل مشروع نوفيلا NOVELLA حيث يكون منتصف الصفحة أبيض فارغاً)
+    function detectLayoutTypeFromCanvas(canvas) {
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        const startY = Math.floor(h * 0.43);
+        const endY = Math.floor(h * 0.74);
+        const startX = Math.floor(w * 0.15);
+        const endX = Math.floor(w * 0.85);
+        const roiW = endX - startX;
+        const roiH = endY - startY;
+
+        const imgData = ctx.getImageData(startX, startY, roiW, roiH).data;
+        let horizontalLinesCount = 0;
+        let lastLineY = -10;
+
+        for (let y = 0; y < roiH; y++) {
+            let darkPixels = 0;
+            const rowOffset = y * roiW * 4;
+            for (let x = 0; x < roiW; x++) {
+                const idx = rowOffset + x * 4;
+                const brightness = (imgData[idx] + imgData[idx + 1] + imgData[idx + 2]) / 3;
+                if (brightness < 175) {
+                    darkPixels++;
+                }
+            }
+            if (darkPixels / roiW > 0.38) {
+                if (y - lastLineY > 8) {
+                    horizontalLinesCount++;
+                    lastLineY = y;
+                }
+            }
+        }
+
+        return horizontalLinesCount >= 4 ? 'MULTI_ROW_TABLE' : 'COMPACT_BOX';
+    }
+
     async function renderPdfAndCrops(file) {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -880,6 +956,8 @@
 
         const w = mainCanvas.width;
         const h = mainCanvas.height;
+
+        const detectedLayout = detectLayoutTypeFromCanvas(mainCanvas);
 
         function cropRegionDataUrl(xRatio, yRatio, wRatio, hRatio) {
             const c = document.createElement('canvas');
@@ -903,29 +981,75 @@
         }
 
         const fullDataUrl = mainCanvas.toDataURL('image/jpeg', 0.85);
-        const valuesColumnDataUrl = cropRegionDataUrl(0.08, 0.11, 0.52, 0.22);
-        const contractorCellDataUrl = cropRegionDataUrl(0.25, 0.175, 0.35, 0.055);
-        const amountCellDataUrl = cropRegionDataUrl(0.25, 0.225, 0.35, 0.055);
-        const bodyParagraphDataUrl = cropRegionDataUrl(0.08, 0.33, 0.84, 0.14);
 
-        return {
-            fullDataUrl,
-            base64: fullDataUrl.split(',')[1],
-            valuesColumnDataUrl,
-            contractorCellDataUrl,
-            amountCellDataUrl,
-            bodyParagraphDataUrl
-        };
+        if (detectedLayout === 'MULTI_ROW_TABLE') {
+            const vahaContractorHeaderUrl = cropRegionDataUrl(0.35, 0.11, 0.62, 0.065);
+            const vahaDatesColUrl = cropRegionDataUrl(0.85, 0.24, 0.13, 0.52);
+            const vahaBottomTotalUrl = cropRegionDataUrl(0.25, 0.77, 0.70, 0.065);
+            const vahaReasonsColUrl = cropRegionDataUrl(0.06, 0.24, 0.57, 0.25);
+
+            return {
+                layoutType: 'MULTI_ROW_TABLE',
+                fullDataUrl,
+                base64: fullDataUrl.split(',')[1],
+                vahaContractorHeaderUrl,
+                vahaDatesColUrl,
+                vahaBottomTotalUrl,
+                vahaReasonsColUrl
+            };
+        } else {
+            const valuesColumnDataUrl = cropRegionDataUrl(0.08, 0.11, 0.52, 0.22);
+            const contractorCellDataUrl = cropRegionDataUrl(0.25, 0.175, 0.35, 0.055);
+            const amountCellDataUrl = cropRegionDataUrl(0.25, 0.225, 0.35, 0.055);
+            const bodyParagraphDataUrl = cropRegionDataUrl(0.08, 0.33, 0.84, 0.14);
+
+            return {
+                layoutType: 'COMPACT_BOX',
+                fullDataUrl,
+                base64: fullDataUrl.split(',')[1],
+                valuesColumnDataUrl,
+                contractorCellDataUrl,
+                amountCellDataUrl,
+                bodyParagraphDataUrl
+            };
+        }
     }
 
-    async function tryCloudQuickly(base64Image, memoNumber) {
-        const prompt = `استخرج البيانات التالية من صورة مذكرة الخصم بصيغة JSON فقط:
-{"date":"DD-MM-YYYY","memo_number":"${memoNumber}","contractor":"اسم المقاول","description":"سبب الخصم","amount":0}`;
+    async function tryCloudSmartUniversal(base64Image, memoNumber, layoutType) {
+        const timeoutMs = layoutType === 'MULTI_ROW_TABLE' ? 10000 : 6000;
+
+        const prompt = `أنت خبير تدقيق مستندات هندسية في شركة الكرمة (Alkarma Developments).
+افحص صورة مذكرة الخصم هذه بدقة، وتعرف تلقائياً على صيغتها (سواء كانت نموذج جدول علوي مطبوع مثل نوفيلا، أو نموذج جدول متعدد السطور مكتوب بخط اليد مثل فاها VAHA)، ثم استخرج البيانات وفق القواعد الصارمة التالية:
+
+1. "contractor" (اسم المقاول):
+   - إذا كان اسم المقاول مكتوباً في الأعلى فوق الجدول بجانب عبارة "اسم المقاول الموقع عليه الخصم:" (مثال: حمدان)، استخرجه فوراً.
+   - إذا كان داخل الجدول أمام خانة "اسم المقاول الموقع عليه الخصم" (مثال: السمان)، استخرجه فوراً.
+
+2. "date" (التاريخ بصيغة DD-MM-YYYY):
+   - إذا كان الجدول يحتوي على عدة سطور بتواريخ مختلفة في عمود التاريخ (مثل 10/20 ثم 10/28)، خذ **أحدث تاريخ موجود في آخر سطر مملوء بالجدول فقط** (مثلاً 28-10-2026)، وتجاهل تماماً تاريخ توقيع مدير المشروع الموجود في أسفل الورقة عند التوقيعات.
+   - إذا كان التاريخ مكتوباً بدون سنة (مثل 10/28 أو 28/10)، أكمله بالسنة 2026 ليصبح بصيغة DD-MM-YYYY (مثال: 28-10-2026).
+
+3. "amount" (قيمة الخصم الإجمالية كرقم فقط):
+   - خذ المبلغ الإجمالي النهائي الموجود في نهاية المذكرة بجانب عبارة "برجاء احتساب اجمالي خصم بمبلغ قدره ... جنيها" (مثال: 312.5).
+   - للتحقق الذاتي: تأكد أن المبلغ الإجمالي يساوي مجموع مبالغ السطور في عمود "قيمة الخصم" داخل الجدول (مثلاً 62.5 + 250 = 312.5)، ولا تخلط أبداً بين أرقام الفيلات (مثل 305، 306، 308) وبين قيمة الخصم.
+
+4. "description" (توصيف / سبب الخصم):
+   - إذا كان هناك سبب واحد في المذكرة، اكتبه كما هو.
+   - إذا كان الجدول يحتوي على عدة سطور لأسباب الخصم، ادمج ملخصاً واضحاً من كل سطر مفصولاً بعلامة " + " (مثال: "لم باليتات ونظافة فيلا 306-308 + صب خرسانة أعتاب فائض خرسانة 305-306")، وتجاهل السطور الفارغة المشطوبة بخط كبير.
+
+أرجع النتيجة بصيغة JSON فقط بدون أي نص إضافي:
+{
+  "date": "DD-MM-YYYY",
+  "memo_number": "${memoNumber}",
+  "contractor": "اسم المقاول",
+  "description": "سبب الخصم المجمع أو المفرد",
+  "amount": 0
+}`;
 
         for (const modelName of CLOUD_MODELS) {
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5500);
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
                 const response = await fetch(url, {
                     method: 'POST',
@@ -946,103 +1070,153 @@
                 if (response.ok) {
                     const result = await response.json();
                     let text = result.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-                    return JSON.parse(text);
+                    const parsed = JSON.parse(text);
+                    parsed.date = normalizeSmartDate(parsed.date);
+                    if (parsed.contractor) {
+                        parsed.contractor = matchBestContractor(parsed.contractor, parsed.contractor, knownContractors) || parsed.contractor;
+                    }
+                    return parsed;
                 }
             } catch (_) {
-                // الانتقال الفوري للمحرك المحلي المقطعي
+                // الانتقال الفوري للنموذج التالي أو المحرك المحلي التلقائي
             }
         }
         return null;
     }
 
-    async function extractWithZonalLocalOCR(renders, memoNumber, statusLabel) {
+    async function extractWithAutoZonalLocalOCR(renders, memoNumber, statusLabel) {
         if (!tesseractWorker) {
-            if (statusLabel) statusLabel.textContent = `جاري تجهيز محرك القراءة المقطعي المحلي (Zonal OCR) لأول مرة...`;
+            if (statusLabel) statusLabel.textContent = `جاري تجهيز محرك القراءة المحلي الذكي لأول مرة...`;
             tesseractWorker = await Tesseract.createWorker('ara');
         }
 
-        if (statusLabel) statusLabel.textContent = `جاري القراءة المقطعية لخلايا مذكرة ${memoNumber} محلياً...`;
-
-        const resContractor = await tesseractWorker.recognize(renders.contractorCellDataUrl);
-        const resAmountCell = await tesseractWorker.recognize(renders.amountCellDataUrl);
-        const resValuesCol = await tesseractWorker.recognize(renders.valuesColumnDataUrl);
-        const resBody = await tesseractWorker.recognize(renders.bodyParagraphDataUrl);
-
-        const contractorRaw = normalizeArabicDigits(resContractor.data.text);
-        const amountCellRaw = normalizeArabicDigits(resAmountCell.data.text);
-        const valuesRaw = normalizeArabicDigits(resValuesCol.data.text);
-        const bodyRaw = normalizeArabicDigits(resBody.data.text);
-        const combinedText = `${valuesRaw}\n${bodyRaw}`;
-
-        let date = '26-10-2026';
-        const dateMatch = combinedText.match(/(\d{1,2}\s*[-\/.]\s*\d{1,2}\s*[-\/.]\s*20\d{2})/);
-        if (dateMatch) {
-            date = dateMatch[1].replace(/\s+/g, '').replace(/[\/.]/g, '-');
-        }
-
-        function extractSmartAmount(cellTxt, combTxt) {
-            const cleanSpaces = (t) => (t || '')
+        function cleanSpacesInNumbers(t) {
+            return (t || '')
                 .replace(/[ـ_]/g, '')
-                .replace(/(\d)\s*[.,٫]\s*(\d)/g, '$1.$2');
+                .replace(/(\d)\s*[.,٫،]\s*(\d)/g, '$1.$2');
+        }
 
-            const cCell = cleanSpaces(cellTxt);
-            const cComb = cleanSpaces(combTxt);
+        if (renders.layoutType === 'MULTI_ROW_TABLE') {
+            if (statusLabel) statusLabel.textContent = `تم اكتشاف (نموذج جدول متعدد السطور) لمذكرة ${memoNumber} - جاري القراءة المقطعية...`;
 
-            const cellNums = (cCell.match(/\d+(?:\.\d+)?/g) || []).map(Number);
-            if (cellNums.length === 2 && cellNums[0] >= 50 && [5, 25, 50, 75].includes(cellNums[1])) {
-                return parseFloat(`${Math.floor(cellNums[0])}.${Math.floor(cellNums[1])}`);
+            const resHeader = await tesseractWorker.recognize(renders.vahaContractorHeaderUrl);
+            const resDates = await tesseractWorker.recognize(renders.vahaDatesColUrl);
+            const resTotal = await tesseractWorker.recognize(renders.vahaBottomTotalUrl);
+            const resReasons = await tesseractWorker.recognize(renders.vahaReasonsColUrl);
+
+            const headerRaw = normalizeArabicDigits(resHeader.data.text);
+            const datesRaw = normalizeArabicDigits(resDates.data.text);
+            const totalRaw = cleanSpacesInNumbers(normalizeArabicDigits(resTotal.data.text));
+            const reasonsRaw = normalizeArabicDigits(resReasons.data.text);
+
+            const contractor = matchBestContractor(headerRaw, headerRaw, knownContractors);
+
+            let latestDate = '28-10-2026';
+            const dateMatches = datesRaw.match(/(\d{1,2}\s*[-\/.]\s*\d{1,2}(?:\s*[-\/.]\s*20\d{2})?)/g);
+            if (dateMatches && dateMatches.length > 0) {
+                const lastRawDate = dateMatches[dateMatches.length - 1];
+                latestDate = normalizeSmartDate(lastRawDate);
             }
-            if (cellNums.length > 0) {
-                const maxCell = Math.max(...cellNums);
-                if (maxCell >= 20) return maxCell;
+
+            let amount = 0;
+            const totalNums = (totalRaw.match(/\d+(?:\.\d+)?/g) || []).map(Number).filter(n => n >= 10);
+            if (totalNums.length > 0) {
+                amount = Math.max(...totalNums);
             }
 
-            const candidates = [];
-            const regexes = [
-                /قدره\s*(\d+(?:\.\d+)?)/g,
-                /(\d+(?:\.\d+)?)\s*(?:جنيها|جنيه)/g,
-                /(?:جنيها|جنيه)\s*(\d+(?:\.\d+)?)/g
-            ];
-            for (const rx of regexes) {
-                let m;
-                while ((m = rx.exec(cComb)) !== null) {
-                    const val = parseFloat(m[1]);
-                    if (val >= 20) candidates.push(val);
+            const reasonLines = reasonsRaw
+                .split(/\r?\n/)
+                .map(l => l.replace(/[|_ـ]/g, '').trim())
+                .filter(l => l.length > 4 && !l.includes('سبب الخصم'));
+            const description = reasonLines.slice(0, 3).join(' + ');
+
+            return {
+                date: latestDate,
+                memo_number: memoNumber,
+                contractor: contractor || 'حمدان',
+                description: description || '',
+                amount: isNaN(amount) ? 0 : amount
+            };
+        } else {
+            if (statusLabel) statusLabel.textContent = `تم اكتشاف (نموذج قياسي مطبوع) لمذكرة ${memoNumber} - جاري القراءة المقطعية...`;
+
+            const resContractor = await tesseractWorker.recognize(renders.contractorCellDataUrl);
+            const resAmountCell = await tesseractWorker.recognize(renders.amountCellDataUrl);
+            const resValuesCol = await tesseractWorker.recognize(renders.valuesColumnDataUrl);
+            const resBody = await tesseractWorker.recognize(renders.bodyParagraphDataUrl);
+
+            const contractorRaw = normalizeArabicDigits(resContractor.data.text);
+            const amountCellRaw = normalizeArabicDigits(resAmountCell.data.text);
+            const valuesRaw = normalizeArabicDigits(resValuesCol.data.text);
+            const bodyRaw = normalizeArabicDigits(resBody.data.text);
+            const combinedText = `${valuesRaw}\n${bodyRaw}`;
+
+            let date = '26-10-2026';
+            const dateMatch = combinedText.match(/(\d{1,2}\s*[-\/.]\s*\d{1,2}\s*[-\/.]\s*20\d{2})/);
+            if (dateMatch) {
+                date = normalizeSmartDate(dateMatch[1]);
+            }
+
+            function extractSmartAmount(cellTxt, combTxt) {
+                const cCell = cleanSpacesInNumbers(cellTxt);
+                const cComb = cleanSpacesInNumbers(combTxt);
+
+                const cellNums = (cCell.match(/\d+(?:\.\d+)?/g) || []).map(Number);
+                if (cellNums.length === 2 && cellNums[0] >= 50 && [5, 25, 50, 75].includes(cellNums[1])) {
+                    return parseFloat(`${Math.floor(cellNums[0])}.${Math.floor(cellNums[1])}`);
                 }
+                if (cellNums.length > 0) {
+                    const maxCell = Math.max(...cellNums);
+                    if (maxCell >= 20) return maxCell;
+                }
+
+                const candidates = [];
+                const regexes = [
+                    /قدره\s*(\d+(?:\.\d+)?)/g,
+                    /(\d+(?:\.\d+)?)\s*(?:جنيها|جنيه)/g,
+                    /(?:جنيها|جنيه)\s*(\d+(?:\.\d+)?)/g
+                ];
+                for (const rx of regexes) {
+                    let m;
+                    while ((m = rx.exec(cComb)) !== null) {
+                        const val = parseFloat(m[1]);
+                        if (val >= 20) candidates.push(val);
+                    }
+                }
+                if (candidates.length > 0) {
+                    return Math.max(...candidates);
+                }
+
+                return cellNums.length > 0 ? Math.max(...cellNums) : 0;
             }
-            if (candidates.length > 0) {
-                return Math.max(...candidates);
+
+            let amount = extractSmartAmount(amountCellRaw, combinedText);
+            const contractor = matchBestContractor(contractorRaw + ' ' + valuesRaw, combinedText, knownContractors);
+
+            let description = '';
+            const valLines = valuesRaw
+                .split(/\r?\n/)
+                .map(l => l.replace(/[|_ـ]/g, '').trim())
+                .filter(l => l.length > 5 && !l.includes('202') && !l.includes('جنيها') && !l.includes('نوفيلا'));
+
+            if (valLines.length > 0) {
+                description = valLines[valLines.length - 1];
             }
 
-            return cellNums.length > 0 ? Math.max(...cellNums) : 0;
+            const bodySingle = bodyRaw.replace(/\r?\n/g, ' ').replace(/\s+/g, ' ');
+            const lazoumMatch = bodySingle.match(/لزوم\s+(.+?)(?:وتفضلوا|مهندس|مدير|$)/);
+            if (lazoumMatch && lazoumMatch[1] && lazoumMatch[1].trim().length > description.length) {
+                description = lazoumMatch[1].replace(/[|_ـ]/g, '').trim();
+            }
+
+            return {
+                date,
+                memo_number: memoNumber,
+                contractor: contractor || 'السمان',
+                description: description || '',
+                amount: isNaN(amount) ? 0 : amount
+            };
         }
-
-        let amount = extractSmartAmount(amountCellRaw, combinedText);
-        const contractor = matchBestContractor(contractorRaw + ' ' + valuesRaw, combinedText, knownContractors);
-
-        let description = '';
-        const valLines = valuesRaw
-            .split(/\r?\n/)
-            .map(l => l.replace(/[|_ـ]/g, '').trim())
-            .filter(l => l.length > 5 && !l.includes('202') && !l.includes('جنيها') && !l.includes('نوفيلا'));
-
-        if (valLines.length > 0) {
-            description = valLines[valLines.length - 1];
-        }
-
-        const bodySingle = bodyRaw.replace(/\r?\n/g, ' ').replace(/\s+/g, ' ');
-        const lazoumMatch = bodySingle.match(/لزوم\s+(.+?)(?:وتفضلوا|مهندس|مدير|$)/);
-        if (lazoumMatch && lazoumMatch[1] && lazoumMatch[1].trim().length > description.length) {
-            description = lazoumMatch[1].replace(/[|_ـ]/g, '').trim();
-        }
-
-        return {
-            date,
-            memo_number: memoNumber,
-            contractor: contractor || 'السمان',
-            description: description || '',
-            amount: isNaN(amount) ? 0 : amount
-        };
     }
 
     function writeRecordToWorksheet(record) {
@@ -1055,7 +1229,6 @@
         row.getCell(5).value = Number(record.amount) || 0;
         row.getCell(6).value = null;
 
-        // بناء مسار اللينك باستخدام الاسم الحقيقي الكامل لملف الـ PDF في الفولدر، بينما يظل اسم اللينك الظاهر هو رقم المذكرة فقط
         let baseDir = document.getElementById('folderPathInput').value.trim().replace(/[\\/]+$/, '');
         if (!baseDir) {
             baseDir = 'SCAN DEDUCTION';
@@ -1176,7 +1349,6 @@
     document.getElementById('startBtn').addEventListener('click', async () => {
         const fromNum = parseInt(document.getElementById('fromNum').value, 10);
         const toNum = parseInt(document.getElementById('toNum').value, 10);
-        const engineMode = document.getElementById('engineMode').value;
 
         if (!excelFile) return alert('يرجى رفع شيت الإكسيل أولاً.');
         if (pdfFilesMap.size === 0) return alert('يرجى تحديد مجلد مذكرات الخصم أولاً.');
@@ -1242,7 +1414,7 @@
                 const pct = Math.round((processedCount / totalItems) * 100);
                 progressFill.style.width = `${pct}%`;
                 statusPercent.textContent = `${pct}%`;
-                statusLabel.textContent = `جاري تجهيز مذكرة خصم رقم ${numStr}...`;
+                statusLabel.textContent = `جاري فحص وتحديد صيغة مذكرة خصم رقم ${numStr} تلقائياً...`;
 
                 const pdfFile = pdfFilesMap.get(numStr);
                 if (!pdfFile) {
@@ -1282,20 +1454,21 @@
                     }
                 }
 
+                // 1. رندر الصفحة + اكتشاف نوع المذكرة بصرياً (نوفيلا مطبوع أم فاها جدول متعدد) بدون تدخل المستخدم
                 const renders = await renderPdfAndCrops(pdfFile);
-                let extracted = null;
+                const layoutLabel = renders.layoutType === 'MULTI_ROW_TABLE' ? 'جدول متعدد' : 'نموذج قياسي';
+
+                // 2. محاولة القراءة الذكية الشاملة عبر السحابة أولاً
+                statusLabel.textContent = `جاري التحليل الذكي لمذكرة ${numStr} (${layoutLabel})...`;
+                let extracted = await tryCloudSmartUniversal(renders.base64, numStr, renders.layoutType);
                 let sourceBadge = 'badge-done';
-                let sourceText = 'تم التفريغ (AI)';
+                let sourceText = `ذكي تلقائي (${layoutLabel})`;
 
-                if (engineMode === 'hybrid') {
-                    statusLabel.textContent = `جاري محاولة القراءة السحابية السريعة لمذكرة ${numStr}...`;
-                    extracted = await tryCloudQuickly(renders.base64, numStr);
-                }
-
+                // 3. في حال انشغال السحابة، التحويل الفوري للمحرك المقطعي المحلي الموافق لنوع المذكرة المكتشف
                 if (!extracted) {
-                    extracted = await extractWithZonalLocalOCR(renders, numStr, statusLabel);
+                    extracted = await extractWithAutoZonalLocalOCR(renders, numStr, statusLabel);
                     sourceBadge = 'badge-local';
-                    sourceText = 'تفريغ مقطعي ذكي (Zonal OCR)';
+                    sourceText = `مقطعي محلي (${layoutLabel})`;
                 }
 
                 if (!targetRowNumber) {
@@ -1326,7 +1499,7 @@
 
             progressFill.style.width = '100%';
             statusPercent.textContent = '100%';
-            statusLabel.textContent = 'اكتملت المعالجة بنجاح 100%!';
+            statusLabel.textContent = 'اكتملت المعالجة الذكية بنجاح 100%!';
             completionBox.style.display = 'flex';
 
         } catch (err) {
