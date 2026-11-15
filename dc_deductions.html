@@ -645,7 +645,6 @@
         const isLocalFile = window.location.protocol === "file:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
         const sessionRaw = localStorage.getItem("emperor_session");
 
-        // إخفاء زر العودة إذا كانت الأداة مفتوحة داخل الـ iframe في لوحة التحكم، وإظهاره فقط إذا فتحت في نافذة مستقلة
         const isInIframe = window.self !== window.top;
         if (!isLocalFile && !isInIframe) {
             const backBtn = document.getElementById("backToDashBtn");
@@ -724,14 +723,48 @@
         }
     });
 
+    function normalizeArabicDigits(str) {
+        if (!str) return '';
+        return str
+            .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+            .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+    }
+
+    // دالة مساعدة لاستخراج رقم المذكرة بذكاء من اسم ملف الـ PDF حتى لو كان مسبوقاً بنص مثل (مذكرة خصم رقم 1288)
+    function extractMemoNumberFromFilename(fileName) {
+        const withoutExt = fileName.replace(/\.pdf$/i, '').trim();
+        const normalized = normalizeArabicDigits(withoutExt);
+        if (/^\d+$/.test(normalized)) {
+            return String(parseInt(normalized, 10));
+        }
+        const keywordMatch = normalized.match(/(?:رقم|مذكر[ةه]|خصم)\s*[:\-]?\s*(\d+)/);
+        if (keywordMatch) {
+            return String(parseInt(keywordMatch[1], 10));
+        }
+        const allNums = normalized.match(/\d+/g);
+        if (allNums && allNums.length > 0) {
+            return String(parseInt(allNums[0], 10));
+        }
+        return normalized;
+    }
+
     document.getElementById('folderInput').addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
         pdfFilesMap.clear();
         let detectedFolderRelativeDir = '';
+        let pdfCount = 0;
         files.forEach(file => {
             if (file.name.toLowerCase().endsWith('.pdf')) {
+                pdfCount++;
                 const baseName = file.name.replace(/\.pdf$/i, '').trim();
+                const normalizedBase = normalizeArabicDigits(baseName);
                 pdfFilesMap.set(baseName, file);
+                pdfFilesMap.set(normalizedBase, file);
+                const extractedNum = extractMemoNumberFromFilename(file.name);
+                if (extractedNum) {
+                    pdfFilesMap.set(extractedNum, file);
+                }
+
                 if (!detectedFolderRelativeDir && file.webkitRelativePath) {
                     const parts = file.webkitRelativePath.split('/');
                     if (parts.length > 1) {
@@ -741,21 +774,14 @@
                 }
             }
         });
-        document.getElementById('folderFileCount').textContent = `تم العثور على ${pdfFilesMap.size} ملف PDF (${detectedFolderRelativeDir || 'المجلد المحدد'})`;
-        if (pdfFilesMap.size > 0) {
+        document.getElementById('folderFileCount').textContent = `تم العثور على ${pdfCount} ملف PDF (${detectedFolderRelativeDir || 'المجلد المحدد'})`;
+        if (pdfCount > 0) {
             document.getElementById('folderDropBox').classList.add('active');
             if (detectedFolderRelativeDir) {
                 document.getElementById('folderPathInput').value = detectedFolderRelativeDir;
             }
         }
     });
-
-    function normalizeArabicDigits(str) {
-        if (!str) return '';
-        return str
-            .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
-            .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
-    }
 
     function normalizeArabicText(str) {
         if (!str) return '';
@@ -1029,11 +1055,13 @@
         row.getCell(5).value = Number(record.amount) || 0;
         row.getCell(6).value = null;
 
+        // بناء مسار اللينك باستخدام الاسم الحقيقي الكامل لملف الـ PDF في الفولدر، بينما يظل اسم اللينك الظاهر هو رقم المذكرة فقط
         let baseDir = document.getElementById('folderPathInput').value.trim().replace(/[\\/]+$/, '');
         if (!baseDir) {
             baseDir = 'SCAN DEDUCTION';
         }
-        const fullTargetLink = `${baseDir}\\${record.num}.pdf`;
+        const targetFileName = record.actualFileName || `${record.num}.pdf`;
+        const fullTargetLink = `${baseDir}\\${targetFileName}`;
 
         row.getCell(7).value = {
             text: String(record.num),
@@ -1278,6 +1306,7 @@
 
                 const recObj = {
                     num: numStr,
+                    actualFileName: pdfFile.name,
                     date: extracted.date || '',
                     contractor: extracted.contractor || '',
                     description: extracted.description || '',
@@ -1324,7 +1353,6 @@
         });
         const url = URL.createObjectURL(blob);
 
-        // تمرير التحميل إلى النافذة الأب (window.top) لتخطي حظر التحميل داخل الـ iframe
         let targetDoc = document;
         try {
             if (window.top && window.top.document) {
