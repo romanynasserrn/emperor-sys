@@ -698,7 +698,7 @@
 
     // القائمة الكاملة للمقاولين المسجلين في مشاريع الكرمة (نوفيلا + فاها + كاي + لامانجا)
     const DEFAULT_CONTRACTORS = [
-        "حمدان", "السمان", "ندره", "ندرة", "الجمال", "الصقر", "سولد كونستركشن", "نيوميكس للخرسانات",
+        "النزهه", "النزهة", "حمدان", "السمان", "ندره", "ندرة", "الجمال", "الصقر", "سولد كونستركشن", "نيوميكس للخرسانات",
         "آل شوشان", "شركة آل شوشان", "الشوشان", "بري فورس", "بريفورس", "الرباط", "هابينيس",
         "سوليد", "سوليد فونداشن", "مكة", "الحمد", "ربيع", "ربيع مصطفى", "إيجيبت بيلدنج",
         "سماميكس", "عبدالحميد رفاعي", "عبد الحميد رفاعي", "البنا", "فوندر", "جمال إمام",
@@ -820,31 +820,20 @@
         }
     });
 
-    // إزالة التكرار من أسباب الخصم المتشابهة وتنظيف أي أجزاء رقمية شاردة مقصوصة مثل "41 +"
-    function cleanAndDeduplicateReasons(rawDesc) {
+    function deduplicateReasonsSmart(rawDesc) {
         if (!rawDesc) return '';
         const parts = String(rawDesc)
             .split(/\s*\+\s*|\s*\|\s*|\r?\n/)
             .map(p => p.replace(/[|_ـ]/g, '').replace(/\s+/g, ' ').trim())
-            .filter(p => {
-                if (!p || p.length < 3) return false;
-                // استبعاد الأرقام المنفردة الشاردة الناتجة عن قص سطر علوي (مثل "41")
-                if (/^\d+$/.test(p)) return false;
-                return true;
-            });
-
+            .filter(p => p.length >= 3 && !/^\d+$/.test(p));
         const unique = [];
-        for (const part of parts) {
-            const normPart = normalizeArabicText(part);
-            const isDuplicate = unique.some(u => {
+        for (const p of parts) {
+            const normP = normalizeArabicText(p);
+            const exists = unique.some(u => {
                 const normU = normalizeArabicText(u);
-                if (normPart === normU) return true;
-                if (normU.includes(normPart) || normPart.includes(normU)) return true;
-                return similarityScore(part, u) >= 0.78;
+                return normP === normU || similarityScore(p, u) >= 0.88;
             });
-            if (!isDuplicate) {
-                unique.push(part);
-            }
+            if (!exists) unique.push(p);
         }
         return unique.join(' + ');
     }
@@ -1012,10 +1001,11 @@
         const fullDataUrl = mainCanvas.toDataURL('image/jpeg', 0.85);
 
         if (detectedLayout === 'MULTI_ROW_TABLE') {
-            const vahaContractorHeaderUrl = cropRegionDataUrl(0.35, 0.11, 0.62, 0.065);
-            const vahaDatesColUrl = cropRegionDataUrl(0.85, 0.24, 0.13, 0.52);
-            const vahaBottomTotalUrl = cropRegionDataUrl(0.18, 0.75, 0.78, 0.085);
-            const vahaReasonsColUrl = cropRegionDataUrl(0.06, 0.24, 0.57, 0.30);
+            const vahaContractorHeaderUrl = cropRegionDataUrl(0.20, 0.10, 0.75, 0.08);
+            const vahaDatesColUrl = cropRegionDataUrl(0.83, 0.22, 0.15, 0.54);
+            const vahaBottomTotalUrl = cropRegionDataUrl(0.15, 0.72, 0.80, 0.12);
+            const vahaReasonsColUrl = cropRegionDataUrl(0.05, 0.22, 0.58, 0.52);
+            const vahaAmountsColUrl = cropRegionDataUrl(0.62, 0.22, 0.13, 0.52);
 
             return {
                 layoutType: 'MULTI_ROW_TABLE',
@@ -1024,7 +1014,8 @@
                 vahaContractorHeaderUrl,
                 vahaDatesColUrl,
                 vahaBottomTotalUrl,
-                vahaReasonsColUrl
+                vahaReasonsColUrl,
+                vahaAmountsColUrl
             };
         } else {
             const valuesColumnDataUrl = cropRegionDataUrl(0.08, 0.11, 0.52, 0.22);
@@ -1059,12 +1050,12 @@
    - إذا كان التاريخ مكتوباً بدون سنة (مثل 10/28 أو 28/10)، أكمله بالسنة 2026 ليصبح بصيغة DD-MM-YYYY (مثال: 28-10-2026).
 
 3. "amount" (قيمة الخصم الإجمالية كرقم فقط):
-   - ركز أولاً على الرقم المكتوب بخط اليد أسفل الجدول مباشرة أمام عبارة "برجاء احتساب اجمالي خصم بمبلغ قدره ... جنيها" (مثال: 1220 أو 312.5)، مع تجاهل النقاط المتقطعة تحت الرقم.
-   - قارن هذا الرقم بمجموع مبالغ السطور في عمود "قيمة الخصم" داخل الجدول للتأكد من صحته، ولا تخلط أبداً بين أرقام الفيلات (مثل 305، 306، 308، 417) وبين قيمة الخصم.
+   - خذ المبلغ الإجمالي النهائي الموجود في نهاية المذكرة بجانب عبارة "برجاء احتساب اجمالي خصم بمبلغ قدره ... جنيها" (مثال: 312.5).
+   - للتحقق الذاتي: تأكد أن المبلغ الإجمالي يساوي مجموع مبالغ السطور في عمود "قيمة الخصم" داخل الجدول (مثلاً 62.5 + 250 = 312.5)، ولا تخلط أبداً بين أرقام الفيلات (مثل 305، 306، 308) وبين قيمة الخصم.
 
 4. "description" (توصيف / سبب الخصم):
    - إذا كان هناك سبب واحد في المذكرة، اكتبه كما هو.
-   - إذا كان الجدول يحتوي على عدة سطور لأسباب الخصم، ادمج ملخصاً واضحاً من كل سطر مفصولاً بعلامة " + " مع منع تكرار نفس العبارة أو السطر المكرر، وتجاهل السطور الفارغة المشطوبة وأي أرقام منفردة شاردة.
+   - إذا كان الجدول يحتوي على عدة سطور لأسباب الخصم، ادمج ملخصاً واضحاً من كل سطر مفصولاً بعلامة " + " (مثال: "لم باليتات ونظافة فيلا 306-308 + صب خرسانة أعتاب فائض خرسانة 305-306")، وتجاهل السطور الفارغة المشطوبة بخط كبير.
 
 أرجع النتيجة بصيغة JSON فقط بدون أي نص إضافي:
 {
@@ -1102,10 +1093,12 @@
                     const parsed = JSON.parse(text);
                     parsed.date = normalizeSmartDate(parsed.date);
                     if (parsed.contractor) {
-                        parsed.contractor = matchBestContractor(parsed.contractor, parsed.contractor, knownContractors) || parsed.contractor;
+                        const cleanCloudContractor = parsed.contractor.replace(/اسم|المقاول|الموقع|عليه|الخصم|:/g, '').trim();
+                        const matched = matchBestContractor(cleanCloudContractor, cleanCloudContractor, knownContractors);
+                        parsed.contractor = (matched && similarityScore(cleanCloudContractor, matched) >= 0.70) ? matched : cleanCloudContractor;
                     }
                     if (parsed.description) {
-                        parsed.description = cleanAndDeduplicateReasons(parsed.description);
+                        parsed.description = deduplicateReasonsSmart(parsed.description);
                     }
                     return parsed;
                 }
@@ -1135,11 +1128,13 @@
             const resDates = await tesseractWorker.recognize(renders.vahaDatesColUrl);
             const resTotal = await tesseractWorker.recognize(renders.vahaBottomTotalUrl);
             const resReasons = await tesseractWorker.recognize(renders.vahaReasonsColUrl);
+            const resAmountsCol = await tesseractWorker.recognize(renders.vahaAmountsColUrl);
 
             const headerRaw = normalizeArabicDigits(resHeader.data.text);
             const datesRaw = normalizeArabicDigits(resDates.data.text);
             const totalRaw = cleanSpacesInNumbers(normalizeArabicDigits(resTotal.data.text));
             const reasonsRaw = normalizeArabicDigits(resReasons.data.text);
+            const amountsColRaw = cleanSpacesInNumbers(normalizeArabicDigits(resAmountsCol.data.text));
 
             const contractor = matchBestContractor(headerRaw, headerRaw, knownContractors);
 
@@ -1151,21 +1146,27 @@
             }
 
             let amount = 0;
-            const totalNums = (totalRaw.match(/\d+(?:\.\d+)?/g) || []).map(Number).filter(n => n >= 10);
+            const totalNums = (totalRaw.match(/\d+(?:\.\d+)?/g) || []).map(Number).filter(n => n >= 10 && n !== 2026);
             if (totalNums.length > 0) {
                 amount = Math.max(...totalNums);
+            }
+            if (amount === 0) {
+                const rowNums = (amountsColRaw.match(/\d+(?:\.\d+)?/g) || []).map(Number).filter(n => n > 0 && n < 50000);
+                if (rowNums.length > 0) {
+                    amount = rowNums.reduce((acc, v) => acc + v, 0);
+                }
             }
 
             const reasonLines = reasonsRaw
                 .split(/\r?\n/)
                 .map(l => l.replace(/[|_ـ]/g, '').trim())
                 .filter(l => l.length > 4 && !l.includes('سبب الخصم'));
-            const description = cleanAndDeduplicateReasons(reasonLines.slice(0, 4).join(' + '));
+            const description = deduplicateReasonsSmart(reasonLines.join(' + '));
 
             return {
                 date: latestDate,
                 memo_number: memoNumber,
-                contractor: contractor || 'حمدان',
+                contractor: contractor || '',
                 description: description || '',
                 amount: isNaN(amount) ? 0 : amount
             };
@@ -1333,9 +1334,7 @@
         document.getElementById('modalDesc').value = rec.description || '';
         const previewImg = document.getElementById('modalPreviewImg');
         previewImg.src = rec.imageDataUrl || '';
-        if (previewImg.parentElement) {
-            previewImg.parentElement.scrollTop = 0;
-        }
+        if (previewImg.parentElement) previewImg.parentElement.scrollTop = 0;
         document.getElementById('previewModal').style.display = 'flex';
         document.getElementById('modalContractor').focus();
     };
