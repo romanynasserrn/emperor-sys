@@ -7,11 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- ExcelJS for preserving styles and adding hyperlinks -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-    <!-- PDF.js for rendering PDF pages to images -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- Tesseract.js for Local Offline OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
@@ -28,14 +25,12 @@
             --warning: #f59e0b;
             --info: #38bdf8;
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Cairo', sans-serif;
         }
-
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
@@ -45,7 +40,6 @@
             background-image: radial-gradient(circle at top right, rgba(217, 119, 6, 0.08), transparent 40%),
                               radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent 40%);
         }
-
         header {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
@@ -58,13 +52,11 @@
             top: 0;
             z-index: 100;
         }
-
         .brand {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-
         .brand-logo {
             width: 44px;
             height: 44px;
@@ -78,20 +70,17 @@
             color: #0f172a;
             box-shadow: 0 4px 15px var(--gold-glow);
         }
-
         .brand-text h1 {
             font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: 0.5px;
             color: var(--text-main);
         }
-
         .brand-text span {
             font-size: 0.85rem;
             color: var(--gold-light);
             font-weight: 600;
         }
-
         main {
             flex: 1;
             max-width: 1200px;
@@ -102,7 +91,6 @@
             flex-direction: column;
             gap: 1.5rem;
         }
-
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -110,7 +98,6 @@
             padding: 1.5rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
-
         .card-title {
             font-size: 1.12rem;
             font-weight: 700;
@@ -122,7 +109,6 @@
             border-bottom: 1px solid var(--card-border);
             padding-bottom: 0.75rem;
         }
-
         .form-group {
             display: flex;
             flex-direction: column;
@@ -130,13 +116,11 @@
             flex: 1;
             min-width: 200px;
         }
-
         label {
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-muted);
         }
-
         input[type="number"],
         input[type="text"] {
             background: #0f172a;
@@ -149,18 +133,15 @@
             transition: border-color 0.2s, box-shadow 0.2s;
             width: 100%;
         }
-
         input:focus {
             border-color: var(--gold-light);
             box-shadow: 0 0 0 3px var(--gold-glow);
         }
-
         .grid-2 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.25rem;
         }
-
         .upload-box {
             background: rgba(15, 23, 42, 0.6);
             border: 2px dashed var(--card-border);
@@ -174,17 +155,14 @@
             justify-content: center;
             gap: 0.65rem;
         }
-
         .upload-box:hover {
             border-color: var(--gold-light);
             background: rgba(245, 158, 11, 0.04);
         }
-
         .upload-box.active {
             border-color: var(--success);
             background: rgba(16, 185, 129, 0.06);
         }
-
         .btn {
             padding: 0.7rem 1.4rem;
             border-radius: 10px;
@@ -198,33 +176,27 @@
             justify-content: center;
             gap: 8px;
         }
-
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-
         .btn-gold {
             background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
             color: #0f172a;
             box-shadow: 0 4px 12px var(--gold-glow);
         }
-
         .btn-gold:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 18px var(--gold-glow);
         }
-
         .btn-outline {
             background: transparent;
             border: 1px solid var(--gold-light);
             color: var(--gold-light);
         }
-
         .btn-outline:hover:not(:disabled) {
             background: rgba(245, 158, 11, 0.1);
         }
-
         .btn-success {
             background: var(--success);
             color: #0f172a;
@@ -232,18 +204,15 @@
             padding: 0.85rem 1.75rem;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
-
         .btn-success:hover:not(:disabled) {
             transform: translateY(-2px);
             background: #34d399;
         }
-
         .btn-sm {
             padding: 0.35rem 0.75rem;
             font-size: 0.82rem;
             border-radius: 8px;
         }
-
         .file-badge {
             font-size: 0.83rem;
             color: var(--text-muted);
@@ -252,7 +221,6 @@
             border-radius: 20px;
             border: 1px solid var(--card-border);
         }
-
         .auto-pilot-badge {
             font-size: 0.82rem;
             color: #34d399;
@@ -265,14 +233,12 @@
             align-items: center;
             gap: 6px;
         }
-
         .progress-wrapper {
             display: none;
             flex-direction: column;
             gap: 0.65rem;
             margin-top: 1rem;
         }
-
         .progress-bar-bg {
             width: 100%;
             height: 12px;
@@ -281,21 +247,18 @@
             overflow: hidden;
             border: 1px solid var(--card-border);
         }
-
         .progress-bar-fill {
             height: 100%;
             width: 0%;
             background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
             transition: width 0.3s ease;
         }
-
         .status-text {
             font-size: 0.88rem;
             color: var(--gold-light);
             display: flex;
             justify-content: space-between;
         }
-
         .alert-success {
             display: none;
             background: rgba(16, 185, 129, 0.12);
@@ -308,7 +271,6 @@
             gap: 1rem;
             margin-top: 1rem;
         }
-
         .alert-success-msg {
             display: flex;
             align-items: center;
@@ -317,21 +279,18 @@
             font-weight: 700;
             font-size: 1rem;
         }
-
         .table-container {
             overflow-x: auto;
             margin-top: 0.75rem;
             border-radius: 10px;
             border: 1px solid var(--card-border);
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: right;
             font-size: 0.88rem;
         }
-
         th {
             background: #0f172a;
             color: var(--gold-light);
@@ -340,18 +299,15 @@
             border-bottom: 1px solid var(--card-border);
             white-space: nowrap;
         }
-
         td {
             padding: 0.6rem 0.75rem;
             border-bottom: 1px solid var(--card-border);
             color: var(--text-main);
             vertical-align: middle;
         }
-
         tr:hover td {
             background: rgba(255, 255, 255, 0.02);
         }
-
         .table-input {
             background: rgba(15, 23, 42, 0.85);
             border: 1px solid #334155;
@@ -361,11 +317,9 @@
             font-size: 0.86rem;
             width: 100%;
         }
-
         .table-input:focus {
             border-color: var(--gold-light);
         }
-
         .badge {
             padding: 0.25rem 0.6rem;
             border-radius: 6px;
@@ -374,13 +328,10 @@
             display: inline-block;
             white-space: nowrap;
         }
-
         .badge-done { background: rgba(16, 185, 129, 0.15); color: #34d399; }
         .badge-local { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
         .badge-skip { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
         .badge-miss { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-
-        /* Split-Screen Visual Preview Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -392,7 +343,6 @@
             justify-content: center;
             padding: 1.5rem;
         }
-
         .modal-box {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -405,7 +355,6 @@
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
         }
-
         .modal-header {
             padding: 1rem 1.5rem;
             background: #0f172a;
@@ -414,7 +363,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .modal-body {
             display: grid;
             grid-template-columns: 1fr 1.25fr;
@@ -423,13 +371,11 @@
             overflow-y: auto;
             flex: 1;
         }
-
         @media (max-width: 850px) {
             .modal-body {
                 grid-template-columns: 1fr;
             }
         }
-
         .preview-img-container {
             background: #0f172a;
             border: 1px solid var(--card-border);
@@ -441,20 +387,17 @@
             justify-content: center;
             padding: 0.5rem;
         }
-
         .preview-img-container img {
             max-width: 100%;
             height: auto;
             border-radius: 8px;
         }
-
         .modal-form {
             display: flex;
             flex-direction: column;
             gap: 1rem;
             justify-content: center;
         }
-
         footer {
             background: #0b1120;
             border-top: 1px solid var(--card-border);
@@ -464,7 +407,6 @@
             font-size: 0.9rem;
             margin-top: auto;
         }
-
         footer span {
             color: var(--gold-light);
             font-weight: 700;
@@ -490,7 +432,6 @@
 </header>
 
 <main>
-    <!-- Inputs Section -->
     <section class="card">
         <div class="card-title">
             <span>📂 بيانات الإدخال ونطاق المذكرات</span>
@@ -498,7 +439,6 @@
         </div>
 
         <div class="grid-2" style="margin-bottom: 1.25rem;">
-            <!-- Excel Upload -->
             <div class="upload-box" id="excelDropBox">
                 <div style="font-size: 1.8rem;">📊</div>
                 <strong>1. شيت الإكسيل (Deductions Log)</strong>
@@ -509,7 +449,6 @@
                 <span class="file-badge" id="excelFileName">لم يتم اختيار ملف بعد</span>
             </div>
 
-            <!-- PDF Folder Upload -->
             <div class="upload-box" id="folderDropBox">
                 <div style="font-size: 1.8rem;">📁</div>
                 <strong>2. مجلد مذكرات الخصم (SCAN DEDUCTION)</strong>
@@ -544,7 +483,6 @@
             </button>
         </div>
 
-        <!-- Progress Bar -->
         <div class="progress-wrapper" id="progressWrapper">
             <div class="status-text">
                 <span id="statusLabel">جاري التحضير...</span>
@@ -555,7 +493,6 @@
             </div>
         </div>
 
-        <!-- Completion Alert & Download Button -->
         <div class="alert-success" id="completionBox">
             <div class="alert-success-msg">
                 <span style="font-size: 1.4rem;">✅</span>
@@ -567,7 +504,6 @@
         </div>
     </section>
 
-    <!-- Editable Results Log Table -->
     <section class="card" id="resultsCard" style="display: none;">
         <div class="card-title">
             <span>📋 جدول المراجعة والتعديل الفوري (أي تعديل هنا يُحفظ مباشرة في شيت الإكسيل)</span>
@@ -593,7 +529,6 @@
     </section>
 </main>
 
-<!-- Split-Screen Visual Review Modal -->
 <div class="modal-overlay" id="previewModal">
     <div class="modal-box">
         <div class="modal-header">
@@ -601,7 +536,6 @@
             <button type="button" class="btn btn-outline btn-sm" onclick="closePreviewModal()">✖ إغلاق (Esc)</button>
         </div>
         <div class="modal-body">
-            <!-- Left/Right Form -->
             <div class="modal-form">
                 <div class="form-group">
                     <label>رقم المذكرة:</label>
@@ -632,7 +566,6 @@
                     </button>
                 </div>
             </div>
-            <!-- PDF Page Image Preview -->
             <div class="preview-img-container">
                 <img id="modalPreviewImg" src="" alt="صورة مذكرة الخصم">
             </div>
@@ -645,7 +578,6 @@
 </footer>
 
 <script>
-    // التحقق الذكي المتوافق تماماً مع بنية جلسة login.html في منظومة Emperor
     (function checkEmperorAuth() {
         const MODULE_ID = "DC_DEDUCTIONS";
         const isLocalFile = window.location.protocol === "file:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
@@ -692,11 +624,9 @@
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // تجميع المفتاح برمجياً وقت التشغيل فقط لتجنب حظر Secret Scanning في GitHub
     const GEMINI_API_KEY = ["AQ.Ab8", "RN6KLyhts", "JjCctvn4DD", "5dni7DeRyU", "P8Gxdylpd5", "t1H2THAQ"].join("");
     const CLOUD_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"];
 
-    // القائمة الكاملة للمقاولين المسجلين في مشاريع الكرمة (نوفيلا + فاها + كاي + لامانجا)
     const DEFAULT_CONTRACTORS = [
         "أحمد سليم",
         "احمد سليم",
@@ -769,7 +699,7 @@
         "الندى",
         "promo first",
         "نيوزمان"
-];
+    ];
 
     let excelFile = null;
     let workbookInstance = null;
@@ -799,9 +729,8 @@
             .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
     }
 
-    // توحيد صيغة التاريخ وتكملة السنة تلقائياً إذا كانت بصيغة مختصرة مثل (10/28 -> 28-10-2026)
     function normalizeSmartDate(dateStr) {
-        if (!dateStr) return '28-10-2026';
+        if (!dateStr) return '';
         let clean = normalizeArabicDigits(dateStr).replace(/\s+/g, '');
         const fullMatch1 = clean.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](20\d{2})$/);
         if (fullMatch1) {
@@ -830,7 +759,6 @@
         return clean;
     }
 
-    // استخراج رقم المذكرة بذكاء من اسم ملف الـ PDF حتى لو كان مسبوقاً بنص مثل (مذكرة خصم رقم 1288)
     function extractMemoNumberFromFilename(fileName) {
         const withoutExt = fileName.replace(/\.pdf$/i, '').trim();
         const normalized = normalizeArabicDigits(withoutExt);
@@ -885,10 +813,15 @@
 
     function deduplicateReasonsSmart(rawDesc) {
         if (!rawDesc) return '';
-        const parts = String(rawDesc)
+        let cleaned = String(rawDesc)
+            .replace(/\s+\d+\s*(?:ساعة|ساعات|لودر)?\s*$/i, '')
+            .replace(/\s+(?:ساعة|ساعات|لودر)\s+\d+\s*$/i, '');
+
+        const parts = cleaned
             .split(/\s*\+\s*|\s*\|\s*|\r?\n/)
             .map(p => p.replace(/[|_ـ]/g, '').replace(/\s+/g, ' ').trim())
             .filter(p => p.length >= 3 && !/^\d+$/.test(p));
+
         const unique = [];
         for (const p of parts) {
             const normP = normalizeArabicText(p);
@@ -974,19 +907,16 @@
             }
         }
 
-        if (bestScore >= 0.55) {
+        if (bestScore >= 0.72) {
             return bestMatch;
         }
 
         const fallback = cleanCell
             .replace(/اسم|المقاول|الموقع|عليه|الخصم|اول/g, '')
             .trim();
-        return fallback || cleanCell;
+        return fallback;
     }
 
-    // كاشف بصري تلقائي (Auto-Layout Detector): يفحص النصف السفلي من الصفحة ليميز بين:
-    // 1. نموذج الجدول متعدد السطور (مثل مشروع فاها VAHA حيث يمتد الجدول حتى أسفل الصفحة)
-    // 2. نموذج الجدول العلوي المختصر (مثل مشروع نوفيلا NOVELLA حيث يكون منتصف الصفحة أبيض فارغاً)
     function detectLayoutTypeFromCanvas(canvas) {
         const ctx = canvas.getContext('2d');
         const w = canvas.width;
@@ -1100,27 +1030,25 @@
 
     async function tryCloudSmartUniversal(base64Image, memoNumber, layoutType, statusLabel) {
         const isHandwrittenTable = layoutType === 'MULTI_ROW_TABLE';
-        const timeoutMs = isHandwrittenTable ? 15000 : 6500;
-        const maxPasses = isHandwrittenTable ? 2 : 1;
+        const timeoutMs = isHandwrittenTable ? 15000 : 8000;
+        const maxPasses = 2;
 
         const prompt = `أنت خبير تدقيق مستندات هندسية في شركة الكرمة (Alkarma Developments).
 افحص صورة مذكرة الخصم هذه بدقة، وتعرف تلقائياً على صيغتها (سواء كانت نموذج جدول علوي مطبوع مثل نوفيلا، أو نموذج جدول متعدد السطور مكتوب بخط اليد مثل فاها VAHA)، ثم استخرج البيانات وفق القواعد الصارمة التالية:
 
 1. "contractor" (اسم المقاول):
-   - إذا كان اسم المقاول مكتوباً في الأعلى فوق الجدول بجانب عبارة "اسم المقاول الموقع عليه الخصم:" (مثال: حمدان)، استخرجه فوراً.
+   - إذا كان اسم المقاول مكتوباً في الأعلى فوق الجدول بجانب عبارة "اسم المقاول الموقع عليه الخصم:" (مثال: حمدان أو احمد سليم أو النزهه)، استخرجه فوراً.
    - إذا كان داخل الجدول أمام خانة "اسم المقاول الموقع عليه الخصم" (مثال: السمان)، استخرجه فوراً.
 
 2. "date" (التاريخ بصيغة DD-MM-YYYY):
-   - إذا كان الجدول يحتوي على عدة سطور بتواريخ مختلفة في عمود التاريخ (مثل 10/20 ثم 10/28)، خذ **أحدث تاريخ موجود في آخر سطر مملوء بالجدول فقط** (مثلاً 28-10-2026)، وتجاهل تماماً تاريخ توقيع مدير المشروع الموجود في أسفل الورقة عند التوقيعات.
-   - إذا كان التاريخ مكتوباً بدون سنة (مثل 10/28 أو 28/10)، أكمله بالسنة 2026 ليصبح بصيغة DD-MM-YYYY (مثال: 28-10-2026).
+   - إذا كان الجدول يحتوي على عدة سطور بتواريخ مختلفة في عمود التاريخ (مثل 10/20 ثم 10/28 أو 2026/9/7)، خذ **أحدث تاريخ موجود في آخر سطر مملوء بالجدول فقط** (مثلاً 07-09-2026 أو 28-10-2026)، وتجاهل تماماً تاريخ توقيع مدير المشروع الموجود في أسفل الورقة.
+   - إذا كان التاريخ مكتوباً بدون سنة (مثل 10/28 أو 28/10)، أكمله بالسنة 2026 ليصبح بصيغة DD-MM-YYYY.
 
 3. "amount" (قيمة الخصم الإجمالية كرقم فقط):
-   - خذ المبلغ الإجمالي النهائي الموجود في نهاية المذكرة بجانب عبارة "برجاء احتساب اجمالي خصم بمبلغ قدره ... جنيها" (مثال: 312.5).
-   - للتحقق الذاتي: تأكد أن المبلغ الإجمالي يساوي مجموع مبالغ السطور في عمود "قيمة الخصم" داخل الجدول (مثلاً 62.5 + 250 = 312.5)، ولا تخلط أبداً بين أرقام الفيلات (مثل 305، 306، 308) وبين قيمة الخصم.
+   - خذ المبلغ الإجمالي النهائي الموجود في نهاية المذكرة بجانب عبارة "برجاء احتساب اجمالي خصم بمبلغ قدره ... جنيها" أو من عمود "قيمه الخصم" في الجدول (مثال: 415 أو 312.5 أو 1250)، ولا تخلط أبداً بين أرقام الفيلات (مثل 402، 305، 306) وبين قيمة الخصم.
 
 4. "description" (توصيف / سبب الخصم):
-   - إذا كان هناك سبب واحد في المذكرة، اكتبه كما هو.
-   - إذا كان الجدول يحتوي على عدة سطور لأسباب الخصم، ادمج ملخصاً واضحاً من كل سطر مفصولاً بعلامة " + " (مثال: "لم باليتات ونظافة فيلا 306-308 + صب خرسانة أعتاب فائض خرسانة 305-306")، وتجاهل السطور الفارغة المشطوبة بخط كبير.
+   - اكتب ملخص سبب الخصم من سطور الجدول بدون إلحاق أرقام عدد الساعات (مثل "1 ساعة لودر") في نهاية النص، وتجاهل السطور الفارغة المشطوبة.
 
 أرجع النتيجة بصيغة JSON فقط بدون أي نص إضافي:
 {
@@ -1134,43 +1062,43 @@
         for (let pass = 1; pass <= maxPasses; pass++) {
             for (const modelName of CLOUD_MODELS) {
                 if (statusLabel && pass > 1) {
-                    statusLabel.textContent = `إعادة محاولة القراءة السحابية الذكية لخط اليد (مذكرة ${memoNumber} - محاولة ${pass})...`;
+                    statusLabel.textContent = `إعادة محاولة القراءة السحابية الذكية لمذكرة ${memoNumber} (محاولة ${pass})...`;
                 }
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    signal: controller.signal,
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [
-                                { text: prompt },
-                                { inline_data: { mime_type: "image/jpeg", data: base64Image } }
-                            ]
-                        }],
-                        generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
-                    })
-                });
-                clearTimeout(timeoutId);
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: controller.signal,
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: prompt },
+                                    { inline_data: { mime_type: "image/jpeg", data: base64Image } }
+                                ]
+                            }],
+                            generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
+                        })
+                    });
+                    clearTimeout(timeoutId);
 
-                if (response.ok) {
-                    const result = await response.json();
-                    let text = result.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-                    const parsed = JSON.parse(text);
-                    parsed.date = normalizeSmartDate(parsed.date);
-                    if (parsed.contractor) {
-                        const cleanCloudContractor = parsed.contractor.replace(/اسم|المقاول|الموقع|عليه|الخصم|:/g, '').trim();
-                        const matched = matchBestContractor(cleanCloudContractor, cleanCloudContractor, knownContractors);
-                        parsed.contractor = (matched && similarityScore(cleanCloudContractor, matched) >= 0.70) ? matched : cleanCloudContractor;
+                    if (response.ok) {
+                        const result = await response.json();
+                        let text = result.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+                        const parsed = JSON.parse(text);
+                        parsed.date = normalizeSmartDate(parsed.date);
+                        if (parsed.contractor) {
+                            const cleanCloudContractor = parsed.contractor.replace(/اسم|المقاول|الموقع|عليه|الخصم|:/g, '').trim();
+                            const matched = matchBestContractor(cleanCloudContractor, cleanCloudContractor, knownContractors);
+                            parsed.contractor = (matched && similarityScore(cleanCloudContractor, matched) >= 0.70) ? matched : cleanCloudContractor;
+                        }
+                        if (parsed.description) {
+                            parsed.description = deduplicateReasonsSmart(parsed.description);
+                        }
+                        return parsed;
                     }
-                    if (parsed.description) {
-                        parsed.description = deduplicateReasonsSmart(parsed.description);
-                    }
-                    return parsed;
-                }
                 } catch (_) {
                     // الانتقال الفوري للنموذج التالي
                 }
@@ -1253,7 +1181,7 @@
             const bodyRaw = normalizeArabicDigits(resBody.data.text);
             const combinedText = `${valuesRaw}\n${bodyRaw}`;
 
-            let date = '26-10-2026';
+            let date = '';
             const dateMatch = combinedText.match(/(\d{1,2}\s*[-\/.]\s*\d{1,2}\s*[-\/.]\s*20\d{2})/);
             if (dateMatch) {
                 date = normalizeSmartDate(dateMatch[1]);
@@ -1289,7 +1217,7 @@
                     return Math.max(...candidates);
                 }
 
-                return cellNums.length > 0 ? Math.max(...cellNums) : 0;
+                return 0;
             }
 
             let amount = extractSmartAmount(amountCellRaw, combinedText);
@@ -1311,12 +1239,17 @@
                 description = lazoumMatch[1].replace(/[|_ـ]/g, '').trim();
             }
 
+            description = deduplicateReasonsSmart(description);
+
+            const needsManualReview = (!date || !contractor || !amount);
+
             return {
                 date,
                 memo_number: memoNumber,
-                contractor: contractor || 'السمان',
+                contractor: contractor || '',
                 description: description || '',
-                amount: isNaN(amount) ? 0 : amount
+                amount: isNaN(amount) ? 0 : amount,
+                needsManualReview
             };
         }
     }
@@ -1475,6 +1408,8 @@
         extractedRecords.clear();
         renderResultsTable();
 
+        let firstManualReviewMemo = null;
+
         try {
             statusLabel.textContent = 'جاري قراءة شيت الإكسيل واستخراج قائمة المقاولين...';
             const excelBuffer = await excelFile.arrayBuffer();
@@ -1558,26 +1493,28 @@
                     }
                 }
 
-                // 1. رندر الصفحة + اكتشاف نوع المذكرة بصرياً (نوفيلا مطبوع أم فاها جدول متعدد) بدون تدخل المستخدم
                 const renders = await renderPdfAndCrops(pdfFile);
                 const layoutLabel = renders.layoutType === 'MULTI_ROW_TABLE' ? 'جدول متعدد' : 'نموذج قياسي';
 
-                // 2. محاولة القراءة الذكية الشاملة عبر السحابة أولاً
                 statusLabel.textContent = `جاري التحليل الذكي لمذكرة ${numStr} (${layoutLabel})...`;
                 let extracted = await tryCloudSmartUniversal(renders.base64, numStr, renders.layoutType, statusLabel);
                 let sourceBadge = 'badge-done';
                 let sourceText = `ذكي تلقائي (${layoutLabel})`;
 
-                // 3. في حال انشغال السحابة، التحويل الفوري للمحرك المقطعي المحلي الموافق لنوع المذكرة المكتشف
                 if (!extracted) {
                     extracted = await extractWithAutoZonalLocalOCR(renders, numStr, statusLabel);
                     if (extracted.needsManualReview) {
                         sourceBadge = 'badge-skip';
-                        sourceText = `⚠️ خط يد (يحتاج مراجعة)`;
+                        sourceText = `⚠️ يحتاج مراجعة`;
+                        if (!firstManualReviewMemo) firstManualReviewMemo = numStr;
                     } else {
                         sourceBadge = 'badge-local';
                         sourceText = `مقطعي محلي (${layoutLabel})`;
                     }
+                } else if (!extracted.contractor || !extracted.amount) {
+                    sourceBadge = 'badge-skip';
+                    sourceText = `⚠️ يحتاج مراجعة`;
+                    if (!firstManualReviewMemo) firstManualReviewMemo = numStr;
                 }
 
                 if (!targetRowNumber) {
@@ -1610,6 +1547,10 @@
             statusPercent.textContent = '100%';
             statusLabel.textContent = 'اكتملت المعالجة الذكية بنجاح 100%!';
             completionBox.style.display = 'flex';
+
+            if (firstManualReviewMemo) {
+                openPreviewModal(firstManualReviewMemo);
+            }
 
         } catch (err) {
             console.error(err);
