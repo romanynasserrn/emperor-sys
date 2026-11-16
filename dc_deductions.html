@@ -698,15 +698,78 @@
 
     // القائمة الكاملة للمقاولين المسجلين في مشاريع الكرمة (نوفيلا + فاها + كاي + لامانجا)
     const DEFAULT_CONTRACTORS = [
-        "النزهه", "النزهة", "حمدان", "السمان", "ندره", "ندرة", "الجمال", "الصقر", "سولد كونستركشن", "نيوميكس للخرسانات",
-        "آل شوشان", "شركة آل شوشان", "الشوشان", "بري فورس", "بريفورس", "الرباط", "هابينيس",
-        "سوليد", "سوليد فونداشن", "مكة", "الحمد", "ربيع", "ربيع مصطفى", "إيجيبت بيلدنج",
-        "سماميكس", "عبدالحميد رفاعي", "عبد الحميد رفاعي", "البنا", "فوندر", "جمال إمام",
-        "إيجي ميكس", "محمود محمد عبدالحميد", "محمود محمد عبد الحميد", "جمال السعدني", "المشعل",
-        "شعبان سيد", "شعبان سيد عبدالوهاب", "عبدالحمد", "بلو سكاي", "السويفي", "الإيمان",
-        "محمود فاروق", "مصطفى محمود فاروق", "الهيثم", "عيد طه", "العادل", "الندى",
-        "promo first", "نيوزمان"
-    ];
+        "أحمد سليم",
+        "احمد سليم",
+        "احمد الشناوي",
+        "اسبرنج - حواش",
+        "الرباط",
+        "الرباط .(فراج)",
+        "الشحات",
+        "الشناوي",
+        "الصقر",
+        "العشري",
+        "النزهة",
+        "النزهه",
+        "حفني",
+        "حفني عبد الجواد",
+        "حمدان",
+        "سوليد فاونديشن",
+        "سوليد فاونديشن .(العاشري)",
+        "سوليد فونداشن",
+        "عبدالله مصطفى رشوان",
+        "فراج",
+        "محطه خرسانات الفاتح",
+        "محمد اسبرنج - حواشي",
+        "محمد الشناوي",
+        "محمد العراقي",
+        "محمد عبد الشافي",
+        "محمد قمر",
+        "معمل الدكتور كمال شاروبيم",
+        "مقاول خرسانات الرباط (فراج).",
+        "ندرة",
+        "السمان",
+        "ندره",
+        "الجمال",
+        "سولد كونستركشن",
+        "نيوميكس للخرسانات",
+        "آل شوشان",
+        "شركة آل شوشان",
+        "الشوشان",
+        "بري فورس",
+        "بريفورس",
+        "هابينيس",
+        "سوليد",
+        "مكة",
+        "الحمد",
+        "ربيع",
+        "ربيع مصطفى",
+        "إيجيبت بيلدنج",
+        "سماميكس",
+        "عبدالحميد رفاعي",
+        "عبد الحميد رفاعي",
+        "البنا",
+        "فوندر",
+        "جمال إمام",
+        "إيجي ميكس",
+        "محمود محمد عبدالحميد",
+        "محمود محمد عبد الحميد",
+        "جمال السعدني",
+        "المشعل",
+        "شعبان سيد",
+        "شعبان سيد عبدالوهاب",
+        "عبدالحمد",
+        "بلو سكاي",
+        "السويفي",
+        "الإيمان",
+        "محمود فاروق",
+        "مصطفى محمود فاروق",
+        "الهيثم",
+        "عيد طه",
+        "العادل",
+        "الندى",
+        "promo first",
+        "نيوزمان"
+];
 
     let excelFile = null;
     let workbookInstance = null;
@@ -1035,8 +1098,10 @@
         }
     }
 
-    async function tryCloudSmartUniversal(base64Image, memoNumber, layoutType) {
-        const timeoutMs = layoutType === 'MULTI_ROW_TABLE' ? 10000 : 6000;
+    async function tryCloudSmartUniversal(base64Image, memoNumber, layoutType, statusLabel) {
+        const isHandwrittenTable = layoutType === 'MULTI_ROW_TABLE';
+        const timeoutMs = isHandwrittenTable ? 15000 : 6500;
+        const maxPasses = isHandwrittenTable ? 2 : 1;
 
         const prompt = `أنت خبير تدقيق مستندات هندسية في شركة الكرمة (Alkarma Developments).
 افحص صورة مذكرة الخصم هذه بدقة، وتعرف تلقائياً على صيغتها (سواء كانت نموذج جدول علوي مطبوع مثل نوفيلا، أو نموذج جدول متعدد السطور مكتوب بخط اليد مثل فاها VAHA)، ثم استخرج البيانات وفق القواعد الصارمة التالية:
@@ -1066,7 +1131,11 @@
   "amount": 0
 }`;
 
-        for (const modelName of CLOUD_MODELS) {
+        for (let pass = 1; pass <= maxPasses; pass++) {
+            for (const modelName of CLOUD_MODELS) {
+                if (statusLabel && pass > 1) {
+                    statusLabel.textContent = `إعادة محاولة القراءة السحابية الذكية لخط اليد (مذكرة ${memoNumber} - محاولة ${pass})...`;
+                }
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -1102,8 +1171,12 @@
                     }
                     return parsed;
                 }
-            } catch (_) {
-                // الانتقال الفوري للنموذج التالي أو المحرك المحلي التلقائي
+                } catch (_) {
+                    // الانتقال الفوري للنموذج التالي
+                }
+            }
+            if (pass < maxPasses) {
+                await new Promise(r => setTimeout(r, 1200));
             }
         }
         return null;
@@ -1136,9 +1209,10 @@
             const reasonsRaw = normalizeArabicDigits(resReasons.data.text);
             const amountsColRaw = cleanSpacesInNumbers(normalizeArabicDigits(resAmountsCol.data.text));
 
-            const contractor = matchBestContractor(headerRaw, headerRaw, knownContractors);
+            const matchedContractor = matchBestContractor(headerRaw, headerRaw, knownContractors);
+            const contractor = (matchedContractor && similarityScore(headerRaw, matchedContractor) >= 0.72) ? matchedContractor : '';
 
-            let latestDate = '28-10-2026';
+            let latestDate = '';
             const dateMatches = datesRaw.match(/(\d{1,2}\s*[-\/.]\s*\d{1,2}(?:\s*[-\/.]\s*20\d{2})?)/g);
             if (dateMatches && dateMatches.length > 0) {
                 const lastRawDate = dateMatches[dateMatches.length - 1];
@@ -1146,29 +1220,24 @@
             }
 
             let amount = 0;
-            const totalNums = (totalRaw.match(/\d+(?:\.\d+)?/g) || []).map(Number).filter(n => n >= 10 && n !== 2026);
+            const totalNums = (totalRaw.match(/\d+(?:\.\d+)?/g) || []).map(Number).filter(n => n >= 20 && n !== 2026);
             if (totalNums.length > 0) {
                 amount = Math.max(...totalNums);
             }
             if (amount === 0) {
-                const rowNums = (amountsColRaw.match(/\d+(?:\.\d+)?/g) || []).map(Number).filter(n => n > 0 && n < 50000);
+                const rowNums = (amountsColRaw.match(/\d+(?:\.\d+)?/g) || []).map(Number).filter(n => n >= 10 && n < 50000);
                 if (rowNums.length > 0) {
                     amount = rowNums.reduce((acc, v) => acc + v, 0);
                 }
             }
 
-            const reasonLines = reasonsRaw
-                .split(/\r?\n/)
-                .map(l => l.replace(/[|_ـ]/g, '').trim())
-                .filter(l => l.length > 4 && !l.includes('سبب الخصم'));
-            const description = deduplicateReasonsSmart(reasonLines.join(' + '));
-
             return {
                 date: latestDate,
                 memo_number: memoNumber,
-                contractor: contractor || '',
-                description: description || '',
-                amount: isNaN(amount) ? 0 : amount
+                contractor: contractor,
+                description: '',
+                amount: isNaN(amount) ? 0 : amount,
+                needsManualReview: true
             };
         } else {
             if (statusLabel) statusLabel.textContent = `تم اكتشاف (نموذج قياسي مطبوع) لمذكرة ${memoNumber} - جاري القراءة المقطعية...`;
@@ -1495,15 +1564,20 @@
 
                 // 2. محاولة القراءة الذكية الشاملة عبر السحابة أولاً
                 statusLabel.textContent = `جاري التحليل الذكي لمذكرة ${numStr} (${layoutLabel})...`;
-                let extracted = await tryCloudSmartUniversal(renders.base64, numStr, renders.layoutType);
+                let extracted = await tryCloudSmartUniversal(renders.base64, numStr, renders.layoutType, statusLabel);
                 let sourceBadge = 'badge-done';
                 let sourceText = `ذكي تلقائي (${layoutLabel})`;
 
                 // 3. في حال انشغال السحابة، التحويل الفوري للمحرك المقطعي المحلي الموافق لنوع المذكرة المكتشف
                 if (!extracted) {
                     extracted = await extractWithAutoZonalLocalOCR(renders, numStr, statusLabel);
-                    sourceBadge = 'badge-local';
-                    sourceText = `مقطعي محلي (${layoutLabel})`;
+                    if (extracted.needsManualReview) {
+                        sourceBadge = 'badge-skip';
+                        sourceText = `⚠️ خط يد (يحتاج مراجعة)`;
+                    } else {
+                        sourceBadge = 'badge-local';
+                        sourceText = `مقطعي محلي (${layoutLabel})`;
+                    }
                 }
 
                 if (!targetRowNumber) {
