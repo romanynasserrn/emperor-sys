@@ -1,0 +1,25 @@
+name: Telegram Deployment Notification
+
+on:
+  deployment_status:
+
+jobs:
+  notify:
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram Message
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          MESSAGE="🚀 <b>تم نشر التحديث الجديد على الموقع بنجاح!</b>
+          ━━━━━━━━━━━━━━━━━━
+          🌐 <b>الرابط:</b> https://emperor-sys.com
+          📝 <b>التعديل:</b> ${{ github.event.deployment.description || 'تحديث ملفات المنظومة' }}
+          👤 <b>بواسطة:</b> ${{ github.actor }}"
+
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${CHAT_ID}" \
+            -d "parse_mode=HTML" \
+            --data-urlencode "text=${MESSAGE}"
