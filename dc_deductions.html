@@ -7,8 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- ExcelJS for preserving styles and adding hyperlinks -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <!-- PDF.js for rendering PDF pages to images -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Tesseract.js for Local Offline OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
@@ -25,12 +28,14 @@
             --warning: #f59e0b;
             --info: #38bdf8;
         }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Cairo', sans-serif;
         }
+
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
@@ -40,6 +45,7 @@
             background-image: radial-gradient(circle at top right, rgba(217, 119, 6, 0.08), transparent 40%),
                               radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent 40%);
         }
+
         header {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
@@ -52,11 +58,13 @@
             top: 0;
             z-index: 100;
         }
+
         .brand {
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .brand-logo {
             width: 44px;
             height: 44px;
@@ -70,17 +78,20 @@
             color: #0f172a;
             box-shadow: 0 4px 15px var(--gold-glow);
         }
+
         .brand-text h1 {
             font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: 0.5px;
             color: var(--text-main);
         }
+
         .brand-text span {
             font-size: 0.85rem;
             color: var(--gold-light);
             font-weight: 600;
         }
+
         main {
             flex: 1;
             max-width: 1200px;
@@ -91,6 +102,7 @@
             flex-direction: column;
             gap: 1.5rem;
         }
+
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -98,6 +110,7 @@
             padding: 1.5rem;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
+
         .card-title {
             font-size: 1.12rem;
             font-weight: 700;
@@ -109,6 +122,7 @@
             border-bottom: 1px solid var(--card-border);
             padding-bottom: 0.75rem;
         }
+
         .form-group {
             display: flex;
             flex-direction: column;
@@ -116,11 +130,13 @@
             flex: 1;
             min-width: 200px;
         }
+
         label {
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-muted);
         }
+
         input[type="number"],
         input[type="text"] {
             background: #0f172a;
@@ -133,15 +149,18 @@
             transition: border-color 0.2s, box-shadow 0.2s;
             width: 100%;
         }
+
         input:focus {
             border-color: var(--gold-light);
             box-shadow: 0 0 0 3px var(--gold-glow);
         }
+
         .grid-2 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.25rem;
         }
+
         .upload-box {
             background: rgba(15, 23, 42, 0.6);
             border: 2px dashed var(--card-border);
@@ -155,14 +174,17 @@
             justify-content: center;
             gap: 0.65rem;
         }
+
         .upload-box:hover {
             border-color: var(--gold-light);
             background: rgba(245, 158, 11, 0.04);
         }
+
         .upload-box.active {
             border-color: var(--success);
             background: rgba(16, 185, 129, 0.06);
         }
+
         .btn {
             padding: 0.7rem 1.4rem;
             border-radius: 10px;
@@ -176,27 +198,33 @@
             justify-content: center;
             gap: 8px;
         }
+
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
+
         .btn-gold {
             background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
             color: #0f172a;
             box-shadow: 0 4px 12px var(--gold-glow);
         }
+
         .btn-gold:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 18px var(--gold-glow);
         }
+
         .btn-outline {
             background: transparent;
             border: 1px solid var(--gold-light);
             color: var(--gold-light);
         }
+
         .btn-outline:hover:not(:disabled) {
             background: rgba(245, 158, 11, 0.1);
         }
+
         .btn-success {
             background: var(--success);
             color: #0f172a;
@@ -204,15 +232,18 @@
             padding: 0.85rem 1.75rem;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
+
         .btn-success:hover:not(:disabled) {
             transform: translateY(-2px);
             background: #34d399;
         }
+
         .btn-sm {
             padding: 0.35rem 0.75rem;
             font-size: 0.82rem;
             border-radius: 8px;
         }
+
         .file-badge {
             font-size: 0.83rem;
             color: var(--text-muted);
@@ -221,6 +252,7 @@
             border-radius: 20px;
             border: 1px solid var(--card-border);
         }
+
         .auto-pilot-badge {
             font-size: 0.82rem;
             color: #34d399;
@@ -233,12 +265,14 @@
             align-items: center;
             gap: 6px;
         }
+
         .progress-wrapper {
             display: none;
             flex-direction: column;
             gap: 0.65rem;
             margin-top: 1rem;
         }
+
         .progress-bar-bg {
             width: 100%;
             height: 12px;
@@ -247,18 +281,21 @@
             overflow: hidden;
             border: 1px solid var(--card-border);
         }
+
         .progress-bar-fill {
             height: 100%;
             width: 0%;
             background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
             transition: width 0.3s ease;
         }
+
         .status-text {
             font-size: 0.88rem;
             color: var(--gold-light);
             display: flex;
             justify-content: space-between;
         }
+
         .alert-success {
             display: none;
             background: rgba(16, 185, 129, 0.12);
@@ -271,6 +308,7 @@
             gap: 1rem;
             margin-top: 1rem;
         }
+
         .alert-success-msg {
             display: flex;
             align-items: center;
@@ -279,18 +317,21 @@
             font-weight: 700;
             font-size: 1rem;
         }
+
         .table-container {
             overflow-x: auto;
             margin-top: 0.75rem;
             border-radius: 10px;
             border: 1px solid var(--card-border);
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: right;
             font-size: 0.88rem;
         }
+
         th {
             background: #0f172a;
             color: var(--gold-light);
@@ -299,15 +340,18 @@
             border-bottom: 1px solid var(--card-border);
             white-space: nowrap;
         }
+
         td {
             padding: 0.6rem 0.75rem;
             border-bottom: 1px solid var(--card-border);
             color: var(--text-main);
             vertical-align: middle;
         }
+
         tr:hover td {
             background: rgba(255, 255, 255, 0.02);
         }
+
         .table-input {
             background: rgba(15, 23, 42, 0.85);
             border: 1px solid #334155;
@@ -317,9 +361,11 @@
             font-size: 0.86rem;
             width: 100%;
         }
+
         .table-input:focus {
             border-color: var(--gold-light);
         }
+
         .badge {
             padding: 0.25rem 0.6rem;
             border-radius: 6px;
@@ -328,10 +374,13 @@
             display: inline-block;
             white-space: nowrap;
         }
+
         .badge-done { background: rgba(16, 185, 129, 0.15); color: #34d399; }
         .badge-local { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
         .badge-skip { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
         .badge-miss { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+        /* Split-Screen Visual Preview Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -343,6 +392,7 @@
             justify-content: center;
             padding: 1.5rem;
         }
+
         .modal-box {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -355,6 +405,7 @@
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
         }
+
         .modal-header {
             padding: 1rem 1.5rem;
             background: #0f172a;
@@ -363,6 +414,7 @@
             justify-content: space-between;
             align-items: center;
         }
+
         .modal-body {
             display: grid;
             grid-template-columns: 1fr 1.25fr;
@@ -371,11 +423,13 @@
             overflow-y: auto;
             flex: 1;
         }
+
         @media (max-width: 850px) {
             .modal-body {
                 grid-template-columns: 1fr;
             }
         }
+
         .preview-img-container {
             background: #0f172a;
             border: 1px solid var(--card-border);
@@ -387,17 +441,20 @@
             justify-content: center;
             padding: 0.5rem;
         }
+
         .preview-img-container img {
             max-width: 100%;
             height: auto;
             border-radius: 8px;
         }
+
         .modal-form {
             display: flex;
             flex-direction: column;
             gap: 1rem;
             justify-content: center;
         }
+
         footer {
             background: #0b1120;
             border-top: 1px solid var(--card-border);
@@ -407,6 +464,7 @@
             font-size: 0.9rem;
             margin-top: auto;
         }
+
         footer span {
             color: var(--gold-light);
             font-weight: 700;
@@ -432,6 +490,7 @@
 </header>
 
 <main>
+    <!-- Inputs Section -->
     <section class="card">
         <div class="card-title">
             <span>📂 بيانات الإدخال ونطاق المذكرات</span>
@@ -439,6 +498,7 @@
         </div>
 
         <div class="grid-2" style="margin-bottom: 1.25rem;">
+            <!-- Excel Upload -->
             <div class="upload-box" id="excelDropBox">
                 <div style="font-size: 1.8rem;">📊</div>
                 <strong>1. شيت الإكسيل (Deductions Log)</strong>
@@ -449,6 +509,7 @@
                 <span class="file-badge" id="excelFileName">لم يتم اختيار ملف بعد</span>
             </div>
 
+            <!-- PDF Folder Upload -->
             <div class="upload-box" id="folderDropBox">
                 <div style="font-size: 1.8rem;">📁</div>
                 <strong>2. مجلد مذكرات الخصم (SCAN DEDUCTION)</strong>
@@ -483,6 +544,7 @@
             </button>
         </div>
 
+        <!-- Progress Bar -->
         <div class="progress-wrapper" id="progressWrapper">
             <div class="status-text">
                 <span id="statusLabel">جاري التحضير...</span>
@@ -493,6 +555,7 @@
             </div>
         </div>
 
+        <!-- Completion Alert & Download Button -->
         <div class="alert-success" id="completionBox">
             <div class="alert-success-msg">
                 <span style="font-size: 1.4rem;">✅</span>
@@ -504,6 +567,7 @@
         </div>
     </section>
 
+    <!-- Editable Results Log Table -->
     <section class="card" id="resultsCard" style="display: none;">
         <div class="card-title">
             <span>📋 جدول المراجعة والتعديل الفوري (أي تعديل هنا يُحفظ مباشرة في شيت الإكسيل)</span>
@@ -529,6 +593,7 @@
     </section>
 </main>
 
+<!-- Split-Screen Visual Review Modal -->
 <div class="modal-overlay" id="previewModal">
     <div class="modal-box">
         <div class="modal-header">
@@ -536,6 +601,7 @@
             <button type="button" class="btn btn-outline btn-sm" onclick="closePreviewModal()">✖ إغلاق (Esc)</button>
         </div>
         <div class="modal-body">
+            <!-- Left/Right Form -->
             <div class="modal-form">
                 <div class="form-group">
                     <label>رقم المذكرة:</label>
@@ -566,6 +632,7 @@
                     </button>
                 </div>
             </div>
+            <!-- PDF Page Image Preview -->
             <div class="preview-img-container">
                 <img id="modalPreviewImg" src="" alt="صورة مذكرة الخصم">
             </div>
@@ -810,6 +877,28 @@
             }
         }
     });
+
+    // التحقق الحسابي التلقائي: يقارن الإجمالي المستخرج بمجموع سطور الجدول
+    function reconcileAmountsMath(parsed) {
+        const rawTotal = Number(parsed.amount) || 0;
+        const rows = Array.isArray(parsed.row_amounts)
+            ? parsed.row_amounts.map(Number).filter(n => !isNaN(n) && n > 0)
+            : [];
+        if (rows.length === 0) {
+            return { amount: rawTotal, mathWarning: false };
+        }
+        const rowsSum = rows.reduce((acc, v) => acc + v, 0);
+        if (rawTotal === 0) {
+            return { amount: rowsSum, mathWarning: false };
+        }
+        const diff = Math.abs(rawTotal - rowsSum);
+        // إذا كان الفرق بسيطاً (مثل تقريب نص جنيه 2491.5 مقابل 2492) نعتمد الإجمالي المكتوب في أسفل المذكرة
+        if (diff <= 1.5) {
+            return { amount: rawTotal, mathWarning: false };
+        }
+        // إذا كان هناك خطأ واضح في قراءة الإجمالي (فرق أكبر من 1.5)، نعتمد مجموع السطور ونعلّم الصف للمراجعة
+        return { amount: rowsSum, mathWarning: true };
+    }
 
     function deduplicateReasonsSmart(rawDesc) {
         if (!rawDesc) return '';
@@ -1056,7 +1145,8 @@
   "memo_number": "${memoNumber}",
   "contractor": "اسم المقاول",
   "description": "سبب الخصم المجمع أو المفرد",
-  "amount": 0
+  "amount": 0,
+  "row_amounts": []
 }`;
 
         for (let pass = 1; pass <= maxPasses; pass++) {
@@ -1097,6 +1187,9 @@
                         if (parsed.description) {
                             parsed.description = deduplicateReasonsSmart(parsed.description);
                         }
+                        const mathCheck = reconcileAmountsMath(parsed);
+                        parsed.amount = mathCheck.amount;
+                        parsed.mathWarning = mathCheck.mathWarning;
                         return parsed;
                     }
                 } catch (_) {
@@ -1511,9 +1604,9 @@
                         sourceBadge = 'badge-local';
                         sourceText = `مقطعي محلي (${layoutLabel})`;
                     }
-                } else if (!extracted.contractor || !extracted.amount) {
+                } else if (!extracted.contractor || !extracted.amount || extracted.mathWarning) {
                     sourceBadge = 'badge-skip';
-                    sourceText = `⚠️ يحتاج مراجعة`;
+                    sourceText = extracted.mathWarning ? `⚠️ فرق حسابي (راجع)` : `⚠️ يحتاج مراجعة`;
                     if (!firstManualReviewMemo) firstManualReviewMemo = numStr;
                 }
 
