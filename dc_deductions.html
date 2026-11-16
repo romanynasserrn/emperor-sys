@@ -820,6 +820,35 @@
         }
     });
 
+    // إزالة التكرار من أسباب الخصم المتشابهة وتنظيف أي أجزاء رقمية شاردة مقصوصة مثل "41 +"
+    function cleanAndDeduplicateReasons(rawDesc) {
+        if (!rawDesc) return '';
+        const parts = String(rawDesc)
+            .split(/\s*\+\s*|\s*\|\s*|\r?\n/)
+            .map(p => p.replace(/[|_ـ]/g, '').replace(/\s+/g, ' ').trim())
+            .filter(p => {
+                if (!p || p.length < 3) return false;
+                // استبعاد الأرقام المنفردة الشاردة الناتجة عن قص سطر علوي (مثل "41")
+                if (/^\d+$/.test(p)) return false;
+                return true;
+            });
+
+        const unique = [];
+        for (const part of parts) {
+            const normPart = normalizeArabicText(part);
+            const isDuplicate = unique.some(u => {
+                const normU = normalizeArabicText(u);
+                if (normPart === normU) return true;
+                if (normU.includes(normPart) || normPart.includes(normU)) return true;
+                return similarityScore(part, u) >= 0.78;
+            });
+            if (!isDuplicate) {
+                unique.push(part);
+            }
+        }
+        return unique.join(' + ');
+    }
+
     function normalizeArabicText(str) {
         if (!str) return '';
         return str
@@ -985,8 +1014,8 @@
         if (detectedLayout === 'MULTI_ROW_TABLE') {
             const vahaContractorHeaderUrl = cropRegionDataUrl(0.35, 0.11, 0.62, 0.065);
             const vahaDatesColUrl = cropRegionDataUrl(0.85, 0.24, 0.13, 0.52);
-            const vahaBottomTotalUrl = cropRegionDataUrl(0.25, 0.77, 0.70, 0.065);
-            const vahaReasonsColUrl = cropRegionDataUrl(0.06, 0.24, 0.57, 0.25);
+            const vahaBottomTotalUrl = cropRegionDataUrl(0.18, 0.75, 0.78, 0.085);
+            const vahaReasonsColUrl = cropRegionDataUrl(0.06, 0.24, 0.57, 0.30);
 
             return {
                 layoutType: 'MULTI_ROW_TABLE',
@@ -1030,12 +1059,12 @@
    - إذا كان التاريخ مكتوباً بدون سنة (مثل 10/28 أو 28/10)، أكمله بالسنة 2026 ليصبح بصيغة DD-MM-YYYY (مثال: 28-10-2026).
 
 3. "amount" (قيمة الخصم الإجمالية كرقم فقط):
-   - خذ المبلغ الإجمالي النهائي الموجود في نهاية المذكرة بجانب عبارة "برجاء احتساب اجمالي خصم بمبلغ قدره ... جنيها" (مثال: 312.5).
-   - للتحقق الذاتي: تأكد أن المبلغ الإجمالي يساوي مجموع مبالغ السطور في عمود "قيمة الخصم" داخل الجدول (مثلاً 62.5 + 250 = 312.5)، ولا تخلط أبداً بين أرقام الفيلات (مثل 305، 306، 308) وبين قيمة الخصم.
+   - ركز أولاً على الرقم المكتوب بخط اليد أسفل الجدول مباشرة أمام عبارة "برجاء احتساب اجمالي خصم بمبلغ قدره ... جنيها" (مثال: 1220 أو 312.5)، مع تجاهل النقاط المتقطعة تحت الرقم.
+   - قارن هذا الرقم بمجموع مبالغ السطور في عمود "قيمة الخصم" داخل الجدول للتأكد من صحته، ولا تخلط أبداً بين أرقام الفيلات (مثل 305، 306، 308، 417) وبين قيمة الخصم.
 
 4. "description" (توصيف / سبب الخصم):
    - إذا كان هناك سبب واحد في المذكرة، اكتبه كما هو.
-   - إذا كان الجدول يحتوي على عدة سطور لأسباب الخصم، ادمج ملخصاً واضحاً من كل سطر مفصولاً بعلامة " + " (مثال: "لم باليتات ونظافة فيلا 306-308 + صب خرسانة أعتاب فائض خرسانة 305-306")، وتجاهل السطور الفارغة المشطوبة بخط كبير.
+   - إذا كان الجدول يحتوي على عدة سطور لأسباب الخصم، ادمج ملخصاً واضحاً من كل سطر مفصولاً بعلامة " + " مع منع تكرار نفس العبارة أو السطر المكرر، وتجاهل السطور الفارغة المشطوبة وأي أرقام منفردة شاردة.
 
 أرجع النتيجة بصيغة JSON فقط بدون أي نص إضافي:
 {
@@ -1074,6 +1103,9 @@
                     parsed.date = normalizeSmartDate(parsed.date);
                     if (parsed.contractor) {
                         parsed.contractor = matchBestContractor(parsed.contractor, parsed.contractor, knownContractors) || parsed.contractor;
+                    }
+                    if (parsed.description) {
+                        parsed.description = cleanAndDeduplicateReasons(parsed.description);
                     }
                     return parsed;
                 }
@@ -1128,7 +1160,7 @@
                 .split(/\r?\n/)
                 .map(l => l.replace(/[|_ـ]/g, '').trim())
                 .filter(l => l.length > 4 && !l.includes('سبب الخصم'));
-            const description = reasonLines.slice(0, 3).join(' + ');
+            const description = cleanAndDeduplicateReasons(reasonLines.slice(0, 4).join(' + '));
 
             return {
                 date: latestDate,
@@ -1299,7 +1331,11 @@
         document.getElementById('modalContractor').value = rec.contractor || '';
         document.getElementById('modalAmount').value = rec.amount || 0;
         document.getElementById('modalDesc').value = rec.description || '';
-        document.getElementById('modalPreviewImg').src = rec.imageDataUrl || '';
+        const previewImg = document.getElementById('modalPreviewImg');
+        previewImg.src = rec.imageDataUrl || '';
+        if (previewImg.parentElement) {
+            previewImg.parentElement.scrollTop = 0;
+        }
         document.getElementById('previewModal').style.display = 'flex';
         document.getElementById('modalContractor').focus();
     };
