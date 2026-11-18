@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منظومة إمبراطور | إدارة ومزامنة الأرصدة</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --primary: #0284c7;
+      --accent: #38bdf8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); }
+    .container { max-width: 1200px; margin: 0 auto; }
+    
+    /* Header */
+    .header {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+      background: var(--card); padding: 16px 20px; border-radius: 14px; border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .header h1 { margin: 0; font-size: 20px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .session-badge {
+      background: #0f172a; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+      font-size: 13px; color: var(--muted);
+    }
+    .session-badge b { color: var(--success); }
+
+    /* Cards */
+    .grid-top { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .card h3 { margin: 0 0 12px 0; font-size: 16px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+    /* Buttons */
+    .btn {
+      border: none; border-radius: 8px; padding: 10px 14px; font-weight: bold; cursor: pointer;
+      color: #fff; font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); width: 100%; margin-bottom: 10px; }
+    .btn-outline { background: #0f172a; border: 1px solid var(--accent); color: var(--accent); width: 100%; }
+    
+    .projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .btn-proj { background: #0f172a; border: 1px solid var(--border); padding: 12px; text-align: right; justify-content: space-between; }
+    .btn-proj:hover { border-color: var(--accent); background: #162238; }
+
+    .input-group { display: flex; gap: 8px; margin-top: 10px; }
+    .input {
+      flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: #0f172a; color: #fff; font-size: 14px;
+    }
+
+    /* Stats */
+    .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat-box { background: var(--card); border: 1px solid var(--border); padding: 14px; border-radius: 12px; text-align: center; }
+    .stat-box span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .stat-box strong { font-size: 18px; color: var(--accent); }
+
+    /* Table */
+    .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .table-wrap { overflow-x: auto; background: var(--card); border-radius: 14px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; font-size: 14px; }
+    th, td { padding: 12px 14px; text-align: right; border-bottom: 1px solid var(--border); }
+    th { background: #0f172a; color: var(--accent); font-weight: bold; }
+    tr:hover { background: rgba(56, 189, 248, 0.05); }
+    .qty-badge { background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
+    #statusMsg { margin-top: 12px; font-size: 13px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- الهيدر العلوي -->
+  <div class="header">
+    <h1>👑 منظومة إمبراطور | مركز الأرصدة الموحد</h1>
+    <div class="session-badge">
+      حالة ربط بودو: <b id="lastSessionTime">جاري الفحص...</b>
+    </div>
+  </div>
+
+  <!-- كروت التحكم في الجلسة وسحب المشاريع -->
+  <div class="grid-top">
+    <!-- الكارت الأول: ربط جلسة الموبايل والكمبيوتر -->
+    <div class="card">
+      <h3>🔗 الخطوة 1: استلام جلسة بودو من المتصفح</h3>
+      <p style="font-size:13px; color:var(--muted); margin-top:0;">
+        بسبب عزل الحماية في كروم، افتح بودو في تبويب آخر ثم فعل كود الربط السريع أو ألصق كود الجلسة:
+      </p>
+      <button class="btn btn-primary" onclick="copyMobileBridgeCode()">
+        📲 نسخ كود الربط السريع لكروم الموبايل
+      </button>
+      <div class="input-group">
+        <input type="text" id="manualSessInput" class="input" placeholder="أو ألصق كود PHPSESSID يدوياً هنا...">
+        <button class="btn" style="background:var(--success);" onclick="saveManualSession()">حفظ</button>
+      </div>
+      <div id="statusMsg"></div>
+    </div>
+
+    <!-- الكارت الثاني: أزرار سحب أرصدة المشاريع -->
+    <div class="card">
+      <h3>🚀 الخطوة 2: أزرار سحب أرصدة المشاريع</h3>
+      <div class="projects-grid">
+        <button class="btn btn-proj" onclick="pullProjectStock('541', '1010103 - kay')">
+          <span>🏗️ مشروع كاي (Kay)</span> <span>⬇️</span>
+        </button>
+        <button class="btn btn-proj" onclick="pullProjectStock('542', 'Vaha')">
+          <span>🏗️ مشروع فاها (Vaha)</span> <span>⬇️</span>
+        </button>
+        <button class="btn btn-proj" onclick="pullProjectStock('543', 'Novella')">
+          <span>🏗️ مشروع نوفيلا (Novella)</span> <span>⬇️</span>
+        </button>
+        <button class="btn btn-proj" onclick="pullProjectStock('544', 'Lamanga')">
+          <span>🏗️ مشروع لامانجا (Lamanga)</span> <span>⬇️</span>
+        </button>
+      </div>
+      <button class="btn btn-outline" style="margin-top:10px;" onclick="loadSavedStock()">
+        🔄 تحديث جدول الأرصدة المعروض بالأسفل
+      </button>
+    </div>
+  </div>
+
+  <!-- شريط الإحصائيات السريعة -->
+  <div class="stats-bar">
+    <div class="stat-box">
+      <span>إجمالي الأصناف المعروضة</span>
+      <strong id="statCount">0</strong>
+    </div>
+    <div class="stat-box">
+      <span>إجمالي القيمة الدفترية (ج.م)</span>
+      <strong id="statTotalCost">0.00</strong>
+    </div>
+    <div class="stat-box">
+      <span>آخر مزامنة للشيت</span>
+      <strong id="statLastSync" style="font-size:14px;">-</strong>
+    </div>
+  </div>
+
+  <!-- شريط البحث والفلترة -->
+  <div class="filter-bar">
+    <input type="text" id="searchInput" class="input" placeholder="🔍 ابحث بكود الصنف أو اسم الصنف أو المجموعة..." oninput="renderTable()">
+    <select id="projectFilter" class="input" style="max-width:220px;" onchange="renderTable()">
+      <option value="ALL">كافة المشاريع المسحوبة</option>
+    </select>
+  </div>
+
+  <!-- جدول الأرصدة -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>المشروع</th>
+          <th>كود الصنف</th>
+          <th>اسم الصنف</th>
+          <th>المجموعة</th>
+          <th>الوحدة</th>
+          <th>الرصيد الفعلي</th>
+          <th>التكلفة الإجمالية</th>
+          <th>وقت التحديث</th>
+        </tr>
+      </thead>
+      <tbody id="stockTableBody">
+        <tr><td colspan="8" style="text-align:center; padding:30px;">⏳ جاري تحميل الأرصدة من منظومة إمبراطور...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const EMPEROR_API_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
+const SECRET = "ALKARMA_EMPEROR_2026_SECURE";
+let allStockItems = [];
+
+// نسخ كود الجسر الخاص بكروم الموبايل
+function copyMobileBridgeCode() {
+  const bridgeCode = `javascript:(function(){const u="${EMPEROR_API_URL}";const s="${SECRET}";const c=document.cookie;fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SAVE_BUDU_BRIDGE",secret:s,cookieStr:c})});const o=XMLHttpRequest.prototype.send;XMLHttpRequest.prototype.send=function(b){this.addEventListener("load",async function(){try{const j=JSON.parse(this.responseText);if(j&&Array.isArray(j.data)&&j.data.length>0&&!String(b).includes("EMP=1")){await fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SAVE_BUDU_BRIDGE",secret:s,cookieStr:document.cookie,rawBody:String(b)})});let fb=String(b).replace(/RequestSize=\\d+/g,"RequestSize=3000").replace(/RequestIndex=\\d+/g,"RequestIndex=0").replace(/PageIndex=\\d+/g,"PageIndex=1")+"&EMP=1";const r=await fetch("https://app.buducloud.com/SCM/249.php?mid=3&ppk=253",{method:"POST",credentials:"include",headers:{"content-type":"application/x-www-form-urlencoded; charset=UTF-8","x-requested-with":"XMLHttpRequest"},body:fb});const fj=await r.json();const items=(fj&&fj.data)?fj.data:j.data;await fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SYNC_BUDU_STOCK",secret:s,items:items})});alert("✅ تم ربط الجلسة وسحب "+items.length+" صنف لإمبراطور!");}}catch(e){}});return o.apply(this,arguments);};alert("👑 تم تفعيل ربط الجلسة! اضغط بحث في بودو الآن.");})();`;
+  
+  navigator.clipboard.writeText(bridgeCode).then(() => {
+    setStatus("✅ تم نسخ كود الربط! احفظه كإشارة مرجعية في كروم الموبايل باسم (ربط) لتشغيله من شريط العنوان داخل بودو.", "#4ade80");
+  });
+}
+
+function setStatus(msg, color) {
+  const el = document.getElementById("statusMsg");
+  el.style.color = color || "#38bdf8";
+  el.innerHTML = msg;
+}
+
+// حفظ كود الجلسة اليدوي
+async function saveManualSession() {
+  const val = document.getElementById("manualSessInput").value.trim();
+  if (!val) return alert("يرجى لصق كود الجلسة أولاً");
+  setStatus("⏳ جاري حفظ كود الجلسة في السيرفر...", "#38bdf8");
+  await pullProjectStock("541", "1010103 - kay", val);
+}
+
+// سحب مشروع محدد بضغطة زر
+async function pullProjectStock(orgId, orgTitle, customSess) {
+  setStatus("⏳ جاري الاتصال بخادم بودو وسحب أرصدة (" + orgTitle + ")...", "#facc15");
+  try {
+    const res = await fetch(EMPEROR_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "PULL_BUDU_DIRECT",
+        orgId: orgId,
+        orgTitle: orgTitle,
+        phpSessId: customSess || ""
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      setStatus("✅ " + data.message + " (" + data.projects + ")", "#4ade80");
+      loadSavedStock();
+    } else {
+      setStatus("❌ " + data.message, "#f87171");
+    }
+  } catch (e) {
+    setStatus("❌ خطأ في الاتصال: " + e.message, "#f87171");
+  }
+}
+
+// تحميل الأرصدة المحفوظة في الشيت وعرضها في الجدول
+async function loadSavedStock() {
+  try {
+    const res = await fetch(EMPEROR_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "GET_BUDU_STOCK", projectFilter: "ALL" })
+    });
+    const data = await res.json();
+    if (data.success) {
+      allStockItems = data.items || [];
+      document.getElementById("lastSessionTime").innerText = data.sessionTime || "مربوط";
+      document.getElementById("statLastSync").innerText = data.lastUpdated || "-";
+      updateProjectDropdown();
+      renderTable();
+    }
+  } catch (e) {
+    document.getElementById("stockTableBody").innerHTML = `<tr><td colspan="8" style="text-align:center;color:#f87171;">تعذر تحميل البيانات</td></tr>`;
+  }
+}
+
+function updateProjectDropdown() {
+  const sel = document.getElementById("projectFilter");
+  const currentVal = sel.value;
+  const projects = [...new Set(allStockItems.map(i => i.project).filter(Boolean))];
+  sel.innerHTML = `<option value="ALL">كافة المشاريع (${allStockItems.length})</option>` +
+    projects.map(p => `<option value="${p}">${p}</option>`).join("");
+  if (projects.includes(currentVal)) sel.value = currentVal;
+}
+
+function renderTable() {
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  const proj = document.getElementById("projectFilter").value;
+  const tbody = document.getElementById("stockTableBody");
+
+  const filtered = allStockItems.filter(item => {
+    const matchProj = (proj === "ALL" || item.project === proj);
+    const matchQuery = !q || 
+      item.code.toLowerCase().includes(q) || 
+      item.name.toLowerCase().includes(q) || 
+      item.group.toLowerCase().includes(q);
+    return matchProj && matchQuery;
+  });
+
+  let totalCost = 0;
+  filtered.forEach(i => totalCost += (Number(i.totalCost) || 0));
+
+  document.getElementById("statCount").innerText = filtered.length.toLocaleString();
+  document.getElementById("statTotalCost").innerText = totalCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:25px; color:#94a3b8;">لا توجد أصناف مطابقة للبحث</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.slice(0, 300).map(item => `
+    <tr>
+      <td><b>${item.project}</b></td>
+      <td><code>${item.code}</code></td>
+      <td>${item.name}</td>
+      <td>${item.group}</td>
+      <td>${item.uom}</td>
+      <td><span class="qty-badge">${Number(item.qty).toLocaleString()}</span></td>
+      <td>${Number(item.totalCost).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td style="font-size:12px; color:#94a3b8;">${item.updatedAt}</td>
+    </tr>
+  `).join("");
+}
+
+window.onload = loadSavedStock;
+</script>
+</body>
+</html>
