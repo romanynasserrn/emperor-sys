@@ -82,12 +82,13 @@
     .btn-submit { width: 100%; padding: 12px; background-color: var(--accent); color: #ffffff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
     .btn-submit:hover { background-color: var(--accent-hover); }
     .btn-submit:disabled { background-color: var(--text-muted); cursor: not-allowed; }
-    .alert { padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: none; }
+    .alert { padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: none; line-height: 1.6; }
     .alert-danger { background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
     .card-footer-nav { text-align: center; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
-    .footer-home-link { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 600; }
+    .footer-home-link { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 600; display: block; }
     .footer-home-link:hover { text-decoration: underline; }
+    .version-tag { font-size: 11px; color: #94a3b8; margin-top: 8px; font-family: monospace; }
 
     .dashboard-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
     
@@ -218,14 +219,14 @@
         <div class="form-group">
           <label class="form-label" for="userEmail">البريد الإلكتروني المعتمد</label>
           <div class="input-wrapper">
-            <input type="email" id="userEmail" class="form-input" placeholder="name@company.com" required>
+            <input type="email" id="userEmail" class="form-input" placeholder="name@company.com" autocomplete="email" required>
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="userPassword">كلمة المرور</label>
           <div class="input-wrapper">
-            <input type="password" id="userPassword" class="form-input" placeholder="••••••••" required>
+            <input type="password" id="userPassword" class="form-input" placeholder="••••••••" autocomplete="current-password" required>
             <button type="button" id="togglePasswordBtn" class="toggle-password-btn">👁️</button>
           </div>
         </div>
@@ -242,6 +243,7 @@
 
       <div class="card-footer-nav">
         <a href="index.html" class="footer-home-link">العودة إلى الصفحة الرئيسية للتعريف بالمنظومة ←</a>
+        <div class="version-tag">Core Build v2.5 | By Romany Nasser</div>
       </div>
     </div>
   </div>
@@ -281,6 +283,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
+    const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // صلاحية الجلسة 12 ساعة لضمان تحديث الصلاحيات دورياً
 
     const SYSTEM_MODULES = {
       "TIMELINE_CONTROL": {
@@ -362,6 +365,29 @@
     const installBanner = document.getElementById('installBanner');
     const installAppBtn = document.getElementById('installAppBtn');
 
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function fetchWithTimeout(url, options, timeoutMs = 15000) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(id);
+        return response;
+      } catch (err) {
+        clearTimeout(id);
+        throw err;
+      }
+    }
+
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
@@ -404,24 +430,31 @@
     });
 
     window.addEventListener('DOMContentLoaded', () => {
-      const savedSession = localStorage.getItem('emperor_session');
-      if (savedSession) {
-        try {
-          const parsed = JSON.parse(savedSession);
-          currentSession = parsed;
-          renderDashboard(parsed);
-          return;
-        } catch (e) {
-          localStorage.removeItem('emperor_session');
-        }
-      }
+      try {
+        const savedSessionRaw = localStorage.getItem('emperor_session');
+        if (savedSessionRaw) {
+          const parsed = JSON.parse(savedSessionRaw);
+          const isStructValid = parsed && parsed.user && parsed.user.email && parsed.company && parsed.company.companyId;
+          const isNotExpired = !parsed._savedAt || (Date.now() - parsed._savedAt < SESSION_TTL_MS);
 
-      const savedEmail = localStorage.getItem('emperor_saved_email');
-      if (savedEmail) {
-        userEmailInput.value = savedEmail;
-        userPasswordInput.focus();
-      } else {
-        userEmailInput.value = "";
+          if (isStructValid && isNotExpired) {
+            currentSession = parsed;
+            renderDashboard(parsed);
+            return;
+          } else {
+            localStorage.removeItem('emperor_session');
+          }
+        }
+
+        const savedEmail = localStorage.getItem('emperor_saved_email');
+        if (savedEmail) {
+          userEmailInput.value = savedEmail;
+          userPasswordInput.focus();
+        } else {
+          userEmailInput.value = "";
+        }
+      } catch (e) {
+        try { localStorage.removeItem('emperor_session'); } catch (err) {}
       }
     });
 
@@ -435,26 +468,44 @@
       const password = userPasswordInput.value.trim();
 
       try {
-        const response = await fetch(SCRIPT_URL, {
+        const response = await fetchWithTimeout(SCRIPT_URL, {
           method: 'POST',
+          redirect: 'follow',
+          credentials: 'omit',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: "LOGIN", email, password })
-        });
+        }, 15000);
 
-        const data = await response.json();
+        const rawText = await response.text();
+        let data;
+        try {
+          data = JSON.parse(rawText);
+        } catch (parseErr) {
+          showError('استجاب الخادم بصيغة غير صالحة. يرجى فتح المنظومة من تطبيق Google Chrome الرسمي وتحديثه.');
+          return;
+        }
 
-        if (data.success) {
+        if (data && data.success) {
+          data._savedAt = Date.now();
           currentSession = data;
           if (rememberMeCheck.checked) {
-            localStorage.setItem('emperor_session', JSON.stringify(data));
-            localStorage.setItem('emperor_saved_email', email);
+            try {
+              localStorage.setItem('emperor_session', JSON.stringify(data));
+              localStorage.setItem('emperor_saved_email', email);
+            } catch (storageErr) {
+              // تجاهل خطأ التخزين المحلي في وضع التصفح الخفي
+            }
           }
           renderDashboard(data);
         } else {
-          showError(data.message || 'بيانات الدخول غير صحيحة');
+          showError((data && data.message) ? data.message : 'بيانات الدخول غير صحيحة');
         }
       } catch (err) {
-        showError('تعذر الاتصال بالخادم المركزي');
+        if (err && err.name === 'AbortError') {
+          showError('انتهت مهلة الاتصال بالخادم (15 ثانية). تحقق من استقرار الإنترنت وحاول مجدداً.');
+        } else {
+          showError('تعذر استقبال رد الخادم على هذا المتصفح. افتح الرابط عبر متصفح Google Chrome الرسمي وأوقف أي VPN أو موفر بيانات (' + (err.message || 'Network') + ')');
+        }
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'تسجيل الدخول للمنظومة';
@@ -467,16 +518,23 @@
     }
 
     function renderDashboard(sessionData) {
+      if (!sessionData || !sessionData.user || !sessionData.company) {
+        try { localStorage.removeItem('emperor_session'); } catch (e) {}
+        return;
+      }
+
       loginSection.style.display = 'none';
       dashboardSection.style.display = 'flex';
 
-      displayCompanyName.textContent = sessionData.company.companyName;
+      displayCompanyName.textContent = sessionData.company.companyName || 'Emperor Sys';
       displayUserEmail.textContent = sessionData.user.email + ' (' + sessionData.user.role + ')';
 
       if (sessionData.user.role === 'SUPER_ADMIN' || sessionData.user.assignedProjectId === 'ALL') {
         displayProjectScope.textContent = 'نطاق المشاريع: كافة المشاريع (' + (sessionData.projects ? sessionData.projects.length : 0) + ')';
       } else if (sessionData.projects && sessionData.projects.length > 0) {
         displayProjectScope.textContent = 'المشروع المسند: ' + sessionData.projects[0].name;
+      } else {
+        displayProjectScope.textContent = 'المشروع المسند: ' + (sessionData.user.assignedProjectId || '-');
       }
 
       dynamicNav.innerHTML = '';
@@ -496,7 +554,7 @@
         dynamicNav.appendChild(adminLi);
       }
 
-      let rawAllowed = sessionData.allowedModules || [];
+      let rawAllowed = Array.isArray(sessionData.allowedModules) ? sessionData.allowedModules : [];
       let allowed = [];
 
       rawAllowed.forEach(m => {
@@ -546,6 +604,8 @@
         } else {
           loadModuleView(firstKey, firstInfo);
         }
+      } else {
+        workspaceBody.innerHTML = `<div style="padding:40px; text-align:center; color:#64748b;">لا توجد أدوات مفعلة لهذا الحساب حالياً. يرجى مراجعة مدير المنظومة.</div>`;
       }
     }
 
@@ -579,8 +639,8 @@
         externalLinkBtn.style.display = 'none';
         workspaceBody.innerHTML = `
           <div style="padding:40px; background:white; margin:16px; border-radius:12px; border:1px solid var(--border);">
-            <h3>${moduleInfo.name}</h3>
-            <p style="color:var(--text-muted); margin-top:8px;">${moduleInfo.desc || 'خدمة مفعلة بالمنظومة'}</p>
+            <h3>${escapeHtml(moduleInfo.name)}</h3>
+            <p style="color:var(--text-muted); margin-top:8px;">${escapeHtml(moduleInfo.desc || 'خدمة مفعلة بالمنظومة')}</p>
           </div>
         `;
       }
@@ -592,14 +652,16 @@
       workspaceBody.innerHTML = `<div style="text-align:center; padding:50px;">⏳ جاري تحميل بيانات الهيكل التنظيمي وسجل الدخول...</div>`;
 
       try {
-        const res = await fetch(SCRIPT_URL, {
+        const res = await fetchWithTimeout(SCRIPT_URL, {
           method: 'POST',
+          redirect: 'follow',
+          credentials: 'omit',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: "GET_METADATA", adminEmail: currentSession.user.email })
-        });
+        }, 15000);
         const meta = await res.json();
         if (!meta.success) {
-          workspaceBody.innerHTML = `<div style="color:red; padding:20px;">خطأ: ${meta.message}</div>`;
+          workspaceBody.innerHTML = `<div style="color:red; padding:20px;">خطأ: ${escapeHtml(meta.message)}</div>`;
           return;
         }
 
@@ -613,29 +675,30 @@
 
     function renderAdminForm(meta) {
       let companyOptions = '';
-      meta.companies.forEach(c => {
-        companyOptions += `<option value="${c.id}">${c.name}</option>`;
+      (meta.companies || []).forEach(c => {
+        companyOptions += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`;
       });
 
       let projectOptions = '<option value="ALL">كافة مشاريع الشركة (صلاحية كاملة)</option>';
-      meta.projects.forEach(p => {
-        projectOptions += `<option value="${p.id}">${p.name}</option>`;
+      (meta.projects || []).forEach(p => {
+        projectOptions += `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`;
       });
 
       let usersRows = '';
-      meta.users.forEach(u => {
+      (meta.users || []).forEach(u => {
         const modulesDisplay = Array.isArray(u.allowedModules) ? u.allowedModules.join(', ') : (u.allowedModules || 'INWARD');
+        const safeEmail = escapeHtml(u.email);
         usersRows += `
           <tr>
-            <td style="font-weight:bold;">${u.email}</td>
-            <td>${u.companyId}</td>
-            <td>${u.role}</td>
-            <td>${u.assignedProjectId}</td>
-            <td style="color:#2563eb; font-weight:600;">${modulesDisplay}</td>
-            <td><span style="color:${u.status === 'ACTIVE' ? 'green':'red'}; font-weight:bold;">${u.status}</span></td>
+            <td style="font-weight:bold;">${safeEmail}</td>
+            <td>${escapeHtml(u.companyId)}</td>
+            <td>${escapeHtml(u.role)}</td>
+            <td>${escapeHtml(u.assignedProjectId)}</td>
+            <td style="color:#2563eb; font-weight:600;">${escapeHtml(modulesDisplay)}</td>
+            <td><span style="color:${u.status === 'ACTIVE' ? 'green':'red'}; font-weight:bold;">${escapeHtml(u.status)}</span></td>
             <td>
-              <button onclick="editUser('${u.email}')" style="background:#2563eb; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin-left:4px;">تعديل</button>
-              <button onclick="deleteUser('${u.email}')" style="background:#dc2626; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">حذف</button>
+              <button data-action="edit" data-email="${safeEmail}" class="admin-row-btn" style="background:#2563eb; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin-left:4px;">تعديل</button>
+              <button data-action="delete" data-email="${safeEmail}" class="admin-row-btn" style="background:#dc2626; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">حذف</button>
             </td>
           </tr>
         `;
@@ -650,12 +713,12 @@
             : `<span class="badge-failed">مرفوض</span>`;
           logsRows += `
             <tr>
-              <td dir="ltr" style="text-align:right; color:var(--text-muted);">${log.time}</td>
-              <td style="font-weight:bold;">${log.email}</td>
-              <td>${log.role}</td>
-              <td>${log.project}</td>
+              <td dir="ltr" style="text-align:right; color:var(--text-muted);">${escapeHtml(log.time)}</td>
+              <td style="font-weight:bold;">${escapeHtml(log.email)}</td>
+              <td>${escapeHtml(log.role)}</td>
+              <td>${escapeHtml(log.project)}</td>
               <td>${badge}</td>
-              <td>${log.details}</td>
+              <td>${escapeHtml(log.details)}</td>
             </tr>
           `;
         });
@@ -668,7 +731,7 @@
           <div class="admin-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
               <h3 id="formTitle" style="font-size:16px; font-weight:bold; color:var(--primary);">➕ إضافة / تحديث مستخدم</h3>
-              <button onclick="resetUserForm()" style="background:#f1f5f9; border:1px solid var(--border); padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">إعادة تعيين الفورم</button>
+              <button type="button" onclick="resetUserForm()" style="background:#f1f5f9; border:1px solid var(--border); padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">إعادة تعيين الفورم</button>
             </div>
             
             <form id="saveUserForm">
@@ -769,7 +832,7 @@
                     <th>إجراء</th>
                   </tr>
                 </thead>
-                <tbody>${usersRows}</tbody>
+                <tbody id="usersTableBody">${usersRows}</tbody>
               </table>
             </div>
           </div>
@@ -777,7 +840,7 @@
           <div class="admin-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <h3 style="font-size:15px; font-weight:bold;">🔔 سجل مراقبة وحركات تسجيل الدخول (آخر 20 حركة)</h3>
-              <button onclick="loadAdminUserManagement()" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">🔄 تحديث السجل</button>
+              <button type="button" onclick="loadAdminUserManagement()" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">🔄 تحديث السجل</button>
             </div>
             <div style="overflow-x:auto;">
               <table class="user-table">
@@ -799,6 +862,14 @@
       `;
 
       document.getElementById('saveUserForm').addEventListener('submit', submitUserSave);
+      document.getElementById('usersTableBody').addEventListener('click', (ev) => {
+        const btn = ev.target.closest('.admin-row-btn');
+        if (!btn) return;
+        const email = btn.getAttribute('data-email');
+        const action = btn.getAttribute('data-action');
+        if (action === 'edit') editUser(email);
+        if (action === 'delete') deleteUser(email);
+      });
     }
 
     window.resetUserForm = function() {
@@ -817,6 +888,7 @@
     };
 
     window.editUser = function(email) {
+      if (!metadataCache || !metadataCache.users) return;
       const user = metadataCache.users.find(u => u.email.trim().toLowerCase() === email.trim().toLowerCase());
       if (!user) return;
 
@@ -845,7 +917,7 @@
         cb.checked = userMods.includes(cb.value.toUpperCase());
       });
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      workspaceBody.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.deleteUser = async function(email) {
@@ -854,15 +926,17 @@
       }
 
       try {
-        const res = await fetch(SCRIPT_URL, {
+        const res = await fetchWithTimeout(SCRIPT_URL, {
           method: 'POST',
+          redirect: 'follow',
+          credentials: 'omit',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: "DELETE_USER",
             email: email.trim().toLowerCase(),
             adminEmail: currentSession.user.email
           })
-        });
+        }, 15000);
 
         const data = await res.json();
         if (data.success) {
@@ -899,8 +973,10 @@
       saveBtn.textContent = 'جاري الحفظ في النواة المركزية...';
 
       try {
-        const res = await fetch(SCRIPT_URL, {
+        const res = await fetchWithTimeout(SCRIPT_URL, {
           method: 'POST',
+          redirect: 'follow',
+          credentials: 'omit',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: "SAVE_USER",
@@ -913,7 +989,7 @@
             status,
             allowedModules: selectedModules
           })
-        });
+        }, 15000);
 
         const data = await res.json();
         if (data.success) {
@@ -931,9 +1007,8 @@
       }
     }
 
-    // زر تسجيل الخروج مع إغلاق القائمة والغطاء الشفاف وتفريغ المحتوى بالكامل
     logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('emperor_session');
+      try { localStorage.removeItem('emperor_session'); } catch (e) {}
       currentSession = null;
       
       closeSidebar();
@@ -951,7 +1026,9 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .then((reg) => console.log('PWA جاهز ومسجل:', reg.scope))
+          .then((reg) => {
+            reg.update();
+          })
           .catch((err) => console.log('PWA فشل تسجيل العامل:', err));
       });
     }
