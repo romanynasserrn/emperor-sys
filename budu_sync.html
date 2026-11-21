@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>أداة مزامنة مع البودو | BY ROMANY NASSER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --secondary: #1e293b;
+      --accent: #d97706;
+      --accent-hover: #b45309;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --warn-bg: #fef08a;
+      --warn-text: #854d0e;
+      --success: #059669;
+      --info: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* شاشة حظر الوصول الخارجي المباشر */
+    .unauthorized-screen {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: #f8fafc;
+    }
+
+    .unauthorized-card {
+      max-width: 440px;
+      width: 100%;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      text-align: center;
+    }
+
+    .unauthorized-card h2 {
+      color: #dc2626;
+      margin: 0 0 10px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .unauthorized-card p {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .btn-portal {
+      background-color: #2563eb;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    #appContainer {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .brand-title h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    .brand-title p {
+      margin: 0.2rem 0 0;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .session-pill {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .signature-badge {
+      background: rgba(217, 119, 6, 0.18);
+      border: 1px solid var(--accent);
+      color: #fbbf24;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      direction: ltr;
+    }
+
+    main {
+      max-width: 1350px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+    }
+
+    .upload-card {
+      background: var(--card);
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .upload-card:hover, .upload-card.dragover {
+      border-color: var(--accent);
+      background: #fffbeb;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-card h2 {
+      margin: 0.5rem 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .upload-card p {
+      margin: 0 0 1.2rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1.6rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-success {
+      background: var(--success);
+    }
+
+    .btn-success:hover {
+      background: #047857;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .status-bar {
+      margin-top: 1rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--info);
+      display: none;
+    }
+
+    .dashboard {
+      display: none;
+      margin-top: 2rem;
+      animation: fadeIn 0.35s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .stat-box .label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .stat-box .value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 0.25rem;
+    }
+
+    .stat-box.warn .value {
+      color: var(--accent-hover);
+    }
+
+    .actions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: var(--card);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .legend-swatch {
+      width: 22px;
+      height: 22px;
+      background: var(--warn-bg);
+      border: 1px solid #eab308;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .tab-btn {
+      background: #e2e8f0;
+      color: var(--secondary);
+      border: none;
+      padding: 0.65rem 1.15rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .table-wrapper {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-x: auto;
+      max-height: 520px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: right;
+    }
+
+    thead {
+      background: var(--secondary);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    th, td {
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background-color: #f1f5f9;
+    }
+
+    .cell-warn {
+      background-color: var(--warn-bg) !important;
+      color: var(--warn-text) !important;
+      font-weight: 700;
+    }
+
+    .ltr-cell {
+      direction: ltr;
+      text-align: left;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: #fff;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- شاشة الحظر عند محاولة الفتح المباشر خارج المنظومة -->
+  <div id="unauthorizedScreen" class="unauthorized-screen">
+    <div class="unauthorized-card">
+      <div style="font-size: 44px; margin-bottom: 12px;">🚫</div>
+      <h2>دخول غير مصرح به</h2>
+      <p id="unauthReason">
+        لا يمكن فتح أداة مزامنة البودو مباشرة عبر الرابط لحماية الصلاحيات وعزل البيانات. يرجى تسجيل الدخول أولاً عبر البوابة المركزية لمنظومة إمبراطور.
+      </p>
+      <a href="https://emperor-sys.com/login.html" target="_top" class="btn-portal">
+        الانتقال لبوابة المنظومة ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- محتوى الأداة المحمي -->
+  <div id="appContainer">
+    <header>
+      <div class="brand-title">
+        <h1>أداة مزامنة مع البودو — تحليل كروت الصنف</h1>
+        <p>استخراج وتجميع الحركات غير المتزامنة (العمود A فارغ) وتجهيز قوالب الرفع</p>
+      </div>
+      <div class="header-meta">
+        <span class="session-pill" id="sessionScopeLabel">جاري التحقق...</span>
+        <div class="signature-badge">BY ROMANY NASSER</div>
+      </div>
+    </header>
+
+    <main>
+      <div class="upload-card" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">📊</div>
+        <h2>اختر ملف شيت كارت الصنف لرفعه وتحليله</h2>
+        <p>اسحب ملف الإكسيل (.xlsx / .xls) وأفلته هنا، أو اضغط لاختيار الملف من جهازك</p>
+        <button type="button" class="btn">اختيار ملف كارت الصنف</button>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" />
+        <div class="status-bar" id="statusBar"></div>
+      </div>
+
+      <div class="dashboard" id="dashboard">
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="actions-header">
+          <div class="legend">
+            <span class="legend-swatch"></span>
+            <span>خلايا مظللة للتنبيه: كود صنف مركب/مفقود أو مركز تكلفة غير مسجل</span>
+          </div>
+          <button type="button" class="btn btn-success" id="exportBtn">
+            ⬇️ تحميل شيت الإكسيل النهائي (الأدراج المستخرجة)
+          </button>
+        </div>
+
+        <div class="tabs" id="tabsContainer"></div>
+
+        <div class="table-wrapper">
+          <table id="previewTable">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      تم التطوير بواسطة إدارة المخازن — <strong>BY ROMANY NASSER</strong>
+    </footer>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. صمام الأمان: التحقق من الجلسة ومنع الفتح الخارجي
+    // ==========================================
+    (function enforceSecurityGate() {
+      const unauthScreen = document.getElementById('unauthorizedScreen');
+      const appContainer = document.getElementById('appContainer');
+      const reasonEl = document.getElementById('unauthReason');
+
+      try {
+        // منع الفتح المباشر في نافذة مستقلة خارج إطار بوابة إمبراطور
+        if (window.top === window.self) {
+          unauthScreen.style.display = 'flex';
+          return;
+        }
+
+        // التحقق من وجود جلسة معتمدة في المتصفح
+        const rawSession = localStorage.getItem('emperor_session');
+        if (!rawSession) {
+          unauthScreen.style.display = 'flex';
+          return;
+        }
+
+        const session = JSON.parse(rawSession);
+        const isStructValid = session && session.user && session.user.email && session.company && session.company.companyId;
+        const isNotExpired = !session._savedAt || (Date.now() - session._savedAt < 12 * 60 * 60 * 1000);
+
+        if (!isStructValid || !isNotExpired) {
+          reasonEl.textContent = 'انتهت صلاحية الجلسة الحالية. يرجى إعادة تسجيل الدخول عبر البوابة المركزية.';
+          unauthScreen.style.display = 'flex';
+          return;
+        }
+
+        // التحقق من صلاحية الموديول للمستخدم (أو كونه SUPER_ADMIN)
+        const role = String(session.user.role || '').toUpperCase();
+        const allowed = Array.isArray(session.allowedModules)
+          ? session.allowedModules.map(m => String(m).trim().toUpperCase())
+          : [];
+
+        if (role !== 'SUPER_ADMIN' && !allowed.includes('BUDU_SYNC')) {
+          reasonEl.textContent = 'حسابك الحالي غير مصرح له باستخدام (أداة مزامنة مع البودو). يرجى مراجعة مدير المنظومة.';
+          unauthScreen.style.display = 'flex';
+          return;
+        }
+
+        // عرض نطاق الشركة والمستخدم في الشريط العلوي
+        const projLabel = (role === 'SUPER_ADMIN' || session.user.assignedProjectId === 'ALL')
+          ? 'كافة المشاريع'
+          : (session.projects && session.projects[0] ? session.projects[0].name : session.user.assignedProjectId);
+
+        document.getElementById('sessionScopeLabel').textContent =
+          `${session.company.companyName} | ${session.user.email} (${projLabel})`;
+
+        appContainer.style.display = 'flex';
+      } catch (err) {
+        unauthScreen.style.display = 'flex';
+      }
+    })();
+
+    // ==========================================
+    // 2. محرك تحليل كروت الصنف واستخراج حركات البودو
+    // ==========================================
+    let extractedData = {
+      inbound: [],
+      outboundConsumed: [],
+      buduConsumed: [],
+      transfers: [],
+      deductionsDetail: [],
+      buduDeductions: [],
+      warningsCount: 0,
+      sheetsScanned: 0,
+      fileName: ''
+    };
+
+    let activeTabKey = 'inbound';
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const statusBar = document.getElementById('statusBar');
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        processFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        processFile(e.target.files[0]);
+      }
+    });
+
+    function cleanStr(val) {
+      if (val === null || val === undefined) return '';
+      return String(val).trim();
+    }
+
+    function parseNum(val) {
+      if (val === null || val === undefined || val === '') return 0;
+      const n = Number(val);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function isCodeInvalidOrCompound(code) {
+      const s = cleanStr(code);
+      if (!s || s === '0' || s.toLowerCase() === 'nan' || s.toLowerCase() === 'none') return true;
+      if (s.includes('+') || s.includes('/') || s.includes('-')) return true;
+      return false;
+    }
+
+    function formatExcelDate(val) {
+      if (val === null || val === undefined || val === '') return '';
+      if (val instanceof Date && !isNaN(val)) {
+        const y = val.getFullYear();
+        const m = String(val.getMonth() + 1).padStart(2, '0');
+        const d = String(val.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+      if (typeof val === 'number') {
+        const dateObj = XLSX.SSF.parse_date_code(val);
+        if (dateObj) {
+          const y = dateObj.y;
+          const m = String(dateObj.m).padStart(2, '0');
+          const d = String(dateObj.d).padStart(2, '0');
+          return `${y}-${m}-${d}`;
+        }
+      }
+      return cleanStr(val);
+    }
+
+    function processFile(file) {
+      statusBar.style.display = 'block';
+      statusBar.style.color = '#0284c7';
+      statusBar.textContent = 'جاري قراءة وتحليل جميع كروت الصنف في الملف...';
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+
+          const inbound = [];
+          const outboundConsumed = [];
+          const transfers = [];
+          const deductionsDetail = [];
+          let sheetsScanned = 0;
+
+          workbook.SheetNames.forEach((sheetName) => {
+            if (sheetName.trim() === 'الارصدة' || sheetName.trim() === 'الأرصدة') return;
+
+            const ws = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
+            if (!rows || rows.length < 7) return;
+
+            sheetsScanned++;
+            const itemName = cleanStr(rows[0] ? rows[0][1] : '') || sheetName.trim();
+            const itemCode = cleanStr(rows[1] ? rows[1][1] : '');
+            const unit = cleanStr(rows[2] ? rows[2][1] : '');
+            const codeWarn = isCodeInvalidOrCompound(itemCode);
+
+            for (let r = 6; r < rows.length; r++) {
+              const row = rows[r];
+              if (!row) continue;
+
+              const colA = cleanStr(row[0]);
+              if (colA !== '') continue;
+
+              const dateStr = formatExcelDate(row[1]);
+              const inSupp = parseNum(row[2]);
+              const inPurch = parseNum(row[3]);
+              const inTrans = parseNum(row[4]);
+              const outDed = parseNum(row[5]);
+              const outCons = parseNum(row[6]);
+              const outTrans = parseNum(row[7]);
+
+              const reqNo = cleanStr(row[8]);
+              const colJ = cleanStr(row[9]);
+              const colK = cleanStr(row[10]);
+              const colM = cleanStr(row[12]);
+
+              // 1. حركات الوارد (موردين + مشتريات)
+              if (inSupp > 0 || inPurch > 0) {
+                const qty = inSupp > 0 ? inSupp : inPurch;
+                const inType = inSupp > 0 ? 'موردين' : 'مشتريات';
+                let supplier = '';
+                let notesParts = [];
+
+                if (colK.includes('جهه التوريد') || colK.includes('جهة التوريد') || colK.includes('مشتريات')) {
+                  supplier = colK.replace(/جه[هة]\s*التوريد\s*\/?\s*/g, '').trim();
+                  if (colJ) notesParts.push(colJ);
+                } else if (colJ.includes('جهه التوريد') || colJ.includes('جهة التوريد') || colJ.includes('مشتريات')) {
+                  supplier = colJ.replace(/جه[هة]\s*التوريد\s*\/?\s*/g, '').trim();
+                  if (colK) notesParts.push(colK);
+                } else {
+                  supplier = colK || colJ || (inPurch > 0 ? 'مشتريات إدارة' : '');
+                  if (colK && colJ) notesParts.push(colJ);
+                }
+
+                if (reqNo) notesParts.push(`طلب: ${reqNo}`);
+                if (colM) notesParts.push(colM);
+
+                inbound.push({
+                  sheetName,
+                  rowNum: r + 1,
+                  itemCode,
+                  itemName,
+                  unit,
+                  inType,
+                  qty,
+                  date: dateStr,
+                  supplier,
+                  notes: notesParts.join(' | '),
+                  codeWarn
+                });
+              }
+
+              // 2. حركات الصرف المستهلك (العمود G)
+              if (outCons > 0) {
+                outboundConsumed.push({
+                  sheetName,
+                  rowNum: r + 1,
+                  itemCode,
+                  itemName,
+                  unit,
+                  qty: outCons,
+                  date: dateStr,
+                  reqNo,
+                  block: colJ,
+                  element: colK,
+                  costCenter: colM,
+                  codeWarn,
+                  ccWarn: colM === ''
+                });
+              }
+
+              // 3. حركات الصرف بالخصم (العمود F)
+              if (outDed > 0) {
+                deductionsDetail.push({
+                  sheetName,
+                  rowNum: r + 1,
+                  itemCode,
+                  itemName,
+                  unit,
+                  qty: outDed,
+                  date: dateStr,
+                  reqNo,
+                  block: colJ,
+                  element: colK,
+                  costCenter: colM,
+                  codeWarn,
+                  ccWarn: colM === ''
+                });
+              }
+
+              // 4. حركات التحويل / المرتجع (العمود H أو E)
+              if (outTrans > 0 || inTrans > 0) {
+                const isOut = outTrans > 0;
+                transfers.push({
+                  sheetName,
+                  rowNum: r + 1,
+                  itemCode,
+                  itemName,
+                  unit,
+                  direction: isOut ? 'منصرف (محول / مرتجع)' : 'وارد (محول / مرتجع)',
+                  qty: isOut ? outTrans : inTrans,
+                  date: dateStr,
+                  permit: colJ,
+                  destination: colK,
+                  notes: [reqNo, colM].filter(Boolean).join(' | '),
+                  codeWarn
+                });
+              }
+            }
+          });
+
+          function aggregateForBudu(records) {
+            const map = new Map();
+            records.forEach((rec) => {
+              const key = `${rec.itemCode}|||${rec.costCenter}`;
+              if (!map.has(key)) {
+                map.set(key, {
+                  itemCode: rec.itemCode,
+                  qty: 0,
+                  costCenter: rec.costCenter,
+                  codeWarn: rec.codeWarn,
+                  ccWarn: rec.ccWarn
+                });
+              }
+              map.get(key).qty += rec.qty;
+            });
+            return Array.from(map.values());
+          }
+
+          const buduConsumed = aggregateForBudu(outboundConsumed);
+          const buduDeductions = aggregateForBudu(deductionsDetail);
+
+          const warningsCount =
+            inbound.filter(x => x.codeWarn).length +
+            outboundConsumed.filter(x => x.codeWarn || x.ccWarn).length +
+            deductionsDetail.filter(x => x.codeWarn || x.ccWarn).length +
+            transfers.filter(x => x.codeWarn).length;
+
+          extractedData = {
+            inbound,
+            outboundConsumed,
+            buduConsumed,
+            transfers,
+            deductionsDetail,
+            buduDeductions,
+            warningsCount,
+            sheetsScanned,
+            fileName: file.name.replace(/\.[^/.]+$/, '')
+          };
+
+          statusBar.textContent = `تم تحليل ${sheetsScanned} كارت صنف بنجاح!`;
+          renderDashboard();
+        } catch (err) {
+          console.error(err);
+          statusBar.style.color = '#dc2626';
+          statusBar.textContent = 'حدث خطأ أثناء قراءة الملف. تأكد من صحة ملف الإكسيل.';
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    function renderDashboard() {
+      document.getElementById('dashboard').style.display = 'block';
+
+      const stats = [
+        { label: 'كروت الأصناف المفحوصة', value: extractedData.sheetsScanned, warn: false },
+        { label: 'درج 1: وارد غير متزامن', value: extractedData.inbound.length, warn: false },
+        { label: 'درج 2: منصرف مستهلك (تفصيلي)', value: extractedData.outboundConsumed.length, warn: false },
+        { label: 'درج 3: قالب البودو (مجمّع)', value: extractedData.buduConsumed.length, warn: false },
+        { label: 'درج التحويلات (كامل التفاصيل)', value: extractedData.transfers.length, warn: false },
+        { label: 'حركات الخصم غير المتزامنة', value: extractedData.deductionsDetail.length, warn: false },
+        { label: 'تنبيهات (كود مركب/فارغ أو مركز تكلفة)', value: extractedData.warningsCount, warn: extractedData.warningsCount > 0 }
+      ];
+
+      const statsGrid = document.getElementById('statsGrid');
+      statsGrid.innerHTML = stats.map(s => `
+        <div class="stat-box ${s.warn ? 'warn' : ''}">
+          <div class="label">${s.label}</div>
+          <div class="value">${s.value}</div>
+        </div>
+      `).join('');
+
+      const tabs = [
+        { key: 'inbound', title: `1. الوارد غير المتزامن (${extractedData.inbound.length})`, show: true },
+        { key: 'outboundConsumed', title: `2. المنصرف المستهلك - تفصيلي (${extractedData.outboundConsumed.length})`, show: true },
+        { key: 'buduConsumed', title: `3. قالب البودو - مستهلك (${extractedData.buduConsumed.length})`, show: true },
+        { key: 'transfers', title: `4. التحويلات غير المتزامنة (${extractedData.transfers.length})`, show: extractedData.transfers.length > 0 },
+        { key: 'deductionsDetail', title: `5. الخصم - تفصيلي (${extractedData.deductionsDetail.length})`, show: extractedData.deductionsDetail.length > 0 },
+        { key: 'buduDeductions', title: `6. قالب البودو - خصم (${extractedData.buduDeductions.length})`, show: extractedData.buduDeductions.length > 0 }
+      ].filter(t => t.show);
+
+      if (!tabs.find(t => t.key === activeTabKey)) {
+        activeTabKey = tabs[0].key;
+      }
+
+      const tabsContainer = document.getElementById('tabsContainer');
+      tabsContainer.innerHTML = tabs.map(t => `
+        <button type="button" class="tab-btn ${t.key === activeTabKey ? 'active' : ''}" onclick="switchTab('${t.key}')">
+          ${t.title}
+        </button>
+      `).join('');
+
+      renderTable(activeTabKey);
+    }
+
+    function switchTab(key) {
+      activeTabKey = key;
+      renderDashboard();
+    }
+
+    function renderTable(key) {
+      const thead = document.getElementById('tableHead');
+      const tbody = document.getElementById('tableBody');
+
+      if (key === 'inbound') {
+        thead.innerHTML = `<tr>
+          <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>نوع الوارد</th>
+          <th>الكمية</th><th>تاريخ التوريد</th><th>المورد / الجهة</th><th>الملاحظات</th>
+        </tr>`;
+        tbody.innerHTML = extractedData.inbound.map((r, i) => `<tr>
+          <td>${i + 1}</td>
+          <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || '(بدون كود)'}</td>
+          <td>${r.itemName}</td>
+          <td>${r.unit}</td>
+          <td>${r.inType}</td>
+          <td><strong>${r.qty}</strong></td>
+          <td class="ltr-cell">${r.date}</td>
+          <td>${r.supplier}</td>
+          <td>${r.notes}</td>
+        </tr>`).join('');
+      } else if (key === 'outboundConsumed' || key === 'deductionsDetail') {
+        const list = extractedData[key];
+        thead.innerHTML = `<tr>
+          <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>الكمية</th>
+          <th>تاريخ الصرف</th><th>رقم طلب الصرف</th><th>البلوك</th><th>العنصر / البيان</th><th>مركز التكلفة</th>
+        </tr>`;
+        tbody.innerHTML = list.map((r, i) => `<tr>
+          <td>${i + 1}</td>
+          <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || '(بدون كود)'}</td>
+          <td>${r.itemName}</td>
+          <td>${r.unit}</td>
+          <td><strong>${r.qty}</strong></td>
+          <td class="ltr-cell">${r.date}</td>
+          <td>${r.reqNo}</td>
+          <td>${r.block}</td>
+          <td>${r.element}</td>
+          <td class="${r.ccWarn ? 'cell-warn' : ''} ltr-cell">${r.costCenter || '(فارغ)'}</td>
+        </tr>`).join('');
+      } else if (key === 'buduConsumed' || key === 'buduDeductions') {
+        const list = extractedData[key];
+        thead.innerHTML = `<tr>
+          <th class="ltr-cell">Item Code</th>
+          <th class="ltr-cell">Qty</th>
+          <th class="ltr-cell">Cost Center Code</th>
+        </tr>`;
+        tbody.innerHTML = list.map((r) => `<tr>
+          <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || ''}</td>
+          <td class="ltr-cell"><strong>${r.qty}</strong></td>
+          <td class="${r.ccWarn ? 'cell-warn' : ''} ltr-cell">${r.costCenter || ''}</td>
+        </tr>`).join('');
+      } else if (key === 'transfers') {
+        thead.innerHTML = `<tr>
+          <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>نوع الحركة</th>
+          <th>الكمية</th><th>التاريخ</th><th>رقم التصريح / الإذن</th><th>جهة التحويل</th><th>ملاحظات</th>
+        </tr>`;
+        tbody.innerHTML = extractedData.transfers.map((r, i) => `<tr>
+          <td>${i + 1}</td>
+          <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || '(بدون كود)'}</td>
+          <td>${r.itemName}</td>
+          <td>${r.unit}</td>
+          <td>${r.direction}</td>
+          <td><strong>${r.qty}</strong></td>
+          <td class="ltr-cell">${r.date}</td>
+          <td>${r.permit}</td>
+          <td>${r.destination}</td>
+          <td>${r.notes}</td>
+        </tr>`).join('');
+      }
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', exportExcel);
+
+    function exportExcel() {
+      const wb = XLSX.utils.book_new();
+
+      const headerStyle = {
+        font: { name: 'Cairo', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '1E293B' } },
+        alignment: { horizontal: 'center', vertical: 'center' },
+        border: {
+          top: { style: 'thin', color: { rgb: 'CBD5E1' } },
+          bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+          left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+          right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+        }
+      };
+
+      const cellStyle = {
+        font: { name: 'Cairo', sz: 10, color: { rgb: '0F172A' } },
+        alignment: { horizontal: 'center', vertical: 'center' },
+        border: {
+          top: { style: 'thin', color: { rgb: 'E2E8F0' } },
+          bottom: { style: 'thin', color: { rgb: 'E2E8F0' } },
+          left: { style: 'thin', color: { rgb: 'E2E8F0' } },
+          right: { style: 'thin', color: { rgb: 'E2E8F0' } }
+        }
+      };
+
+      const warnStyle = {
+        font: { name: 'Cairo', sz: 10, bold: true, color: { rgb: '854D0E' } },
+        fill: { fgColor: { rgb: 'FEF08A' } },
+        alignment: { horizontal: 'center', vertical: 'center' },
+        border: {
+          top: { style: 'thin', color: { rgb: 'EAB308' } },
+          bottom: { style: 'thin', color: { rgb: 'EAB308' } },
+          left: { style: 'thin', color: { rgb: 'EAB308' } },
+          right: { style: 'thin', color: { rgb: 'EAB308' } }
+        }
+      };
+
+      function buildStyledSheet(headers, rowsData, colWidths, rtl = true) {
+        const aoa = [headers];
+        rowsData.forEach(r => aoa.push(r.values));
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        if (rtl) {
+          ws['!views'] = [{ rightToLeft: true }];
+        }
+        ws['!cols'] = colWidths.map(w => ({ wch: w }));
+
+        for (let c = 0; c < headers.length; c++) {
+          const ref = XLSX.utils.encode_cell({ r: 0, c });
+          if (ws[ref]) ws[ref].s = headerStyle;
+        }
+
+        for (let r = 0; r < rowsData.length; r++) {
+          const warnCols = rowsData[r].warnCols || [];
+          for (let c = 0; c < headers.length; c++) {
+            const ref = XLSX.utils.encode_cell({ r: r + 1, c });
+            if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+            ws[ref].s = warnCols.includes(c) ? warnStyle : cellStyle;
+          }
+        }
+        return ws;
+      }
+
+      // درج 1: وارد غير متزامن
+      const inHeaders = ['كود الصنف', 'اسم الصنف', 'الوحدة', 'نوع الوارد', 'الكمية', 'تاريخ التوريد', 'المورد / الجهة', 'الملاحظات'];
+      const inRows = extractedData.inbound.map(r => ({
+        values: [r.itemCode, r.itemName, r.unit, r.inType, r.qty, r.date, r.supplier, r.notes],
+        warnCols: r.codeWarn ? [0] : []
+      }));
+      XLSX.utils.book_append_sheet(wb, buildStyledSheet(inHeaders, inRows, [22, 30, 10, 14, 12, 15, 25, 35], true), '1- وارد غير متزامن');
+
+      // درج 2: منصرف مستهلك تفصيلي
+      const outHeaders = ['كود الصنف', 'اسم الصنف', 'الوحدة', 'الكمية', 'تاريخ الصرف', 'رقم طلب الصرف', 'البلوك', 'العنصر / البيان', 'مركز التكلفة'];
+      const outRows = extractedData.outboundConsumed.map(r => {
+        const w = [];
+        if (r.codeWarn) w.push(0);
+        if (r.ccWarn) w.push(8);
+        return {
+          values: [r.itemCode, r.itemName, r.unit, r.qty, r.date, r.reqNo, r.block, r.element, r.costCenter],
+          warnCols: w
+        };
+      });
+      XLSX.utils.book_append_sheet(wb, buildStyledSheet(outHeaders, outRows, [22, 30, 10, 12, 15, 16, 14, 35, 55], true), '2- منصرف تفصيلي');
+
+      // درج 3: قالب البودو (مستهلك)
+      const buduHeaders = ['Item Code', 'Qty', 'Cost Center Code'];
+      const buduRows = extractedData.buduConsumed.map(r => {
+        const w = [];
+        if (r.codeWarn) w.push(0);
+        if (r.ccWarn) w.push(2);
+        return {
+          values: [r.itemCode, r.qty, r.costCenter],
+          warnCols: w
+        };
+      });
+      XLSX.utils.book_append_sheet(wb, buildStyledSheet(buduHeaders, buduRows, [24, 14, 58], false), '3- Budu Template');
+
+      // درج التحويلات (إن وجد)
+      if (extractedData.transfers.length > 0) {
+        const trHeaders = ['كود الصنف', 'اسم الصنف', 'الوحدة', 'نوع الحركة', 'الكمية', 'التاريخ', 'رقم التصريح / الإذن', 'جهة التحويل', 'ملاحظات'];
+        const trRows = extractedData.transfers.map(r => ({
+          values: [r.itemCode, r.itemName, r.unit, r.direction, r.qty, r.date, r.permit, r.destination, r.notes],
+          warnCols: r.codeWarn ? [0] : []
+        }));
+        XLSX.utils.book_append_sheet(wb, buildStyledSheet(trHeaders, trRows, [22, 30, 10, 22, 12, 15, 18, 35, 25], true), '4- التحويلات');
+      }
+
+      // درجا الخصم (إن وجد)
+      if (extractedData.deductionsDetail.length > 0) {
+        const dedRows = extractedData.deductionsDetail.map(r => {
+          const w = [];
+          if (r.codeWarn) w.push(0);
+          if (r.ccWarn) w.push(8);
+          return {
+            values: [r.itemCode, r.itemName, r.unit, r.qty, r.date, r.reqNo, r.block, r.element, r.costCenter],
+            warnCols: w
+          };
+        });
+        XLSX.utils.book_append_sheet(wb, buildStyledSheet(outHeaders, dedRows, [22, 30, 10, 12, 15, 16, 14, 35, 55], true), '5- خصم تفصيلي');
+
+        const buduDedRows = extractedData.buduDeductions.map(r => {
+          const w = [];
+          if (r.codeWarn) w.push(0);
+          if (r.ccWarn) w.push(2);
+          return {
+            values: [r.itemCode, r.qty, r.costCenter],
+            warnCols: w
+          };
+        });
+        XLSX.utils.book_append_sheet(wb, buildStyledSheet(buduHeaders, buduDedRows, [24, 14, 58], false), '6- Budu Deductions');
+      }
+
+      const today = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `حركات_غير_متزامنة_${extractedData.fileName}_${today}.xlsx`);
+    }
+  </script>
+</body>
+</html>
