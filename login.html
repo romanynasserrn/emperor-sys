@@ -243,7 +243,7 @@
 
       <div class="card-footer-nav">
         <a href="index.html" class="footer-home-link">العودة إلى الصفحة الرئيسية للتعريف بالمنظومة ←</a>
-        <div class="version-tag">Core Build v2.5 | By Romany Nasser</div>
+        <div class="version-tag">Core Build v2.6 | By Romany Nasser</div>
       </div>
     </div>
   </div>
@@ -283,7 +283,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
-    const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // صلاحية الجلسة 12 ساعة لضمان تحديث الصلاحيات دورياً
+    const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 
     const SYSTEM_MODULES = {
       "TIMELINE_CONTROL": {
@@ -313,6 +313,13 @@
         isReport: false,
         url: "https://script.google.com/macros/s/AKfycbwq37DBYb32Y64H8hSShCL-SMQDkXfWNXgCOl0SvEqgHVlBO8tYTWsrzF7pELckO3FyZQ/exec",
         desc: "حوكمة صرف المواد وفق حدود حارس المقايسة المعتمد لكل بلوك."
+      },
+      "BUDU_SYNC": {
+        name: "أداة مزامنة مع البودو",
+        icon: "🔄",
+        isReport: true,
+        url: "budu_sync.html",
+        desc: "تحليل كروت الصنف واستخراج الحركات غير المتزامنة وتجهيز قوالب البودو."
       },
       "ALUMINUM_MGR": {
         name: "لوحة متابعة مصانع الألومنيوم (إدارة)",
@@ -611,9 +618,13 @@
 
     function loadReportView(report) {
       activeModuleTitle.textContent = report.name;
-      externalLinkBtn.href = report.url;
-      externalLinkBtn.style.display = 'inline-flex';
-      externalLinkBtn.textContent = 'فتح بملء الشاشة ↗';
+      if (report.url === 'budu_sync.html') {
+        externalLinkBtn.style.display = 'none';
+      } else {
+        externalLinkBtn.href = report.url;
+        externalLinkBtn.style.display = 'inline-flex';
+        externalLinkBtn.textContent = 'فتح بملء الشاشة ↗';
+      }
       workspaceBody.innerHTML = `<iframe class="module-iframe" src="${report.url}" allow="downloads; fullscreen; clipboard-read; clipboard-write"></iframe>`;
     }
 
@@ -755,10 +766,10 @@
                   <label class="form-label">الدور الوظيفي (Role):</label>
                   <select id="targetRole" class="form-select">
                     <option value="STOREKEEPER">أمين مخزن (STOREKEEPER)</option>
+                    <option value="PROCUREMENT">إدارة المشتريات (PROCUREMENT)</option>
                     <option value="DOC_CONTROL">منسق مستندات (DOC_CONTROL)</option>
                     <option value="PROJECT_MANAGER">مدير مشروع (PROJECT_MANAGER)</option>
                     <option value="DIRECTOR">مدير قطاع / إدارة (DIRECTOR)</option>
-                   <option value="PROCUREMENT">إدارة المشتريات (PROCUREMENT)</option>
                     <option value="SUPER_ADMIN">مدير عام المنظومة (SUPER_ADMIN)</option>
                   </select>
                 </div>
@@ -797,6 +808,10 @@
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #0284c7;">
                     <input type="checkbox" name="userModule" value="OUTWARD">
                     📑 الصرف ومقايسات البلوكات
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #d97706;">
+                    <input type="checkbox" name="userModule" value="BUDU_SYNC">
+                    🔄 أداة مزامنة مع البودو
                   </label>
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #b45309;">
                     <input type="checkbox" name="userModule" value="ALUMINUM_MGR">
