@@ -280,6 +280,42 @@
       margin-bottom: 1.5rem;
     }
 
+    .export-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .filter-checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .filter-checkbox-label:hover {
+      background: #fef3c7;
+      border-color: #f59e0b;
+    }
+
+    .filter-checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-hover);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
     .legend {
       display: flex;
       align-items: center;
@@ -424,9 +460,17 @@
             <span class="legend-swatch"></span>
             <span>خلايا مظللة للتنبيه: كود صنف مركب/مفقود أو مركز تكلفة غير مسجل</span>
           </div>
-          <button type="button" class="btn btn-success" id="exportBtn">
-            ⬇️ تحميل شيت الإكسيل النهائي (الأدراج المستخرجة)
-          </button>
+
+          <div class="export-controls">
+            <label class="filter-checkbox-label" for="excludeNoCodeCheckbox">
+              <input type="checkbox" id="excludeNoCodeCheckbox" />
+              <span>استثناء الأصناف التي ليس لها أكواد من أدراج المنصرف وقوالب البودو (والاحتفاظ بها في درج الوارد فقط)</span>
+            </label>
+
+            <button type="button" class="btn btn-success" id="exportBtn">
+              ⬇️ تحميل شيت الإكسيل النهائي (الأدراج المستخرجة)
+            </button>
+          </div>
         </div>
 
         <div class="tabs" id="tabsContainer"></div>
@@ -455,13 +499,11 @@
       const reasonEl = document.getElementById('unauthReason');
 
       try {
-        // منع الفتح المباشر في نافذة مستقلة خارج إطار بوابة إمبراطور
         if (window.top === window.self) {
           unauthScreen.style.display = 'flex';
           return;
         }
 
-        // التحقق من وجود جلسة معتمدة في المتصفح
         const rawSession = localStorage.getItem('emperor_session');
         if (!rawSession) {
           unauthScreen.style.display = 'flex';
@@ -478,7 +520,6 @@
           return;
         }
 
-        // التحقق من صلاحية الموديول للمستخدم (أو كونه SUPER_ADMIN)
         const role = String(session.user.role || '').toUpperCase();
         const allowed = Array.isArray(session.allowedModules)
           ? session.allowedModules.map(m => String(m).trim().toUpperCase())
@@ -490,7 +531,6 @@
           return;
         }
 
-        // عرض نطاق الشركة والمستخدم في الشريط العلوي
         const projLabel = (role === 'SUPER_ADMIN' || session.user.assignedProjectId === 'ALL')
           ? 'كافة المشاريع'
           : (session.projects && session.projects[0] ? session.projects[0].name : session.user.assignedProjectId);
@@ -507,14 +547,11 @@
     // ==========================================
     // 2. محرك تحليل كروت الصنف واستخراج حركات البودو
     // ==========================================
-    let extractedData = {
+    let rawExtractedData = {
       inbound: [],
       outboundConsumed: [],
-      buduConsumed: [],
       transfers: [],
       deductionsDetail: [],
-      buduDeductions: [],
-      warningsCount: 0,
       sheetsScanned: 0,
       fileName: ''
     };
@@ -524,6 +561,11 @@
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const statusBar = document.getElementById('statusBar');
+    const excludeNoCodeCheckbox = document.getElementById('excludeNoCodeCheckbox');
+
+    excludeNoCodeCheckbox.addEventListener('change', () => {
+      renderDashboard();
+    });
 
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -559,9 +601,17 @@
       return isNaN(n) ? 0 : n;
     }
 
-    function isCodeInvalidOrCompound(code) {
+    // تعريف الصنف بدون كود فقط (B2 فارغ تماماً أو 0)
+    function isNoCode(code) {
       const s = cleanStr(code);
       if (!s || s === '0' || s.toLowerCase() === 'nan' || s.toLowerCase() === 'none') return true;
+      return false;
+    }
+
+    // تعريف التنبيه البصري (يشمل بدون كود + الأكواد المركبة مثل 9949+1100402)
+    function isCodeInvalidOrCompound(code) {
+      if (isNoCode(code)) return true;
+      const s = cleanStr(code);
       if (s.includes('+') || s.includes('/') || s.includes('-')) return true;
       return false;
     }
@@ -584,6 +634,64 @@
         }
       }
       return cleanStr(val);
+    }
+
+    function aggregateForBudu(records) {
+      const map = new Map();
+      records.forEach((rec) => {
+        const key = `${rec.itemCode}|||${rec.costCenter}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            itemCode: rec.itemCode,
+            qty: 0,
+            costCenter: rec.costCenter,
+            codeWarn: rec.codeWarn,
+            ccWarn: rec.ccWarn
+          });
+        }
+        map.get(key).qty += rec.qty;
+      });
+      return Array.from(map.values());
+    }
+
+    // حساب البيانات الفعالة بناءً على حالة الـ Checkbox دون تعديل البيانات الخام
+    function getEffectiveData() {
+      const excludeNoCode = excludeNoCodeCheckbox.checked;
+
+      // الدرج الأول: يحتفظ دائماً بجميع حركات الوارد (بما فيها التي بلا كود)
+      const inbound = rawExtractedData.inbound;
+
+      // أدراج المنصرف والخصم: تستبعد الأصناف التي بلا كود فقط عند تفعيل الخيار
+      const outboundConsumed = excludeNoCode
+        ? rawExtractedData.outboundConsumed.filter(r => !r.noCode)
+        : rawExtractedData.outboundConsumed;
+
+      const deductionsDetail = excludeNoCode
+        ? rawExtractedData.deductionsDetail.filter(r => !r.noCode)
+        : rawExtractedData.deductionsDetail;
+
+      const transfers = rawExtractedData.transfers;
+
+      const buduConsumed = aggregateForBudu(outboundConsumed);
+      const buduDeductions = aggregateForBudu(deductionsDetail);
+
+      const warningsCount =
+        inbound.filter(x => x.codeWarn).length +
+        outboundConsumed.filter(x => x.codeWarn || x.ccWarn).length +
+        deductionsDetail.filter(x => x.codeWarn || x.ccWarn).length +
+        transfers.filter(x => x.codeWarn).length;
+
+      return {
+        inbound,
+        outboundConsumed,
+        buduConsumed,
+        transfers,
+        deductionsDetail,
+        buduDeductions,
+        warningsCount,
+        sheetsScanned: rawExtractedData.sheetsScanned,
+        fileName: rawExtractedData.fileName
+      };
     }
 
     function processFile(file) {
@@ -614,6 +722,7 @@
             const itemName = cleanStr(rows[0] ? rows[0][1] : '') || sheetName.trim();
             const itemCode = cleanStr(rows[1] ? rows[1][1] : '');
             const unit = cleanStr(rows[2] ? rows[2][1] : '');
+            const noCode = isNoCode(itemCode);
             const codeWarn = isCodeInvalidOrCompound(itemCode);
 
             for (let r = 6; r < rows.length; r++) {
@@ -668,6 +777,7 @@
                   date: dateStr,
                   supplier,
                   notes: notesParts.join(' | '),
+                  noCode,
                   codeWarn
                 });
               }
@@ -686,6 +796,7 @@
                   block: colJ,
                   element: colK,
                   costCenter: colM,
+                  noCode,
                   codeWarn,
                   ccWarn: colM === ''
                 });
@@ -705,6 +816,7 @@
                   block: colJ,
                   element: colK,
                   costCenter: colM,
+                  noCode,
                   codeWarn,
                   ccWarn: colM === ''
                 });
@@ -725,47 +837,18 @@
                   permit: colJ,
                   destination: colK,
                   notes: [reqNo, colM].filter(Boolean).join(' | '),
+                  noCode,
                   codeWarn
                 });
               }
             }
           });
 
-          function aggregateForBudu(records) {
-            const map = new Map();
-            records.forEach((rec) => {
-              const key = `${rec.itemCode}|||${rec.costCenter}`;
-              if (!map.has(key)) {
-                map.set(key, {
-                  itemCode: rec.itemCode,
-                  qty: 0,
-                  costCenter: rec.costCenter,
-                  codeWarn: rec.codeWarn,
-                  ccWarn: rec.ccWarn
-                });
-              }
-              map.get(key).qty += rec.qty;
-            });
-            return Array.from(map.values());
-          }
-
-          const buduConsumed = aggregateForBudu(outboundConsumed);
-          const buduDeductions = aggregateForBudu(deductionsDetail);
-
-          const warningsCount =
-            inbound.filter(x => x.codeWarn).length +
-            outboundConsumed.filter(x => x.codeWarn || x.ccWarn).length +
-            deductionsDetail.filter(x => x.codeWarn || x.ccWarn).length +
-            transfers.filter(x => x.codeWarn).length;
-
-          extractedData = {
+          rawExtractedData = {
             inbound,
             outboundConsumed,
-            buduConsumed,
             transfers,
             deductionsDetail,
-            buduDeductions,
-            warningsCount,
             sheetsScanned,
             fileName: file.name.replace(/\.[^/.]+$/, '')
           };
@@ -783,16 +866,17 @@
     }
 
     function renderDashboard() {
+      const effective = getEffectiveData();
       document.getElementById('dashboard').style.display = 'block';
 
       const stats = [
-        { label: 'كروت الأصناف المفحوصة', value: extractedData.sheetsScanned, warn: false },
-        { label: 'درج 1: وارد غير متزامن', value: extractedData.inbound.length, warn: false },
-        { label: 'درج 2: منصرف مستهلك (تفصيلي)', value: extractedData.outboundConsumed.length, warn: false },
-        { label: 'درج 3: قالب البودو (مجمّع)', value: extractedData.buduConsumed.length, warn: false },
-        { label: 'درج التحويلات (كامل التفاصيل)', value: extractedData.transfers.length, warn: false },
-        { label: 'حركات الخصم غير المتزامنة', value: extractedData.deductionsDetail.length, warn: false },
-        { label: 'تنبيهات (كود مركب/فارغ أو مركز تكلفة)', value: extractedData.warningsCount, warn: extractedData.warningsCount > 0 }
+        { label: 'كروت الأصناف المفحوصة', value: effective.sheetsScanned, warn: false },
+        { label: 'درج 1: وارد غير متزامن', value: effective.inbound.length, warn: false },
+        { label: 'درج 2: منصرف مستهلك (تفصيلي)', value: effective.outboundConsumed.length, warn: false },
+        { label: 'درج 3: قالب البودو (مجمّع)', value: effective.buduConsumed.length, warn: false },
+        { label: 'درج التحويلات (كامل التفاصيل)', value: effective.transfers.length, warn: false },
+        { label: 'حركات الخصم غير المتزامنة', value: effective.deductionsDetail.length, warn: false },
+        { label: 'تنبيهات (كود مركب/فارغ أو مركز تكلفة)', value: effective.warningsCount, warn: effective.warningsCount > 0 }
       ];
 
       const statsGrid = document.getElementById('statsGrid');
@@ -804,12 +888,12 @@
       `).join('');
 
       const tabs = [
-        { key: 'inbound', title: `1. الوارد غير المتزامن (${extractedData.inbound.length})`, show: true },
-        { key: 'outboundConsumed', title: `2. المنصرف المستهلك - تفصيلي (${extractedData.outboundConsumed.length})`, show: true },
-        { key: 'buduConsumed', title: `3. قالب البودو - مستهلك (${extractedData.buduConsumed.length})`, show: true },
-        { key: 'transfers', title: `4. التحويلات غير المتزامنة (${extractedData.transfers.length})`, show: extractedData.transfers.length > 0 },
-        { key: 'deductionsDetail', title: `5. الخصم - تفصيلي (${extractedData.deductionsDetail.length})`, show: extractedData.deductionsDetail.length > 0 },
-        { key: 'buduDeductions', title: `6. قالب البودو - خصم (${extractedData.buduDeductions.length})`, show: extractedData.buduDeductions.length > 0 }
+        { key: 'inbound', title: `1. الوارد غير المتزامن (${effective.inbound.length})`, show: true },
+        { key: 'outboundConsumed', title: `2. المنصرف المستهلك - تفصيلي (${effective.outboundConsumed.length})`, show: true },
+        { key: 'buduConsumed', title: `3. قالب البودو - مستهلك (${effective.buduConsumed.length})`, show: true },
+        { key: 'transfers', title: `4. التحويلات غير المتزامنة (${effective.transfers.length})`, show: effective.transfers.length > 0 },
+        { key: 'deductionsDetail', title: `5. الخصم - تفصيلي (${effective.deductionsDetail.length})`, show: effective.deductionsDetail.length > 0 },
+        { key: 'buduDeductions', title: `6. قالب البودو - خصم (${effective.buduDeductions.length})`, show: effective.buduDeductions.length > 0 }
       ].filter(t => t.show);
 
       if (!tabs.find(t => t.key === activeTabKey)) {
@@ -823,7 +907,7 @@
         </button>
       `).join('');
 
-      renderTable(activeTabKey);
+      renderTable(activeTabKey, effective);
     }
 
     function switchTab(key) {
@@ -831,7 +915,7 @@
       renderDashboard();
     }
 
-    function renderTable(key) {
+    function renderTable(key, effective) {
       const thead = document.getElementById('tableHead');
       const tbody = document.getElementById('tableBody');
 
@@ -840,7 +924,7 @@
           <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>نوع الوارد</th>
           <th>الكمية</th><th>تاريخ التوريد</th><th>المورد / الجهة</th><th>الملاحظات</th>
         </tr>`;
-        tbody.innerHTML = extractedData.inbound.map((r, i) => `<tr>
+        tbody.innerHTML = effective.inbound.map((r, i) => `<tr>
           <td>${i + 1}</td>
           <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || '(بدون كود)'}</td>
           <td>${r.itemName}</td>
@@ -852,7 +936,7 @@
           <td>${r.notes}</td>
         </tr>`).join('');
       } else if (key === 'outboundConsumed' || key === 'deductionsDetail') {
-        const list = extractedData[key];
+        const list = effective[key];
         thead.innerHTML = `<tr>
           <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>الكمية</th>
           <th>تاريخ الصرف</th><th>رقم طلب الصرف</th><th>البلوك</th><th>العنصر / البيان</th><th>مركز التكلفة</th>
@@ -870,7 +954,7 @@
           <td class="${r.ccWarn ? 'cell-warn' : ''} ltr-cell">${r.costCenter || '(فارغ)'}</td>
         </tr>`).join('');
       } else if (key === 'buduConsumed' || key === 'buduDeductions') {
-        const list = extractedData[key];
+        const list = effective[key];
         thead.innerHTML = `<tr>
           <th class="ltr-cell">Item Code</th>
           <th class="ltr-cell">Qty</th>
@@ -886,7 +970,7 @@
           <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>نوع الحركة</th>
           <th>الكمية</th><th>التاريخ</th><th>رقم التصريح / الإذن</th><th>جهة التحويل</th><th>ملاحظات</th>
         </tr>`;
-        tbody.innerHTML = extractedData.transfers.map((r, i) => `<tr>
+        tbody.innerHTML = effective.transfers.map((r, i) => `<tr>
           <td>${i + 1}</td>
           <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || '(بدون كود)'}</td>
           <td>${r.itemName}</td>
@@ -904,6 +988,7 @@
     document.getElementById('exportBtn').addEventListener('click', exportExcel);
 
     function exportExcel() {
+      const effective = getEffectiveData();
       const wb = XLSX.utils.book_new();
 
       const headerStyle = {
@@ -966,9 +1051,9 @@
         return ws;
       }
 
-      // درج 1: وارد غير متزامن
+      // درج 1: وارد غير متزامن (يظل كاملاً دائماً لمتابعته مع المشتريات)
       const inHeaders = ['كود الصنف', 'اسم الصنف', 'الوحدة', 'نوع الوارد', 'الكمية', 'تاريخ التوريد', 'المورد / الجهة', 'الملاحظات'];
-      const inRows = extractedData.inbound.map(r => ({
+      const inRows = effective.inbound.map(r => ({
         values: [r.itemCode, r.itemName, r.unit, r.inType, r.qty, r.date, r.supplier, r.notes],
         warnCols: r.codeWarn ? [0] : []
       }));
@@ -976,7 +1061,7 @@
 
       // درج 2: منصرف مستهلك تفصيلي
       const outHeaders = ['كود الصنف', 'اسم الصنف', 'الوحدة', 'الكمية', 'تاريخ الصرف', 'رقم طلب الصرف', 'البلوك', 'العنصر / البيان', 'مركز التكلفة'];
-      const outRows = extractedData.outboundConsumed.map(r => {
+      const outRows = effective.outboundConsumed.map(r => {
         const w = [];
         if (r.codeWarn) w.push(0);
         if (r.ccWarn) w.push(8);
@@ -989,7 +1074,7 @@
 
       // درج 3: قالب البودو (مستهلك)
       const buduHeaders = ['Item Code', 'Qty', 'Cost Center Code'];
-      const buduRows = extractedData.buduConsumed.map(r => {
+      const buduRows = effective.buduConsumed.map(r => {
         const w = [];
         if (r.codeWarn) w.push(0);
         if (r.ccWarn) w.push(2);
@@ -1001,9 +1086,9 @@
       XLSX.utils.book_append_sheet(wb, buildStyledSheet(buduHeaders, buduRows, [24, 14, 58], false), '3- Budu Template');
 
       // درج التحويلات (إن وجد)
-      if (extractedData.transfers.length > 0) {
+      if (effective.transfers.length > 0) {
         const trHeaders = ['كود الصنف', 'اسم الصنف', 'الوحدة', 'نوع الحركة', 'الكمية', 'التاريخ', 'رقم التصريح / الإذن', 'جهة التحويل', 'ملاحظات'];
-        const trRows = extractedData.transfers.map(r => ({
+        const trRows = effective.transfers.map(r => ({
           values: [r.itemCode, r.itemName, r.unit, r.direction, r.qty, r.date, r.permit, r.destination, r.notes],
           warnCols: r.codeWarn ? [0] : []
         }));
@@ -1011,8 +1096,8 @@
       }
 
       // درجا الخصم (إن وجد)
-      if (extractedData.deductionsDetail.length > 0) {
-        const dedRows = extractedData.deductionsDetail.map(r => {
+      if (effective.deductionsDetail.length > 0) {
+        const dedRows = effective.deductionsDetail.map(r => {
           const w = [];
           if (r.codeWarn) w.push(0);
           if (r.ccWarn) w.push(8);
@@ -1023,7 +1108,7 @@
         });
         XLSX.utils.book_append_sheet(wb, buildStyledSheet(outHeaders, dedRows, [22, 30, 10, 12, 15, 16, 14, 35, 55], true), '5- خصم تفصيلي');
 
-        const buduDedRows = extractedData.buduDeductions.map(r => {
+        const buduDedRows = effective.buduDeductions.map(r => {
           const w = [];
           if (r.codeWarn) w.push(0);
           if (r.ccWarn) w.push(2);
@@ -1036,7 +1121,7 @@
       }
 
       const today = new Date().toISOString().slice(0, 10);
-      XLSX.writeFile(wb, `حركات_غير_متزامنة_${extractedData.fileName}_${today}.xlsx`);
+      XLSX.writeFile(wb, `حركات_غير_متزامنة_${effective.fileName}_${today}.xlsx`);
     }
   </script>
 </body>
