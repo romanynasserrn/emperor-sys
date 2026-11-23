@@ -29,6 +29,52 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
+    /* شريط تنبيه التحديث الجديد العام */
+    .update-toast-banner {
+      display: none;
+      background: linear-gradient(90deg, #b45309 0%, #d97706 100%);
+      color: #ffffff;
+      padding: 10px 18px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .update-toast-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-force-relogin {
+      background: #ffffff;
+      color: #92400e;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.15s, background 0.2s;
+    }
+
+    .btn-force-relogin:hover {
+      background: #fef3c7;
+      transform: scale(1.03);
+    }
+
     .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; overflow-y: auto; position: relative; }
     .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); position: relative; }
     
@@ -190,6 +236,15 @@
 </head>
 <body>
 
+  <!-- شريط تنبيه صدور تحديث جديد للمنظومة -->
+  <div id="updateToastBanner" class="update-toast-banner">
+    <div class="update-toast-content">
+      <span>🔔</span>
+      <span id="updateToastText">تم إصدار تحديث جديد للمنظومة! برجاء تسجيل الخروج والدخول مرة أخرى لتفعيل التحسينات.</span>
+    </div>
+    <button type="button" id="forceReloginBtn" class="btn-force-relogin">تسجيل الخروج وتحديث الآن ↻</button>
+  </div>
+
   <!-- شاشة الدخول -->
   <div id="loginSection" class="login-container">
     <div class="login-card">
@@ -243,7 +298,7 @@
 
       <div class="card-footer-nav">
         <a href="index.html" class="footer-home-link">العودة إلى الصفحة الرئيسية للتعريف بالمنظومة ←</a>
-        <div class="version-tag">Core Build v2.6 | By Romany Nasser</div>
+        <div class="version-tag" id="versionTagLabel">Core Build v2.8 | By Romany Nasser</div>
       </div>
     </div>
   </div>
@@ -314,6 +369,13 @@
         url: "https://script.google.com/macros/s/AKfycbwq37DBYb32Y64H8hSShCL-SMQDkXfWNXgCOl0SvEqgHVlBO8tYTWsrzF7pELckO3FyZQ/exec",
         desc: "حوكمة صرف المواد وفق حدود حارس المقايسة المعتمد لكل بلوك."
       },
+      "BUDU_STOCK": {
+        name: "أرصدة بودو السحابية",
+        icon: "☁️",
+        isReport: true,
+        url: "budu_stock.html",
+        desc: "سحب ومزامنة الأرصدة الفعلية الحية من نظام Budu Cloud ERP مباشرة."
+      },
       "BUDU_SYNC": {
         name: "أداة مزامنة مع البودو",
         icon: "🔄",
@@ -348,6 +410,8 @@
     let metadataCache = null;
     let deferredInstallPrompt = null;
     let editingOriginalEmail = null;
+    let loadedAppVersion = null;
+    let latestServerVersion = null;
 
     const loginForm = document.getElementById('loginForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -371,6 +435,68 @@
     const rememberMeCheck = document.getElementById('rememberMe');
     const installBanner = document.getElementById('installBanner');
     const installAppBtn = document.getElementById('installAppBtn');
+    const updateToastBanner = document.getElementById('updateToastBanner');
+    const updateToastText = document.getElementById('updateToastText');
+    const forceReloginBtn = document.getElementById('forceReloginBtn');
+
+    // ==========================================
+    // رادار مراقبة التحديثات الحية (version.json)
+    // ==========================================
+    async function checkForSystemUpdates(isInitialLoad = false) {
+      try {
+        const res = await fetch('version.json?nocache=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) return;
+        const info = await res.json();
+        if (!info || !info.version) return;
+
+        latestServerVersion = info.version;
+
+        if (isInitialLoad) {
+          loadedAppVersion = info.version;
+          const vLabel = document.getElementById('versionTagLabel');
+          if (vLabel) {
+            vLabel.textContent = `Core Build v2.8 (${info.version}) | By Romany Nasser`;
+          }
+
+          if (currentSession && currentSession._appVersion && currentSession._appVersion !== info.version) {
+            showUpdateNotification(info);
+          }
+        } else if (loadedAppVersion && info.version !== loadedAppVersion) {
+          showUpdateNotification(info);
+        }
+      } catch (e) {}
+    }
+
+    function showUpdateNotification(info) {
+      const noteText = info.notes ? ` (${info.notes})` : '';
+      updateToastText.textContent = `تم إصدار تحديث جديد للمنظومة${noteText} — برجاء تسجيل الخروج والدخول مرة أخرى لتفعيل التحديث.`;
+      updateToastBanner.style.display = 'flex';
+    }
+
+    async function performFullLogoutAndRefresh() {
+      try {
+        localStorage.removeItem('emperor_session');
+        if (latestServerVersion) {
+          localStorage.setItem('emperor_ack_version', latestServerVersion);
+        }
+      } catch (e) {}
+
+      if ('caches' in window) {
+        try {
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map(k => caches.delete(k)));
+        } catch (e) {}
+      }
+
+      window.location.href = 'login.html?v=' + Date.now();
+    }
+
+    forceReloginBtn.addEventListener('click', performFullLogoutAndRefresh);
+
+    window.addEventListener('load', () => {
+      checkForSystemUpdates(true);
+      setInterval(() => checkForSystemUpdates(false), 120000);
+    });
 
     function escapeHtml(str) {
       if (str === null || str === undefined) return '';
@@ -494,14 +620,13 @@
 
         if (data && data.success) {
           data._savedAt = Date.now();
+          data._appVersion = latestServerVersion || loadedAppVersion || 'v2.8';
           currentSession = data;
           if (rememberMeCheck.checked) {
             try {
               localStorage.setItem('emperor_session', JSON.stringify(data));
               localStorage.setItem('emperor_saved_email', email);
-            } catch (storageErr) {
-              // تجاهل خطأ التخزين المحلي في وضع التصفح الخفي
-            }
+            } catch (storageErr) {}
           }
           renderDashboard(data);
         } else {
@@ -618,14 +743,15 @@
 
     function loadReportView(report) {
       activeModuleTitle.textContent = report.name;
-      if (report.url === 'budu_sync.html') {
+      if (report.url === 'budu_sync.html' || report.url === 'budu_stock.html') {
         externalLinkBtn.style.display = 'none';
       } else {
         externalLinkBtn.href = report.url;
         externalLinkBtn.style.display = 'inline-flex';
         externalLinkBtn.textContent = 'فتح بملء الشاشة ↗';
       }
-      workspaceBody.innerHTML = `<iframe class="module-iframe" src="${report.url}" allow="downloads; fullscreen; clipboard-read; clipboard-write"></iframe>`;
+      const cacheBustUrl = `${report.url}?v=${encodeURIComponent(latestServerVersion || loadedAppVersion || '2.8')}`;
+      workspaceBody.innerHTML = `<iframe class="module-iframe" src="${cacheBustUrl}" allow="downloads; fullscreen; clipboard-read; clipboard-write"></iframe>`;
     }
 
     function loadModuleView(moduleKey, moduleInfo) {
@@ -808,6 +934,10 @@
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #0284c7;">
                     <input type="checkbox" name="userModule" value="OUTWARD">
                     📑 الصرف ومقايسات البلوكات
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #0369a1;">
+                    <input type="checkbox" name="userModule" value="BUDU_STOCK">
+                    ☁️ أرصدة بودو السحابية
                   </label>
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #d97706;">
                     <input type="checkbox" name="userModule" value="BUDU_SYNC">
@@ -1023,19 +1153,7 @@
       }
     }
 
-    logoutBtn.addEventListener('click', () => {
-      try { localStorage.removeItem('emperor_session'); } catch (e) {}
-      currentSession = null;
-      
-      closeSidebar();
-      mainSidebar.classList.remove('collapsed');
-      
-      workspaceBody.innerHTML = '';
-      
-      dashboardSection.style.display = 'none';
-      loginSection.style.display = 'flex';
-      userPasswordInput.value = '';
-    });
+    logoutBtn.addEventListener('click', performFullLogoutAndRefresh);
   </script>
 
   <script>
