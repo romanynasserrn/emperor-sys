@@ -1,301 +1,1059 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منظومة إمبراطور | إدارة ومزامنة الأرصدة</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>أرصدة بودو السحابية | EMPEROR SYS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --border: #334155;
-      --primary: #0284c7;
-      --accent: #38bdf8;
-      --success: #22c55e;
-      --danger: #ef4444;
-      --text: #f8fafc;
-      --muted: #94a3b8;
+      --primary: #0f172a;
+      --secondary: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --budu: #0284c7;
+      --budu-hover: #0369a1;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --success: #16a34a;
+      --warn: #d97706;
+      --danger: #dc2626;
     }
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); }
-    .container { max-width: 1200px; margin: 0 auto; }
-    
-    /* Header */
-    .header {
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-      background: var(--card); padding: 16px 20px; border-radius: 14px; border: 1px solid var(--border);
-      margin-bottom: 16px;
-    }
-    .header h1 { margin: 0; font-size: 20px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-    .session-badge {
-      background: #0f172a; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
-      font-size: 13px; color: var(--muted);
-    }
-    .session-badge b { color: var(--success); }
 
-    /* Cards */
-    .grid-top { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin-bottom: 16px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
-    .card h3 { margin: 0 0 12px 0; font-size: 16px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
 
-    /* Buttons */
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* شاشة الحظر الخارجي */
+    .unauthorized-screen {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--bg);
+    }
+
+    .unauthorized-card {
+      max-width: 440px;
+      width: 100%;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      text-align: center;
+    }
+
+    .unauthorized-card h2 {
+      color: var(--danger);
+      margin: 0 0 10px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .unauthorized-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .btn-portal {
+      background-color: var(--accent);
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    #appContainer {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #ffffff;
+      padding: 1.25rem 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .brand-title h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title p {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      margin-top: 2px;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .session-pill {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .signature-badge {
+      background: rgba(37, 99, 235, 0.25);
+      border: 1px solid #60a5fa;
+      color: #93c5fd;
+      padding: 0.35rem 0.95rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      letter-spacing: 0.8px;
+      direction: ltr;
+    }
+
+    main {
+      max-width: 1440px;
+      width: 100%;
+      margin: 1.5rem auto;
+      padding: 0 1.25rem;
+      flex: 1;
+    }
+
+    /* شريط حالة الجلسة والجسر */
+    .bridge-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .session-status-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
+      flex-shrink: 0;
+    }
+
+    .status-dot.warn {
+      background: var(--warn);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
+    }
+
+    .bridge-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sess-input {
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      width: 210px;
+      outline: none;
+      direction: ltr;
+      background: #f8fafc;
+    }
+
+    .sess-input:focus {
+      border-color: var(--accent);
+      background: #ffffff;
+    }
+
     .btn {
-      border: none; border-radius: 8px; padding: 10px 14px; font-weight: bold; cursor: pointer;
-      color: #fff; font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-primary { background: var(--primary); width: 100%; margin-bottom: 10px; }
-    .btn-outline { background: #0f172a; border: 1px solid var(--accent); color: var(--accent); width: 100%; }
-    
-    .projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .btn-proj { background: #0f172a; border: 1px solid var(--border); padding: 12px; text-align: right; justify-content: space-between; }
-    .btn-proj:hover { border-color: var(--accent); background: #162238; }
-
-    .input-group { display: flex; gap: 8px; margin-top: 10px; }
-    .input {
-      flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
-      background: #0f172a; color: #fff; font-size: 14px;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
     }
 
-    /* Stats */
-    .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
-    .stat-box { background: var(--card); border: 1px solid var(--border); padding: 14px; border-radius: 12px; text-align: center; }
-    .stat-box span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-    .stat-box strong { font-size: 18px; color: var(--accent); }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-    /* Table */
-    .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-    .table-wrap { overflow-x: auto; background: var(--card); border-radius: 14px; border: 1px solid var(--border); }
-    table { width: 100%; border-collapse: collapse; min-width: 700px; font-size: 14px; }
-    th, td { padding: 12px 14px; text-align: right; border-bottom: 1px solid var(--border); }
-    th { background: #0f172a; color: var(--accent); font-weight: bold; }
-    tr:hover { background: rgba(56, 189, 248, 0.05); }
-    .qty-badge { background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    #statusMsg { margin-top: 12px; font-size: 13px; line-height: 1.5; }
+    .btn-bridge {
+      background: #eff6ff;
+      color: var(--accent);
+      border: 1px solid #bfdbfe;
+    }
+
+    .btn-bridge:hover {
+      background: #dbeafe;
+    }
+
+    .btn-excel {
+      background: var(--success);
+      color: #ffffff;
+    }
+
+    .btn-excel:hover {
+      background: #15803d;
+    }
+
+    .btn-refresh {
+      background: #f1f5f9;
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-refresh:hover {
+      background: #e2e8f0;
+    }
+
+    /* لوحة السحب المباشر للمشاريع الأربعة */
+    .pull-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .pull-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pull-panel-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .projects-pull-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .btn-pull-project {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      border: 1px solid #334155;
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+
+    .btn-pull-project:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+      border-color: #3b82f6;
+      transform: translateY(-1px);
+    }
+
+    .btn-pull-project:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .org-tag {
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.14);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-family: monospace;
+    }
+
+    /* شريط التنبيهات */
+    .alert-banner {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+
+    .alert-success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .alert-danger {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .alert-info {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    /* بطاقات مؤشرات الأداء KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      border-right: 4px solid var(--accent);
+    }
+
+    .kpi-card.cost-card {
+      border-right-color: var(--success);
+    }
+
+    .kpi-card.time-card {
+      border-right-color: var(--warn);
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .kpi-value {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 4px;
+    }
+
+    .kpi-card.time-card .kpi-value {
+      font-size: 1.15rem;
+      margin-top: 8px;
+    }
+
+    /* شريط الفلترة والبحث */
+    .filter-toolbar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .search-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .search-input {
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      min-width: 260px;
+      flex: 1;
+      max-width: 420px;
+      outline: none;
+    }
+
+    .search-input:focus, .project-select:focus {
+      border-color: var(--accent);
+    }
+
+    .project-select {
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      background: #ffffff;
+      color: var(--primary);
+      outline: none;
+      min-width: 190px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* الجدول التفاعلي */
+    .table-wrapper {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-x: auto;
+      max-height: 580px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    thead {
+      background: var(--primary);
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background-color: #f1f5f9;
+    }
+
+    .ltr-cell {
+      direction: ltr;
+      text-align: left;
+    }
+
+    .qty-badge {
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      display: inline-block;
+    }
+
+    .cost-cell {
+      color: #15803d;
+      font-weight: 800;
+    }
+
+    .proj-pill {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: #ffffff;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 1rem; }
+      .brand-title h1 { font-size: 1.1rem; }
+      .search-input { min-width: 100%; }
+      .sess-input { width: 100%; }
+    }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <!-- الهيدر العلوي -->
-  <div class="header">
-    <h1>👑 منظومة إمبراطور | مركز الأرصدة الموحد</h1>
-    <div class="session-badge">
-      حالة ربط بودو: <b id="lastSessionTime">جاري الفحص...</b>
-    </div>
-  </div>
-
-  <!-- كروت التحكم في الجلسة وسحب المشاريع -->
-  <div class="grid-top">
-    <!-- الكارت الأول: ربط جلسة الموبايل والكمبيوتر -->
-    <div class="card">
-      <h3>🔗 الخطوة 1: استلام جلسة بودو من المتصفح</h3>
-      <p style="font-size:13px; color:var(--muted); margin-top:0;">
-        بسبب عزل الحماية في كروم، افتح بودو في تبويب آخر ثم فعل كود الربط السريع أو ألصق كود الجلسة:
+  <!-- شاشة حظر الوصول الخارجي -->
+  <div id="unauthorizedScreen" class="unauthorized-screen">
+    <div class="unauthorized-card">
+      <div style="font-size: 44px; margin-bottom: 12px;">🚫</div>
+      <h2>دخول غير مصرح به</h2>
+      <p id="unauthReason">
+        لا يمكن فتح موديول أرصدة بودو السحابية مباشرة عبر الرابط لحماية البيانات والصلاحيات. يرجى تسجيل الدخول عبر البوابة المركزية لمنظومة إمبراطور.
       </p>
-      <button class="btn btn-primary" onclick="copyMobileBridgeCode()">
-        📲 نسخ كود الربط السريع لكروم الموبايل
-      </button>
-      <div class="input-group">
-        <input type="text" id="manualSessInput" class="input" placeholder="أو ألصق كود PHPSESSID يدوياً هنا...">
-        <button class="btn" style="background:var(--success);" onclick="saveManualSession()">حفظ</button>
+      <a href="https://emperor-sys.com/login.html" target="_top" class="btn-portal">
+        الانتقال لبوابة المنظومة ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- واجهة الموديول -->
+  <div id="appContainer">
+    <header>
+      <div class="brand-title">
+        <h1>☁️ أرصدة بودو السحابية (Budu Cloud ERP)</h1>
+        <p>سحب ومزامنة الأرصدة الفعلية الحية ومتابعة المخزون عبر المشاريع</p>
       </div>
-      <div id="statusMsg"></div>
-    </div>
-
-    <!-- الكارت الثاني: أزرار سحب أرصدة المشاريع -->
-    <div class="card">
-      <h3>🚀 الخطوة 2: أزرار سحب أرصدة المشاريع</h3>
-      <div class="projects-grid">
-        <button class="btn btn-proj" onclick="pullProjectStock('541', '1010103 - kay')">
-          <span>🏗️ مشروع كاي (Kay)</span> <span>⬇️</span>
-        </button>
-        <button class="btn btn-proj" onclick="pullProjectStock('542', 'Vaha')">
-          <span>🏗️ مشروع فاها (Vaha)</span> <span>⬇️</span>
-        </button>
-        <button class="btn btn-proj" onclick="pullProjectStock('543', 'Novella')">
-          <span>🏗️ مشروع نوفيلا (Novella)</span> <span>⬇️</span>
-        </button>
-        <button class="btn btn-proj" onclick="pullProjectStock('544', 'Lamanga')">
-          <span>🏗️ مشروع لامانجا (Lamanga)</span> <span>⬇️</span>
-        </button>
+      <div class="header-meta">
+        <span class="session-pill" id="sessionScopeLabel">جاري التحقق...</span>
+        <div class="signature-badge">BY ROMANY NASSER</div>
       </div>
-      <button class="btn btn-outline" style="margin-top:10px;" onclick="loadSavedStock()">
-        🔄 تحديث جدول الأرصدة المعروض بالأسفل
-      </button>
-    </div>
+    </header>
+
+    <main>
+      <div id="alertBanner" class="alert-banner"></div>
+
+      <!-- شريط حالة الجلسة وكود الجسر -->
+      <div class="bridge-card">
+        <div class="session-status-box">
+          <span id="sessionDot" class="status-dot"></span>
+          <div>
+            <div style="font-size: 13px; font-weight: 800; color: var(--primary);">
+              حالة جلسة الربط السحابي (Budu Session)
+            </div>
+            <div id="sessionTimeText" style="font-size: 12px; color: var(--muted);">
+              آخر ربط للجلسة: جاري الفحص...
+            </div>
+          </div>
+        </div>
+
+        <div class="bridge-controls">
+          <input type="text" id="manualPhpSessId" class="sess-input" placeholder="PHPSESSID اختياري (عند انتهاء الجلسة)" />
+          <button type="button" id="copyBridgeBtn" class="btn btn-bridge" onclick="copyMobileBridgeCode()">
+            🔗 نسخ كود جسر الربط (Bookmarklet)
+          </button>
+        </div>
+      </div>
+
+      <!-- لوحة أزرار السحب المباشر للمشاريع الأربعة -->
+      <div class="pull-panel">
+        <div class="pull-panel-header">
+          <div class="pull-panel-title">⚡ السحب المباشر للأرصدة من خادم بودو إلى قاعدة البيانات</div>
+          <span style="font-size: 11px; color: var(--muted);">اختر المشروع لتحديث أرصدته فوراً وإرسال إشعار تيليجرام</span>
+        </div>
+
+        <div class="projects-pull-grid">
+          <button type="button" class="btn-pull-project" data-org="541" onclick="pullBuduDirect('541', '1010103 - kay', this)">
+            <span>🏗️ سحب أرصدة مشروع كاي (Kay)</span>
+            <span class="org-tag">541</span>
+          </button>
+
+          <button type="button" class="btn-pull-project" data-org="542" onclick="pullBuduDirect('542', 'Vaha', this)">
+            <span>🏘️ سحب أرصدة مشروع فاها (Vaha)</span>
+            <span class="org-tag">542</span>
+          </button>
+
+          <button type="button" class="btn-pull-project" data-org="543" onclick="pullBuduDirect('543', 'Novella', this)">
+            <span>🏛️ سحب أرصدة مشروع نوفيلا (Novella)</span>
+            <span class="org-tag">543</span>
+          </button>
+
+          <button type="button" class="btn-pull-project" data-org="544" onclick="pullBuduDirect('544', 'Lamanga', this)">
+            <span>🏖️ سحب أرصدة مشروع لامانجا (Lamanga)</span>
+            <span class="org-tag">544</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- بطاقات مؤشرات الأداء KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">إجمالي عدد الأصناف المعروضة</div>
+          <div class="kpi-value" id="kpiTotalItems">0</div>
+        </div>
+
+        <div class="kpi-card cost-card" id="kpiCostCard" style="display: none;">
+          <div class="kpi-label">إجمالي القيمة الدفترية (ج.م)</div>
+          <div class="kpi-value" id="kpiTotalCost">0.00 ج.م</div>
+        </div>
+
+        <div class="kpi-card time-card">
+          <div class="kpi-label">توقيت آخر تحديث لجدول الأرصدة</div>
+          <div class="kpi-value" id="kpiLastUpdated">-</div>
+        </div>
+      </div>
+
+      <!-- شريط البحث والفلترة والتصدير -->
+      <div class="filter-toolbar">
+        <div class="search-group">
+          <input type="text" id="searchInput" class="search-input" placeholder="🔍 ابحث بكود الصنف، اسم الصنف، المجموعة، أو المخزن..." />
+          <select id="projectFilterSelect" class="project-select">
+            <option value="ALL">جميع المشاريع (الكل)</option>
+          </select>
+        </div>
+
+        <div class="toolbar-actions">
+          <button type="button" class="btn btn-refresh" onclick="loadBuduStock()">
+            🔄 تحديث العرض
+          </button>
+          <button type="button" class="btn btn-excel" onclick="exportStockToExcel()">
+            ⬇️ تصدير Excel
+          </button>
+        </div>
+      </div>
+
+      <!-- جدول الأرصدة التفاعلي -->
+      <div class="table-wrapper">
+        <table>
+          <thead id="stockTableHead"></thead>
+          <tbody id="stockTableBody">
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 40px; color: var(--muted);">
+                ⏳ جاري تحميل الأرصدة من قاعدة البيانات المركزية...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer>
+      منظومة إدارة المخازن والعمليات <strong>EMPEROR SYS</strong> — <strong>BY ROMANY NASSER</strong>
+    </footer>
   </div>
 
-  <!-- شريط الإحصائيات السريعة -->
-  <div class="stats-bar">
-    <div class="stat-box">
-      <span>إجمالي الأصناف المعروضة</span>
-      <strong id="statCount">0</strong>
-    </div>
-    <div class="stat-box">
-      <span>إجمالي القيمة الدفترية (ج.م)</span>
-      <strong id="statTotalCost">0.00</strong>
-    </div>
-    <div class="stat-box">
-      <span>آخر مزامنة للشيت</span>
-      <strong id="statLastSync" style="font-size:14px;">-</strong>
-    </div>
-  </div>
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
+    const BRIDGE_CODE = `javascript:(function(){const u="https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";const s="ALKARMA_EMPEROR_2026_SECURE";const c=document.cookie;fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SAVE_BUDU_BRIDGE",secret:s,cookieStr:c})});const o=XMLHttpRequest.prototype.send;XMLHttpRequest.prototype.send=function(b){this.addEventListener("load",async function(){try{const j=JSON.parse(this.responseText);if(j&&Array.isArray(j.data)&&j.data.length>0&&!String(b).includes("EMP=1")){await fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SAVE_BUDU_BRIDGE",secret:s,cookieStr:document.cookie,rawBody:String(b)})});let fb=String(b).replace(/RequestSize=\\d+/g,"RequestSize=3000").replace(/RequestIndex=\\d+/g,"RequestIndex=0").replace(/PageIndex=\\d+/g,"PageIndex=1")+"&EMP=1";const r=await fetch("https://app.buducloud.com/SCM/249.php?mid=3&ppk=253",{method:"POST",credentials:"include",headers:{"content-type":"application/x-www-form-urlencoded; charset=UTF-8","x-requested-with":"XMLHttpRequest"},body:fb});const fj=await r.json();const items=(fj&&fj.data)?fj.data:j.data;await fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SYNC_BUDU_STOCK",secret:s,items:items})});alert("✅ تم ربط الجلسة وسحب "+items.length+" صنف لإمبراطور!");}}catch(e){}});return o.apply(this,arguments);};alert("👑 تم تفعيل ربط الجلسة! اضغط بحث في بودو الآن.");})();`;
 
-  <!-- شريط البحث والفلترة -->
-  <div class="filter-bar">
-    <input type="text" id="searchInput" class="input" placeholder="🔍 ابحث بكود الصنف أو اسم الصنف أو المجموعة..." oninput="renderTable()">
-    <select id="projectFilter" class="input" style="max-width:220px;" onchange="renderTable()">
-      <option value="ALL">كافة المشاريع المسحوبة</option>
-    </select>
-  </div>
+    let currentUserRole = '';
+    let isSuperAdmin = false;
+    let allStockItems = [];
+    let filteredItems = [];
 
-  <!-- جدول الأرصدة -->
-  <div class="table-wrap">
-    <table>
-      <thead>
+    // ==========================================
+    // 1. صمام الأمان والتحقق من الصلاحيات
+    // ==========================================
+    (function enforceSecurityGate() {
+      const unauthScreen = document.getElementById('unauthorizedScreen');
+      const appContainer = document.getElementById('appContainer');
+      const reasonEl = document.getElementById('unauthReason');
+
+      try {
+        if (window.top === window.self) {
+          unauthScreen.style.display = 'flex';
+          return;
+        }
+
+        const rawSession = localStorage.getItem('emperor_session');
+        if (!rawSession) {
+          unauthScreen.style.display = 'flex';
+          return;
+        }
+
+        const session = JSON.parse(rawSession);
+        const isStructValid = session && session.user && session.user.email && session.company && session.company.companyId;
+        const isNotExpired = !session._savedAt || (Date.now() - session._savedAt < 12 * 60 * 60 * 1000);
+
+        if (!isStructValid || !isNotExpired) {
+          reasonEl.textContent = 'انتهت صلاحية الجلسة الحالية. يرجى إعادة تسجيل الدخول عبر البوابة المركزية.';
+          unauthScreen.style.display = 'flex';
+          return;
+        }
+
+        currentUserRole = String(session.user.role || '').toUpperCase();
+        isSuperAdmin = (currentUserRole === 'SUPER_ADMIN');
+
+        const allowed = Array.isArray(session.allowedModules)
+          ? session.allowedModules.map(m => String(m).trim().toUpperCase())
+          : [];
+
+        if (!isSuperAdmin && !allowed.includes('BUDU_STOCK')) {
+          reasonEl.textContent = 'حسابك الحالي غير مصرح له بالدخول إلى (أرصدة بودو السحابية). يرجى مراجعة مدير المنظومة.';
+          unauthScreen.style.display = 'flex';
+          return;
+        }
+
+        // إظهار بطاقة التكلفة الإجمالية للسوبر أدمن فقط
+        if (isSuperAdmin) {
+          document.getElementById('kpiCostCard').style.display = 'block';
+        }
+
+        document.getElementById('sessionScopeLabel').textContent =
+          `${session.company.companyName} | ${session.user.email} (${currentUserRole})`;
+
+        appContainer.style.display = 'flex';
+        buildTableHeader();
+        loadBuduStock();
+      } catch (err) {
+        unauthScreen.style.display = 'flex';
+      }
+    })();
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function showBanner(msg, type = 'info') {
+      const banner = document.getElementById('alertBanner');
+      banner.className = `alert-banner alert-${type}`;
+      banner.textContent = msg;
+      banner.style.display = 'block';
+    }
+
+    function hideBanner() {
+      document.getElementById('alertBanner').style.display = 'none';
+    }
+
+    // نسخ كود جسر الموبايل/المتصفح
+    async function copyMobileBridgeCode() {
+      try {
+        await navigator.clipboard.writeText(BRIDGE_CODE);
+        showBanner('✅ تم نسخ كود جسر الربط بنجاح! احفظه في مفضلة المتصفح باسم "ربط" ثم اضغط عليه داخل تبويب بودو.', 'success');
+      } catch (e) {
+        const temp = document.createElement('textarea');
+        temp.value = BRIDGE_CODE;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        showBanner('✅ تم نسخ كود جسر الربط بنجاح! احفظه في مفضلة المتصفح باسم "ربط".', 'success');
+      }
+    }
+
+    function buildTableHeader() {
+      const thead = document.getElementById('stockTableHead');
+      const costTh = isSuperAdmin ? '<th>التكلفة الإجمالية</th>' : '';
+      thead.innerHTML = `
         <tr>
+          <th>#</th>
           <th>المشروع</th>
           <th>كود الصنف</th>
           <th>اسم الصنف</th>
           <th>المجموعة</th>
           <th>الوحدة</th>
+          <th>المخزن الفرعي</th>
           <th>الرصيد الفعلي</th>
-          <th>التكلفة الإجمالية</th>
+          ${costTh}
           <th>وقت التحديث</th>
         </tr>
-      </thead>
-      <tbody id="stockTableBody">
-        <tr><td colspan="8" style="text-align:center; padding:30px;">⏳ جاري تحميل الأرصدة من منظومة إمبراطور...</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-const EMPEROR_API_URL = "https://script.google.com/macros/s/AKfycbygq-dtkn7FLlInFM4p3Z9CbGfcW1zzJBix7ywFTgMEAnwbPbwHgNEbAB6V8KZKjrNIyg/exec";
-const SECRET = "ALKARMA_EMPEROR_2026_SECURE";
-let allStockItems = [];
-
-// نسخ كود الجسر الخاص بكروم الموبايل
-function copyMobileBridgeCode() {
-  const bridgeCode = `javascript:(function(){const u="${EMPEROR_API_URL}";const s="${SECRET}";const c=document.cookie;fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SAVE_BUDU_BRIDGE",secret:s,cookieStr:c})});const o=XMLHttpRequest.prototype.send;XMLHttpRequest.prototype.send=function(b){this.addEventListener("load",async function(){try{const j=JSON.parse(this.responseText);if(j&&Array.isArray(j.data)&&j.data.length>0&&!String(b).includes("EMP=1")){await fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SAVE_BUDU_BRIDGE",secret:s,cookieStr:document.cookie,rawBody:String(b)})});let fb=String(b).replace(/RequestSize=\\d+/g,"RequestSize=3000").replace(/RequestIndex=\\d+/g,"RequestIndex=0").replace(/PageIndex=\\d+/g,"PageIndex=1")+"&EMP=1";const r=await fetch("https://app.buducloud.com/SCM/249.php?mid=3&ppk=253",{method:"POST",credentials:"include",headers:{"content-type":"application/x-www-form-urlencoded; charset=UTF-8","x-requested-with":"XMLHttpRequest"},body:fb});const fj=await r.json();const items=(fj&&fj.data)?fj.data:j.data;await fetch(u,{method:"POST",mode:"no-cors",body:JSON.stringify({action:"SYNC_BUDU_STOCK",secret:s,items:items})});alert("✅ تم ربط الجلسة وسحب "+items.length+" صنف لإمبراطور!");}}catch(e){}});return o.apply(this,arguments);};alert("👑 تم تفعيل ربط الجلسة! اضغط بحث في بودو الآن.");})();`;
-  
-  navigator.clipboard.writeText(bridgeCode).then(() => {
-    setStatus("✅ تم نسخ كود الربط! احفظه كإشارة مرجعية في كروم الموبايل باسم (ربط) لتشغيله من شريط العنوان داخل بودو.", "#4ade80");
-  });
-}
-
-function setStatus(msg, color) {
-  const el = document.getElementById("statusMsg");
-  el.style.color = color || "#38bdf8";
-  el.innerHTML = msg;
-}
-
-// حفظ كود الجلسة اليدوي
-async function saveManualSession() {
-  const val = document.getElementById("manualSessInput").value.trim();
-  if (!val) return alert("يرجى لصق كود الجلسة أولاً");
-  setStatus("⏳ جاري حفظ كود الجلسة في السيرفر...", "#38bdf8");
-  await pullProjectStock("541", "1010103 - kay", val);
-}
-
-// سحب مشروع محدد بضغطة زر
-async function pullProjectStock(orgId, orgTitle, customSess) {
-  setStatus("⏳ جاري الاتصال بخادم بودو وسحب أرصدة (" + orgTitle + ")...", "#facc15");
-  try {
-    const res = await fetch(EMPEROR_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({
-        action: "PULL_BUDU_DIRECT",
-        orgId: orgId,
-        orgTitle: orgTitle,
-        phpSessId: customSess || ""
-      })
-    });
-    const data = await res.json();
-    if (data.success) {
-      setStatus("✅ " + data.message + " (" + data.projects + ")", "#4ade80");
-      loadSavedStock();
-    } else {
-      setStatus("❌ " + data.message, "#f87171");
+      `;
     }
-  } catch (e) {
-    setStatus("❌ خطأ في الاتصال: " + e.message, "#f87171");
-  }
-}
 
-// تحميل الأرصدة المحفوظة في الشيت وعرضها في الجدول
-async function loadSavedStock() {
-  try {
-    const res = await fetch(EMPEROR_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "GET_BUDU_STOCK", projectFilter: "ALL" })
-    });
-    const data = await res.json();
-    if (data.success) {
-      allStockItems = data.items || [];
-      document.getElementById("lastSessionTime").innerText = data.sessionTime || "مربوط";
-      document.getElementById("statLastSync").innerText = data.lastUpdated || "-";
-      updateProjectDropdown();
-      renderTable();
+    // ==========================================
+    // 2. جلب الأرصدة من قاعدة البيانات المركزية
+    // ==========================================
+    async function loadBuduStock() {
+      const tbody = document.getElementById('stockTableBody');
+      const colSpan = isSuperAdmin ? 10 : 9;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center; padding:36px; color:var(--muted);">⏳ جاري جلب الأرصدة المحفوظة من الخادم...</td></tr>`;
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          credentials: 'omit',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "GET_BUDU_STOCK",
+            projectFilter: "ALL"
+          })
+        });
+
+        const data = await res.json();
+        if (!data || !data.success) {
+          tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center; padding:30px; color:var(--danger);">تعذر تحميل البيانات: ${escapeHtml((data && data.message) || 'خطأ غير معروف')}</td></tr>`;
+          return;
+        }
+
+        allStockItems = Array.isArray(data.items) ? data.items : [];
+        document.getElementById('kpiLastUpdated').textContent = data.lastUpdated || 'لا يوجد تحديث مسجل';
+
+        const sessionDot = document.getElementById('sessionDot');
+        const sessionTimeText = document.getElementById('sessionTimeText');
+        if (data.sessionTime) {
+          sessionDot.classList.remove('warn');
+          sessionTimeText.textContent = `آخر ربط للجلسة: ${data.sessionTime}`;
+        } else {
+          sessionDot.classList.add('warn');
+          sessionTimeText.textContent = 'لم يتم ربط جلسة بودو بعد — استخدم كود الجسر أو أدخل PHPSESSID.';
+        }
+
+        populateProjectDropdown(allStockItems);
+        applyFiltersAndRender();
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center; padding:30px; color:var(--danger);">فشل الاتصال بالخادم المركزي. تحقق من الإنترنت وحاول مجدداً.</td></tr>`;
+      }
     }
-  } catch (e) {
-    document.getElementById("stockTableBody").innerHTML = `<tr><td colspan="8" style="text-align:center;color:#f87171;">تعذر تحميل البيانات</td></tr>`;
-  }
-}
 
-function updateProjectDropdown() {
-  const sel = document.getElementById("projectFilter");
-  const currentVal = sel.value;
-  const projects = [...new Set(allStockItems.map(i => i.project).filter(Boolean))];
-  sel.innerHTML = `<option value="ALL">كافة المشاريع (${allStockItems.length})</option>` +
-    projects.map(p => `<option value="${p}">${p}</option>`).join("");
-  if (projects.includes(currentVal)) sel.value = currentVal;
-}
+    function populateProjectDropdown(items) {
+      const select = document.getElementById('projectFilterSelect');
+      const currentVal = select.value;
+      const uniqueProjects = Array.from(new Set(items.map(i => String(i.project || '').trim()).filter(Boolean)));
 
-function renderTable() {
-  const q = document.getElementById("searchInput").value.trim().toLowerCase();
-  const proj = document.getElementById("projectFilter").value;
-  const tbody = document.getElementById("stockTableBody");
+      select.innerHTML = '<option value="ALL">جميع المشاريع (الكل)</option>';
+      uniqueProjects.forEach(proj => {
+        const opt = document.createElement('option');
+        opt.value = proj;
+        opt.textContent = proj;
+        select.appendChild(opt);
+      });
 
-  const filtered = allStockItems.filter(item => {
-    const matchProj = (proj === "ALL" || item.project === proj);
-    const matchQuery = !q || 
-      item.code.toLowerCase().includes(q) || 
-      item.name.toLowerCase().includes(q) || 
-      item.group.toLowerCase().includes(q);
-    return matchProj && matchQuery;
-  });
+      if (uniqueProjects.includes(currentVal)) {
+        select.value = currentVal;
+      }
+    }
 
-  let totalCost = 0;
-  filtered.forEach(i => totalCost += (Number(i.totalCost) || 0));
+    // ==========================================
+    // 3. السحب المباشر لأرصدة مشروع من خادم بودو
+    // ==========================================
+    async function pullBuduDirect(orgId, orgTitle, btnEl) {
+      hideBanner();
+      const allBtns = document.querySelectorAll('.btn-pull-project');
+      allBtns.forEach(b => b.disabled = true);
 
-  document.getElementById("statCount").innerText = filtered.length.toLocaleString();
-  document.getElementById("statTotalCost").innerText = totalCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const originalHtml = btnEl.innerHTML;
+      btnEl.innerHTML = `<span>⏳ جاري السحب من بودو...</span><span class="org-tag">${orgId}</span>`;
 
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:25px; color:#94a3b8;">لا توجد أصناف مطابقة للبحث</td></tr>`;
-    return;
-  }
+      const phpSessId = document.getElementById('manualPhpSessId').value.trim();
 
-  tbody.innerHTML = filtered.slice(0, 300).map(item => `
-    <tr>
-      <td><b>${item.project}</b></td>
-      <td><code>${item.code}</code></td>
-      <td>${item.name}</td>
-      <td>${item.group}</td>
-      <td>${item.uom}</td>
-      <td><span class="qty-badge">${Number(item.qty).toLocaleString()}</span></td>
-      <td>${Number(item.totalCost).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-      <td style="font-size:12px; color:#94a3b8;">${item.updatedAt}</td>
-    </tr>
-  `).join("");
-}
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          credentials: 'omit',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "PULL_BUDU_DIRECT",
+            orgId: orgId,
+            orgTitle: orgTitle,
+            phpSessId: phpSessId
+          })
+        });
 
-window.onload = loadSavedStock;
-</script>
+        const data = await res.json();
+
+        if (data && data.success) {
+          showBanner(`✅ ${data.message || 'تم سحب ومزامنة الأرصدة بنجاح وإرسال إشعار تيليجرام!'}`, 'success');
+          await loadBuduStock();
+        } else if (data && data.needNewSession) {
+          document.getElementById('sessionDot').classList.add('warn');
+          showBanner(`⚠️ انتهت صلاحية جلسة بودو! افتح حسابك في بودو واضغط على مفضلة "ربط" لتجديد الجلسة، أو الصق كود PHPSESSID الجديد في الخانة أعلاه.`, 'danger');
+        } else {
+          showBanner(`❌ فشل السحب: ${(data && data.message) ? data.message : 'تعذر الاتصال بخادم بودو'}`, 'danger');
+        }
+      } catch (err) {
+        showBanner('❌ حدث خطأ في الشبكة أثناء محاولة السحب المباشر من الخادم.', 'danger');
+      } finally {
+        btnEl.innerHTML = originalHtml;
+        allBtns.forEach(b => b.disabled = false);
+      }
+    }
+
+    // ==========================================
+    // 4. البحث الفوري والفلترة وتحديث KPIs
+    // ==========================================
+    document.getElementById('searchInput').addEventListener('input', applyFiltersAndRender);
+    document.getElementById('projectFilterSelect').addEventListener('change', applyFiltersAndRender);
+
+    function applyFiltersAndRender() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const selectedProject = document.getElementById('projectFilterSelect').value;
+
+      filteredItems = allStockItems.filter(item => {
+        const matchProj = (selectedProject === 'ALL') || (String(item.project || '').trim() === selectedProject);
+        if (!matchProj) return false;
+
+        if (!q) return true;
+        const searchable = [
+          item.code,
+          item.name,
+          item.group,
+          item.location,
+          item.project
+        ].map(v => String(v || '').toLowerCase()).join(' ');
+
+        return searchable.includes(q);
+      });
+
+      // تحديث مؤشرات الأداء
+      document.getElementById('kpiTotalItems').textContent = filteredItems.length.toLocaleString('en-US');
+
+      if (isSuperAdmin) {
+        const totalCost = filteredItems.reduce((sum, item) => {
+          const val = Number(item.totalCost) || 0;
+          return sum + val;
+        }, 0);
+        document.getElementById('kpiTotalCost').textContent =
+          totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م';
+      }
+
+      renderStockTable(filteredItems);
+    }
+
+    function renderStockTable(items) {
+      const tbody = document.getElementById('stockTableBody');
+      const colSpan = isSuperAdmin ? 10 : 9;
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center; padding:36px; color:var(--muted);">لا توجد أصناف مطابقة لمعايير البحث أو الفلترة الحالية.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map((item, idx) => {
+        const qtyNum = Number(item.qty) || 0;
+        const costNum = Number(item.totalCost) || 0;
+        const costTd = isSuperAdmin
+          ? `<td class="ltr-cell cost-cell">${costNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>`
+          : '';
+
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><span class="proj-pill">${escapeHtml(item.project)}</span></td>
+            <td class="ltr-cell" style="font-weight:700;">${escapeHtml(item.code)}</td>
+            <td style="font-weight:600;">${escapeHtml(item.name)}</td>
+            <td>${escapeHtml(item.group)}</td>
+            <td>${escapeHtml(item.uom)}</td>
+            <td>${escapeHtml(item.location || '-')}</td>
+            <td class="ltr-cell"><span class="qty-badge">${qtyNum.toLocaleString('en-US')}</span></td>
+            ${costTd}
+            <td class="ltr-cell" style="font-size:11px; color:var(--muted);">${escapeHtml(item.updatedAt)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // 5. تصدير الأرصدة المعروضة إلى Excel
+    // ==========================================
+    function exportStockToExcel() {
+      if (!filteredItems || filteredItems.length === 0) {
+        showBanner('⚠️ لا توجد بيانات معروضة حالياً لتصديرها.', 'info');
+        return;
+      }
+
+      const headers = isSuperAdmin
+        ? ['المشروع', 'كود الصنف', 'اسم الصنف', 'المجموعة', 'الوحدة', 'المخزن الفرعي', 'الرصيد الفعلي', 'التكلفة الإجمالية', 'وقت التحديث']
+        : ['المشروع', 'كود الصنف', 'اسم الصنف', 'المجموعة', 'الوحدة', 'المخزن الفرعي', 'الرصيد الفعلي', 'وقت التحديث'];
+
+      const aoa = [headers];
+      filteredItems.forEach(item => {
+        const qtyNum = Number(item.qty) || 0;
+        if (isSuperAdmin) {
+          aoa.push([
+            item.project || '',
+            item.code || '',
+            item.name || '',
+            item.group || '',
+            item.uom || '',
+            item.location || '',
+            qtyNum,
+            Number(item.totalCost) || 0,
+            item.updatedAt || ''
+          ]);
+        } else {
+          aoa.push([
+            item.project || '',
+            item.code || '',
+            item.name || '',
+            item.group || '',
+            item.uom || '',
+            item.location || '',
+            qtyNum,
+            item.updatedAt || ''
+          ]);
+        }
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!views'] = [{ rightToLeft: true }];
+      ws['!cols'] = isSuperAdmin
+        ? [{ wch: 20 }, { wch: 18 }, { wch: 36 }, { wch: 22 }, { wch: 10 }, { wch: 22 }, { wch: 15 }, { wch: 18 }, { wch: 20 }]
+        : [{ wch: 20 }, { wch: 18 }, { wch: 36 }, { wch: 22 }, { wch: 10 }, { wch: 22 }, { wch: 15 }, { wch: 20 }];
+
+      const headerStyle = {
+        font: { name: 'Cairo', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '0F172A' } },
+        alignment: { horizontal: 'center', vertical: 'center' }
+      };
+
+      for (let c = 0; c < headers.length; c++) {
+        const ref = XLSX.utils.encode_cell({ r: 0, c });
+        if (ws[ref]) ws[ref].s = headerStyle;
+      }
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'أرصدة بودو السحابية');
+
+      const today = new Date().toISOString().slice(0, 10);
+      const projLabel = document.getElementById('projectFilterSelect').value === 'ALL'
+        ? 'كافة_المشاريع'
+        : document.getElementById('projectFilterSelect').value.replace(/\s+/g, '_');
+
+      XLSX.writeFile(wb, `أرصدة_بودو_${projLabel}_${today}.xlsx`);
+    }
+  </script>
 </body>
 </html>
