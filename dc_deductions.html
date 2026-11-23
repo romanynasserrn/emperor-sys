@@ -1508,6 +1508,7 @@
             const excelBuffer = await excelFile.arrayBuffer();
             workbookInstance = new ExcelJS.Workbook();
             await workbookInstance.xlsx.load(excelBuffer);
+            sanitizeSharedFormulas(workbookInstance);
             worksheetInstance = workbookInstance.worksheets[0];
 
             rowMap.clear();
@@ -1661,24 +1662,45 @@
         }
     });
 
-    // دالة لتنظيف المعادلات المشتركة (Shared Formulas) قبل الحفظ لتفادي خطأ ExcelJS الشهير
+    // دالة لتنظيف المعادلات المشتركة (Shared Formulas) على مرحلتين لتفادي خطأ ExcelJS (reading 'replace')
     function sanitizeSharedFormulas(wb) {
         wb.eachSheet((ws) => {
+            const updates = [];
+            // المرحلة 1: قراءة كل المعادلات والنتائج قبل تعديل أي خلية أصلية (Master)
             ws.eachRow({ includeEmpty: false }, (row) => {
                 row.eachCell({ includeEmpty: false }, (cell) => {
                     if (cell.model && (cell.model.sharedFormula || cell.model.shareType === 'shared')) {
-                        const standaloneFormula = cell.formula;
-                        const cachedResult = cell.result;
-                        if (standaloneFormula) {
-                            cell.value = { formula: standaloneFormula, result: cachedResult };
-                        } else if (cachedResult !== undefined) {
-                            cell.value = cachedResult;
-                        } else {
-                            cell.value = null;
+                        let standaloneFormula = null;
+                        let cachedResult = undefined;
+                        try {
+                            standaloneFormula = cell.formula;
+                        } catch (e) {
+                            standaloneFormula = null;
                         }
+                        try {
+                            cachedResult = cell.result;
+                        } catch (e) {
+                            cachedResult = cell.model.result;
+                        }
+                        updates.push({ cell, standaloneFormula, cachedResult });
                     }
                 });
             });
+            // المرحلة 2: فك الارتباط وتحويلها لمعادلات أو قيم مستقلة بأمان
+            for (const item of updates) {
+                const { cell, standaloneFormula, cachedResult } = item;
+                if (cell.model) {
+                    delete cell.model.sharedFormula;
+                    delete cell.model.shareType;
+                }
+                if (standaloneFormula && typeof standaloneFormula === 'string') {
+                    cell.value = { formula: standaloneFormula, result: cachedResult };
+                } else if (cachedResult !== undefined) {
+                    cell.value = cachedResult;
+                } else {
+                    cell.value = null;
+                }
+            }
         });
     }
 
