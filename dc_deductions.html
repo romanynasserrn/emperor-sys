@@ -1661,9 +1661,32 @@
         }
     });
 
+    // دالة لتنظيف المعادلات المشتركة (Shared Formulas) قبل الحفظ لتفادي خطأ ExcelJS الشهير
+    function sanitizeSharedFormulas(wb) {
+        wb.eachSheet((ws) => {
+            ws.eachRow({ includeEmpty: false }, (row) => {
+                row.eachCell({ includeEmpty: false }, (cell) => {
+                    if (cell.model && (cell.model.sharedFormula || cell.model.shareType === 'shared')) {
+                        const standaloneFormula = cell.formula;
+                        const cachedResult = cell.result;
+                        if (standaloneFormula) {
+                            cell.value = { formula: standaloneFormula, result: cachedResult };
+                        } else if (cachedResult !== undefined) {
+                            cell.value = cachedResult;
+                        } else {
+                            cell.value = null;
+                        }
+                    }
+                });
+            });
+        });
+    }
+
     document.getElementById('downloadBtn').addEventListener('click', async () => {
         if (!workbookInstance) return;
-        const buffer = await workbookInstance.xlsx.writeBuffer();
+        try {
+            sanitizeSharedFormulas(workbookInstance);
+            const buffer = await workbookInstance.xlsx.writeBuffer();
         const blob = new Blob([buffer], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
@@ -1685,12 +1708,16 @@
         targetDoc.body.appendChild(a);
         a.click();
 
-        setTimeout(() => {
-            if (a.parentNode) {
-                a.parentNode.removeChild(a);
-            }
-            URL.revokeObjectURL(url);
-        }, 1500);
+            setTimeout(() => {
+                if (a.parentNode) {
+                    a.parentNode.removeChild(a);
+                }
+                URL.revokeObjectURL(url);
+            }, 1500);
+        } catch (err) {
+            console.error('Excel export error:', err);
+            alert('حدث خطأ أثناء تجهيز ملف الإكسيل للتحميل:\n' + err.message);
+        }
     });
 </script>
 
