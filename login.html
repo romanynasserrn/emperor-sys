@@ -27,7 +27,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
     /* شريط تنبيه التحديث الجديد العام */
     .update-toast-banner {
@@ -75,7 +75,7 @@
       transform: scale(1.03);
     }
 
-    .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; overflow-y: auto; position: relative; }
+    .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; min-height: 100dvh; padding: 20px; overflow-y: auto; position: relative; }
     .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); position: relative; }
     
     .btn-back-home {
@@ -136,7 +136,7 @@
     .footer-home-link:hover { text-decoration: underline; }
     .version-tag { font-size: 11px; color: #94a3b8; margin-top: 8px; font-family: monospace; }
 
-    .dashboard-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
+    .dashboard-container { display: none; height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; position: relative; }
     
     .sidebar { 
       width: 280px; 
@@ -144,9 +144,12 @@
       color: #ffffff; 
       display: flex; 
       flex-direction: column; 
-      padding: 24px 16px; 
+      padding: 20px 14px; 
       flex-shrink: 0; 
       height: 100vh; 
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
       z-index: 50; 
       transition: width 0.3s ease, padding 0.3s ease, transform 0.3s ease; 
     }
@@ -159,26 +162,56 @@
       border: none !important;
     }
 
-    .sidebar-header { padding-bottom: 20px; border-bottom: 1px solid #334155; margin-bottom: 24px; position: relative; white-space: nowrap; }
+    .sidebar-header { padding-bottom: 16px; border-bottom: 1px solid #334155; margin-bottom: 14px; position: relative; white-space: nowrap; flex-shrink: 0; }
     .company-badge { font-size: 16px; font-weight: 700; color: #ffffff; }
     .user-info { font-size: 12px; color: #94a3b8; margin-top: 4px; word-break: break-all; }
     .project-scope-badge { display: inline-block; margin-top: 8px; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #1e293b; color: #38bdf8; border: 1px solid #334155; }
-    .modules-nav { list-style: none; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; overflow-y: auto; white-space: nowrap; }
-    .module-item { padding: 12px 14px; border-radius: 8px; color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+
+    /* حاوية القائمة القابلة للتمرير */
+    .sidebar-nav-wrapper {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .modules-nav { 
+      list-style: none; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 6px; 
+      flex: 1 1 auto; 
+      min-height: 0;
+      overflow-y: auto; 
+      overflow-x: hidden;
+      padding-left: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: #475569 #1e293b;
+    }
+
+    .modules-nav::-webkit-scrollbar { width: 5px; }
+    .modules-nav::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
+    .modules-nav::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    .modules-nav::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    .module-item { padding: 11px 12px; border-radius: 8px; color: #cbd5e1; text-decoration: none; font-size: 13.5px; font-weight: 500; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+    .module-item span:last-child { white-space: normal; line-height: 1.35; }
     .module-item:hover, .module-item.active { background: #1e293b; color: #ffffff; }
     
-    .sidebar-bottom-actions { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+    .sidebar-bottom-actions { margin-top: auto; padding-top: 12px; border-top: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; background: var(--primary); }
     .btn-portal-home { background: transparent; border: 1px dashed #475569; color: #94a3b8; padding: 8px; border-radius: 8px; font-size: 12px; text-decoration: none; text-align: center; transition: all 0.2s; }
     .btn-portal-home:hover { border-color: #38bdf8; color: #ffffff; background: #1e293b; }
-    .btn-logout { background: transparent; border: 1px solid #475569; color: #cbd5e1; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-    .btn-logout:hover { background: #334155; color: #ffffff; }
+    .btn-logout { background: #dc2626; border: 1px solid #b91c1c; color: #ffffff; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .btn-logout:hover { background: #b91c1c; color: #ffffff; }
 
-    .main-content { flex-grow: 1; height: 100vh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; width: 100%; }
-    .workspace-header { padding: 12px 16px; background: #ffffff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; min-height: 56px; }
+    .main-content { flex-grow: 1; height: 100vh; height: 100dvh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; width: 100%; }
+    .workspace-header { padding: 12px 16px; background: #ffffff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; min-height: 56px; flex-shrink: 0; }
     .header-left { display: flex; align-items: center; gap: 12px; }
     .workspace-title { font-size: 16px; font-weight: 700; color: var(--primary); }
     .btn-external { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--accent); background: #eff6ff; border: 1px solid #bfdbfe; padding: 6px 10px; border-radius: 6px; text-decoration: none; }
-    .workspace-body { flex-grow: 1; padding: 0; height: calc(100vh - 56px); position: relative; overflow-y: auto; width: 100%; }
+    .workspace-body { flex-grow: 1; padding: 0; height: calc(100dvh - 56px); position: relative; overflow-y: auto; width: 100%; }
     .module-iframe { width: 100%; height: 100%; border: none; display: block; }
 
     .menu-toggle-btn { 
@@ -212,6 +245,7 @@
         top: 0; 
         right: 0; 
         bottom: 0; 
+        height: 100dvh;
         width: 82% !important; 
         max-width: 320px; 
         transform: translateX(100%); 
@@ -298,7 +332,7 @@
 
       <div class="card-footer-nav">
         <a href="index.html" class="footer-home-link">العودة إلى الصفحة الرئيسية للتعريف بالمنظومة ←</a>
-        <div class="version-tag" id="versionTagLabel">Core Build v2.8 | By Romany Nasser</div>
+        <div class="version-tag" id="versionTagLabel">Core Build v2.9 | By Romany Nasser</div>
       </div>
     </div>
   </div>
@@ -314,13 +348,13 @@
         <div id="displayProjectScope" class="project-scope-badge">-</div>
       </div>
 
-      <nav>
+      <nav class="sidebar-nav-wrapper">
         <ul id="dynamicNav" class="modules-nav"></ul>
       </nav>
 
       <div class="sidebar-bottom-actions">
         <a href="index.html" class="btn-portal-home">🌐 الصفحة الرئيسية للمنظومة</a>
-        <button id="logoutBtn" class="btn-logout">تسجيل الخروج</button>
+        <button id="logoutBtn" class="btn-logout">🚪 تسجيل الخروج</button>
       </div>
     </aside>
 
@@ -455,7 +489,7 @@
           loadedAppVersion = info.version;
           const vLabel = document.getElementById('versionTagLabel');
           if (vLabel) {
-            vLabel.textContent = `Core Build v2.8 (${info.version}) | By Romany Nasser`;
+            vLabel.textContent = `Core Build v2.9 (${info.version}) | By Romany Nasser`;
           }
 
           if (currentSession && currentSession._appVersion && currentSession._appVersion !== info.version) {
@@ -620,7 +654,7 @@
 
         if (data && data.success) {
           data._savedAt = Date.now();
-          data._appVersion = latestServerVersion || loadedAppVersion || 'v2.8';
+          data._appVersion = latestServerVersion || loadedAppVersion || 'v2.9';
           currentSession = data;
           if (rememberMeCheck.checked) {
             try {
@@ -750,7 +784,7 @@
         externalLinkBtn.style.display = 'inline-flex';
         externalLinkBtn.textContent = 'فتح بملء الشاشة ↗';
       }
-      const cacheBustUrl = `${report.url}?v=${encodeURIComponent(latestServerVersion || loadedAppVersion || '2.8')}`;
+      const cacheBustUrl = `${report.url}?v=${encodeURIComponent(latestServerVersion || loadedAppVersion || '2.9')}`;
       workspaceBody.innerHTML = `<iframe class="module-iframe" src="${cacheBustUrl}" allow="downloads; fullscreen; clipboard-read; clipboard-write"></iframe>`;
     }
 
