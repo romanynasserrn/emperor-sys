@@ -616,6 +616,70 @@
       return false;
     }
 
+    // ==========================================
+    // محرك الاكتشاف الذكي لعمود مركز التكلفة
+    // ==========================================
+    function isCostCenterPattern(val) {
+      const s = cleanStr(val);
+      if (!s || s.length < 6) return false;
+      // استبعاد الأرقام البحتة (مثل عمود الرصيد) وأوامر التوريد وجهة التوريد
+      if (!isNaN(Number(s))) return false;
+      if (/^po\s*#/i.test(s) || s.includes('جهه التوريد') || s.includes('جهة التوريد')) return false;
+
+      // التحقق من وجود حروف إنجليزية مع شرطات أو أكواد مشاريع وبلوكات البودو
+      const hasEnglish = /[A-Za-z]{2,}/.test(s);
+      const hyphenCount = (s.match(/-/g) || []).length;
+      const hasBuduKeywords = /(BLK|KY|VH|NV|LM|Works|Material|Slab|BDRM|Villa|ST-|FL|Internal|Electrical|Plumbing|Finishing|Concrete|Steel)/i.test(s);
+
+      return hasEnglish && (hyphenCount >= 2 || (hyphenCount >= 1 && hasBuduKeywords));
+    }
+
+    function detectCostCenterColumn(rows) {
+      const colScores = {};
+
+      // فحص جميع صفوف الحركات في الشيت لتحديد العمود الذي يحتوي على مراكز التكلفة
+      for (let r = 6; r < rows.length; r++) {
+        const row = rows[r];
+        if (!row) continue;
+
+        // البحث بدءاً من العمود I (index 8) وحتى نهاية الأعمدة
+        for (let c = 8; c < row.length; c++) {
+          if (isCostCenterPattern(row[c])) {
+            colScores[c] = (colScores[c] || 0) + 1;
+          }
+        }
+      }
+
+      let bestCol = 12; // الافتراضي العمود M في حال عدم وجود أي مركز تكلفة بالشيت
+      let bestScore = 0;
+
+      for (const [colIdx, score] of Object.entries(colScores)) {
+        if (score > bestScore) {
+          bestScore = score;
+          bestCol = Number(colIdx);
+        }
+      }
+      return bestCol;
+    }
+
+    function extractRowCostCenter(row, primaryCol) {
+      const primaryVal = cleanStr(row[primaryCol]);
+      if (isCostCenterPattern(primaryVal)) return primaryVal;
+
+      // فحص الأعمدة المجاورة في نفس الصف (يمين ويسار العمود الأساسي) تحسباً لإزاحة خلية
+      const neighbors = [primaryCol - 1, primaryCol + 1, primaryCol + 2, primaryCol - 2];
+      for (const c of neighbors) {
+        if (c >= 8 && c < row.length) {
+          const candidate = cleanStr(row[c]);
+          if (isCostCenterPattern(candidate)) return candidate;
+        }
+      }
+
+      // إذا كان العمود الأساسي غير فارغ ولا يحتوي على أرقام رصيد، نعيد قيمته كما هي
+      if (primaryVal !== '' && isNaN(Number(primaryVal))) return primaryVal;
+      return '';
+    }
+
     function formatExcelDate(val) {
       if (val === null || val === undefined || val === '') return '';
       if (val instanceof Date && !isNaN(val)) {
@@ -725,6 +789,9 @@
             const noCode = isNoCode(itemCode);
             const codeWarn = isCodeInvalidOrCompound(itemCode);
 
+            // اكتشاف عمود مركز التكلفة ديناميكياً لهذا الشيت
+            const ccColIndex = detectCostCenterColumn(rows);
+
             for (let r = 6; r < rows.length; r++) {
               const row = rows[r];
               if (!row) continue;
@@ -743,7 +810,7 @@
               const reqNo = cleanStr(row[8]);
               const colJ = cleanStr(row[9]);
               const colK = cleanStr(row[10]);
-              const colM = cleanStr(row[12]);
+              const costCenterVal = extractRowCostCenter(row, ccColIndex);
 
               // 1. حركات الوارد (موردين + مشتريات)
               if (inSupp > 0 || inPurch > 0) {
@@ -764,7 +831,7 @@
                 }
 
                 if (reqNo) notesParts.push(`طلب: ${reqNo}`);
-                if (colM) notesParts.push(colM);
+                if (costCenterVal) notesParts.push(costCenterVal);
 
                 inbound.push({
                   sheetName,
@@ -795,10 +862,10 @@
                   reqNo,
                   block: colJ,
                   element: colK,
-                  costCenter: colM,
+                  costCenter: costCenterVal,
                   noCode,
                   codeWarn,
-                  ccWarn: colM === ''
+                  ccWarn: costCenterVal === ''
                 });
               }
 
@@ -815,10 +882,10 @@
                   reqNo,
                   block: colJ,
                   element: colK,
-                  costCenter: colM,
+                  costCenter: costCenterVal,
                   noCode,
                   codeWarn,
-                  ccWarn: colM === ''
+                  ccWarn: costCenterVal === ''
                 });
               }
 
@@ -836,7 +903,7 @@
                   date: dateStr,
                   permit: colJ,
                   destination: colK,
-                  notes: [reqNo, colM].filter(Boolean).join(' | '),
+                  notes: [reqNo, costCenterVal].filter(Boolean).join(' | '),
                   noCode,
                   codeWarn
                 });
