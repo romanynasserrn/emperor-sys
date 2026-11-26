@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>أداة مزامنة مع البودو V3 | BY ROMANY NASSER</title>
+  <title>أداة مزامنة مع البودو V3.1 | BY ROMANY NASSER</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <style>
@@ -215,14 +215,6 @@
       background: #047857;
     }
 
-    .btn-audit {
-      background: var(--info);
-    }
-
-    .btn-audit:hover {
-      background: #0369a1;
-    }
-
     #fileInput {
       display: none;
     }
@@ -319,12 +311,27 @@
       border-color: #f59e0b;
     }
 
+    .filter-checkbox-label.hidden-sheets-opt {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      color: #0369a1;
+    }
+
+    .filter-checkbox-label.hidden-sheets-opt:hover {
+      background: #e0f2fe;
+      border-color: #38bdf8;
+    }
+
     .filter-checkbox-label input[type="checkbox"] {
       width: 18px;
       height: 18px;
       accent-color: var(--accent-hover);
       cursor: pointer;
       flex-shrink: 0;
+    }
+
+    .filter-checkbox-label.hidden-sheets-opt input[type="checkbox"] {
+      accent-color: var(--info);
     }
 
     .legend {
@@ -436,39 +443,15 @@
       text-align: left;
     }
 
-    /* الشات بوت الذكي للتدقيق وتتبع الخلايا */
-    .chat-fab {
+    /* نافذة تفاصيل التدقيق (تظهر فقط عند الضغط على أي صف) */
+    .chat-window {
       position: fixed;
       bottom: 24px;
       left: 24px;
-      background: linear-gradient(135deg, var(--primary) 0%, #0284c7 100%);
-      color: #fff;
-      border: 2px solid #38bdf8;
-      border-radius: 999px;
-      padding: 0.75rem 1.3rem;
-      font-weight: 800;
-      font-size: 0.92rem;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      z-index: 9999;
-      transition: transform 0.2s ease;
-    }
-
-    .chat-fab:hover {
-      transform: translateY(-2px);
-    }
-
-    .chat-window {
-      position: fixed;
-      bottom: 85px;
-      left: 24px;
-      width: 410px;
+      width: 420px;
       max-width: calc(100vw - 32px);
-      height: 510px;
-      max-height: calc(100vh - 110px);
+      height: 500px;
+      max-height: calc(100vh - 60px);
       background: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 16px;
@@ -520,7 +503,7 @@
     }
 
     .msg {
-      max-width: 92%;
+      max-width: 94%;
       padding: 0.7rem 0.95rem;
       border-radius: 12px;
       font-size: 0.85rem;
@@ -563,32 +546,6 @@
       direction: ltr;
       font-family: monospace;
       font-size: 0.85rem;
-    }
-
-    .chat-quick-actions {
-      padding: 0.45rem 0.75rem;
-      background: #f1f5f9;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      gap: 0.4rem;
-      overflow-x: auto;
-    }
-
-    .quick-chip {
-      background: #fff;
-      border: 1px solid #cbd5e1;
-      color: var(--secondary);
-      border-radius: 999px;
-      padding: 0.25rem 0.65rem;
-      font-size: 0.76rem;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .quick-chip:hover {
-      background: #e0f2fe;
-      border-color: var(--info);
     }
 
     .chat-input-area {
@@ -658,7 +615,7 @@
       </div>
       <div class="header-meta">
         <span class="session-pill" id="sessionScopeLabel">جاري التحقق...</span>
-        <div class="signature-badge">V3.0 | BY ROMANY NASSER</div>
+        <div class="signature-badge">V3.1 | BY ROMANY NASSER</div>
       </div>
     </header>
 
@@ -682,14 +639,15 @@
           </div>
 
           <div class="export-controls">
+            <label class="filter-checkbox-label hidden-sheets-opt" for="includeHiddenSheetsCheckbox">
+              <input type="checkbox" id="includeHiddenSheetsCheckbox" />
+              <span id="includeHiddenSheetsLabel">تضمين الشيتات (الأدراج) المخفية في ملف الإكسيل</span>
+            </label>
+
             <label class="filter-checkbox-label" for="excludeNoCodeCheckbox">
               <input type="checkbox" id="excludeNoCodeCheckbox" />
               <span>استثناء الأصناف التي ليس لها أكواد من أدراج المنصرف وقوالب البودو (والاحتفاظ بها في درج الوارد فقط)</span>
             </label>
-
-            <button type="button" class="btn btn-audit" onclick="toggleChat(true)">
-              🤖 فتح مساعد التدقيق
-            </button>
 
             <button type="button" class="btn btn-success" id="exportBtn">
               ⬇️ تحميل شيت الإكسيل النهائي (الأدراج المستخرجة)
@@ -700,7 +658,7 @@
         <div class="tabs" id="tabsContainer"></div>
 
         <div class="audit-hint">
-          💡 تلميح: اضغط على أي صف في الجدول بالأسفل ليخبرك مساعد التدقيق فوراً باسم الشيت ورقم الخلية التي استُخرجت منها القيمة.
+          💡 تلميح: اضغط على أي صف في الجدول بالأسفل لعرض نافذة التدقيق وتفاصيل الشيت ورقم الخلية التي استُخرجت منها القيمة.
         </div>
 
         <div class="table-wrapper">
@@ -712,36 +670,21 @@
       </div>
     </main>
 
-    <!-- زر ونافذة الشات بوت للتدقيق -->
-    <button type="button" class="chat-fab" id="chatFab" onclick="toggleChat(true)">
-      🤖 مساعد التدقيق وتتبع الخلايا
-    </button>
-
+    <!-- نافذة تفاصيل التدقيق (تُفتح تلقائياً عند الضغط على أي صف في الجدول) -->
     <div class="chat-window" id="chatWindow">
       <div class="chat-header">
         <div class="chat-header-title">
-          <span>🤖</span>
-          <span>مساعد التدقيق وتتبع مصدر الخلايا</span>
+          <span>🔍</span>
+          <span>تفاصيل مصدر البيانات والخلية</span>
         </div>
         <button type="button" class="chat-close" onclick="toggleChat(false)">✕</button>
       </div>
 
-      <div class="chat-messages" id="chatMessages">
-        <div class="msg bot">
-          أهلاً بك يا هندسة! أنا متصل مباشرة ببيانات الشيت الذي رفعته.<br>
-          يمكنك <strong>الضغط على أي صف في الجدول</strong> أو سؤالي هنا عن أي كود صنف، كمية، أو رقم طلب صرف لأخبرك بالشيت والخلية الدقيقة التي أتى منها.
-        </div>
-      </div>
-
-      <div class="chat-quick-actions">
-        <button type="button" class="quick-chip" onclick="askBot('ملخص الفحص')">📊 ملخص الفحص</button>
-        <button type="button" class="quick-chip" onclick="askBot('التنبيهات والمشاكل')">⚠️ عرض التنبيهات</button>
-        <button type="button" class="quick-chip" onclick="askBot('أصناف بدون كود')">🏷️ أصناف بدون كود</button>
-      </div>
+      <div class="chat-messages" id="chatMessages"></div>
 
       <form class="chat-input-area" onsubmit="handleChatSubmit(event)">
-        <input type="text" id="chatInput" placeholder="اسأل مثلاً: كود 10001 أو كمية 30 جت منين؟" autocomplete="off" />
-        <button type="submit" class="chat-send-btn">إرسال</button>
+        <input type="text" id="chatInput" placeholder="ابحث عن كود صنف، كمية، أو رقم طلب صرف..." autocomplete="off" />
+        <button type="submit" class="chat-send-btn">بحث</button>
       </form>
     </div>
 
@@ -808,12 +751,16 @@
     // ==========================================
     // 2. محرك تحليل كروت الصنف واستخراج حركات البودو
     // ==========================================
+    let loadedWorkbook = null;
+    let loadedFileName = '';
+
     let rawExtractedData = {
       inbound: [],
       outboundConsumed: [],
       transfers: [],
       deductionsDetail: [],
       sheetsScanned: 0,
+      hiddenSheetsCount: 0,
       fileName: ''
     };
 
@@ -824,9 +771,16 @@
     const fileInput = document.getElementById('fileInput');
     const statusBar = document.getElementById('statusBar');
     const excludeNoCodeCheckbox = document.getElementById('excludeNoCodeCheckbox');
+    const includeHiddenSheetsCheckbox = document.getElementById('includeHiddenSheetsCheckbox');
 
     excludeNoCodeCheckbox.addEventListener('change', () => {
       renderDashboard();
+    });
+
+    includeHiddenSheetsCheckbox.addEventListener('change', () => {
+      if (loadedWorkbook) {
+        parseWorkbookData();
+      }
     });
 
     dropZone.addEventListener('dragover', (e) => {
@@ -1017,6 +971,7 @@
         buduDeductions,
         warningsCount,
         sheetsScanned: rawExtractedData.sheetsScanned,
+        hiddenSheetsCount: rawExtractedData.hiddenSheetsCount,
         fileName: rawExtractedData.fileName
       };
 
@@ -1032,171 +987,9 @@
       reader.onload = function (e) {
         try {
           const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-
-          const inbound = [];
-          const outboundConsumed = [];
-          const transfers = [];
-          const deductionsDetail = [];
-          let sheetsScanned = 0;
-
-          workbook.SheetNames.forEach((sheetName) => {
-            if (sheetName.trim() === 'الارصدة' || sheetName.trim() === 'الأرصدة') return;
-
-            const ws = workbook.Sheets[sheetName];
-            const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
-            if (!rows || rows.length < 7) return;
-
-            sheetsScanned++;
-            const itemName = cleanStr(rows[0] ? rows[0][1] : '') || sheetName.trim();
-            const itemCode = cleanStr(rows[1] ? rows[1][1] : '');
-            const unit = cleanStr(rows[2] ? rows[2][1] : '');
-            const noCode = isNoCode(itemCode);
-            const codeWarn = isCodeInvalidOrCompound(itemCode);
-
-            const ccColIndex = detectCostCenterColumn(rows);
-
-            for (let r = 6; r < rows.length; r++) {
-              const row = rows[r];
-              if (!row) continue;
-
-              const colA = cleanStr(row[0]);
-              if (colA !== '') continue;
-
-              const excelRowNum = r + 1;
-              const dateStr = formatExcelDate(row[1]);
-              const inSupp = parseNum(row[2]);
-              const inPurch = parseNum(row[3]);
-              const inTrans = parseNum(row[4]);
-              const outDed = parseNum(row[5]);
-              const outCons = parseNum(row[6]);
-              const outTrans = parseNum(row[7]);
-
-              const reqNo = cleanStr(row[8]);
-              const colJ = cleanStr(row[9]);
-              const colK = cleanStr(row[10]);
-              const ccMeta = extractRowCostCenterWithMeta(row, ccColIndex);
-              const costCenterVal = ccMeta.value;
-              const ccCellRef = `${colIndexToLetter(ccMeta.colIndex)}${excelRowNum}`;
-
-              // 1. حركات الوارد (موردين + مشتريات)
-              if (inSupp > 0 || inPurch > 0) {
-                const isSupp = inSupp > 0;
-                const qty = isSupp ? inSupp : inPurch;
-                const qtyCellRef = `${isSupp ? 'C' : 'D'}${excelRowNum}`;
-                const inType = isSupp ? 'موردين' : 'مشتريات';
-                let supplier = '';
-                let notesParts = [];
-
-                if (colK.includes('جهه التوريد') || colK.includes('جهة التوريد') || colK.includes('مشتريات')) {
-                  supplier = colK.replace(/جه[هة]\s*التوريد\s*\/?\s*/g, '').trim();
-                  if (colJ) notesParts.push(colJ);
-                } else if (colJ.includes('جهه التوريد') || colJ.includes('جهة التوريد') || colJ.includes('مشتريات')) {
-                  supplier = colJ.replace(/جه[هة]\s*التوريد\s*\/?\s*/g, '').trim();
-                  if (colK) notesParts.push(colK);
-                } else {
-                  supplier = colK || colJ || (inPurch > 0 ? 'مشتريات إدارة' : '');
-                  if (colK && colJ) notesParts.push(colJ);
-                }
-
-                if (reqNo) notesParts.push(`طلب: ${reqNo}`);
-                if (costCenterVal) notesParts.push(costCenterVal);
-
-                inbound.push({
-                  sheetName,
-                  rowNum: excelRowNum,
-                  qtyCellRef,
-                  itemCode,
-                  itemName,
-                  unit,
-                  inType,
-                  qty,
-                  date: dateStr,
-                  supplier,
-                  notes: notesParts.join(' | '),
-                  noCode,
-                  codeWarn
-                });
-              }
-
-              // 2. حركات الصرف المستهلك (العمود G)
-              if (outCons > 0) {
-                outboundConsumed.push({
-                  sheetName,
-                  rowNum: excelRowNum,
-                  qtyCellRef: `G${excelRowNum}`,
-                  ccCellRef,
-                  itemCode,
-                  itemName,
-                  unit,
-                  qty: outCons,
-                  date: dateStr,
-                  reqNo,
-                  block: colJ,
-                  element: colK,
-                  costCenter: costCenterVal,
-                  noCode,
-                  codeWarn,
-                  ccWarn: costCenterVal === ''
-                });
-              }
-
-              // 3. حركات الصرف بالخصم (العمود F)
-              if (outDed > 0) {
-                deductionsDetail.push({
-                  sheetName,
-                  rowNum: excelRowNum,
-                  qtyCellRef: `F${excelRowNum}`,
-                  ccCellRef,
-                  itemCode,
-                  itemName,
-                  unit,
-                  qty: outDed,
-                  date: dateStr,
-                  reqNo,
-                  block: colJ,
-                  element: colK,
-                  costCenter: costCenterVal,
-                  noCode,
-                  codeWarn,
-                  ccWarn: costCenterVal === ''
-                });
-              }
-
-              // 4. حركات التحويل / المرتجع (العمود H أو E)
-              if (outTrans > 0 || inTrans > 0) {
-                const isOut = outTrans > 0;
-                transfers.push({
-                  sheetName,
-                  rowNum: excelRowNum,
-                  qtyCellRef: `${isOut ? 'H' : 'E'}${excelRowNum}`,
-                  itemCode,
-                  itemName,
-                  unit,
-                  direction: isOut ? 'منصرف (محول / مرتجع)' : 'وارد (محول / مرتجع)',
-                  qty: isOut ? outTrans : inTrans,
-                  date: dateStr,
-                  permit: colJ,
-                  destination: colK,
-                  notes: [reqNo, costCenterVal].filter(Boolean).join(' | '),
-                  noCode,
-                  codeWarn
-                });
-              }
-            }
-          });
-
-          rawExtractedData = {
-            inbound,
-            outboundConsumed,
-            transfers,
-            deductionsDetail,
-            sheetsScanned,
-            fileName: file.name.replace(/\.[^/.]+$/, '')
-          };
-
-          statusBar.textContent = `تم تحليل ${sheetsScanned} كارت صنف بنجاح!`;
-          renderDashboard();
+          loadedWorkbook = XLSX.read(data, { type: 'array', cellDates: true });
+          loadedFileName = file.name.replace(/\.[^/.]+$/, '');
+          parseWorkbookData();
         } catch (err) {
           console.error(err);
           statusBar.style.color = '#dc2626';
@@ -1205,6 +998,198 @@
       };
 
       reader.readAsArrayBuffer(file);
+    }
+
+    function parseWorkbookData() {
+      if (!loadedWorkbook) return;
+
+      const includeHidden = includeHiddenSheetsCheckbox.checked;
+      const wbSheetsMeta = (loadedWorkbook.Workbook && loadedWorkbook.Workbook.Sheets) ? loadedWorkbook.Workbook.Sheets : [];
+
+      const inbound = [];
+      const outboundConsumed = [];
+      const transfers = [];
+      const deductionsDetail = [];
+      let sheetsScanned = 0;
+      let totalHiddenCount = 0;
+
+      loadedWorkbook.SheetNames.forEach((sheetName, idx) => {
+        if (sheetName.trim() === 'الارصدة' || sheetName.trim() === 'الأرصدة') return;
+
+        // فحص هل الشيت مخفي (Hidden = 1 أو VeryHidden = 2)
+        const meta = wbSheetsMeta[idx];
+        const isHidden = meta && (meta.Hidden === 1 || meta.Hidden === 2);
+        if (isHidden) {
+          totalHiddenCount++;
+          if (!includeHidden) return; // تجاهل الشيت المخفي إذا لم يتم تفعيل الخيار
+        }
+
+        const ws = loadedWorkbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
+        if (!rows || rows.length < 7) return;
+
+        sheetsScanned++;
+        const itemName = cleanStr(rows[0] ? rows[0][1] : '') || sheetName.trim();
+        const itemCode = cleanStr(rows[1] ? rows[1][1] : '');
+        const unit = cleanStr(rows[2] ? rows[2][1] : '');
+        const noCode = isNoCode(itemCode);
+        const codeWarn = isCodeInvalidOrCompound(itemCode);
+
+        const ccColIndex = detectCostCenterColumn(rows);
+
+        for (let r = 6; r < rows.length; r++) {
+          const row = rows[r];
+          if (!row) continue;
+
+          const colA = cleanStr(row[0]);
+          if (colA !== '') continue;
+
+          const excelRowNum = r + 1;
+          const dateStr = formatExcelDate(row[1]);
+          const inSupp = parseNum(row[2]);
+          const inPurch = parseNum(row[3]);
+          const inTrans = parseNum(row[4]);
+          const outDed = parseNum(row[5]);
+          const outCons = parseNum(row[6]);
+          const outTrans = parseNum(row[7]);
+
+          const reqNo = cleanStr(row[8]);
+          const colJ = cleanStr(row[9]);
+          const colK = cleanStr(row[10]);
+          const ccMeta = extractRowCostCenterWithMeta(row, ccColIndex);
+          const costCenterVal = ccMeta.value;
+          const ccCellRef = `${colIndexToLetter(ccMeta.colIndex)}${excelRowNum}`;
+
+          // 1. حركات الوارد (موردين + مشتريات)
+          if (inSupp > 0 || inPurch > 0) {
+            const isSupp = inSupp > 0;
+            const qty = isSupp ? inSupp : inPurch;
+            const qtyCellRef = `${isSupp ? 'C' : 'D'}${excelRowNum}`;
+            const inType = isSupp ? 'موردين' : 'مشتريات';
+            let supplier = '';
+            let notesParts = [];
+
+            if (colK.includes('جهه التوريد') || colK.includes('جهة التوريد') || colK.includes('مشتريات')) {
+              supplier = colK.replace(/جه[هة]\s*التوريد\s*\/?\s*/g, '').trim();
+              if (colJ) notesParts.push(colJ);
+            } else if (colJ.includes('جهه التوريد') || colJ.includes('جهة التوريد') || colJ.includes('مشتريات')) {
+              supplier = colJ.replace(/جه[هة]\s*التوريد\s*\/?\s*/g, '').trim();
+              if (colK) notesParts.push(colK);
+            } else {
+              supplier = colK || colJ || (inPurch > 0 ? 'مشتريات إدارة' : '');
+              if (colK && colJ) notesParts.push(colJ);
+            }
+
+            if (reqNo) notesParts.push(`طلب: ${reqNo}`);
+            if (costCenterVal) notesParts.push(costCenterVal);
+
+            inbound.push({
+              sheetName,
+              isHiddenSheet: isHidden,
+              rowNum: excelRowNum,
+              qtyCellRef,
+              itemCode,
+              itemName,
+              unit,
+              inType,
+              qty,
+              date: dateStr,
+              supplier,
+              notes: notesParts.join(' | '),
+              noCode,
+              codeWarn
+            });
+          }
+
+          // 2. حركات الصرف المستهلك (العمود G)
+          if (outCons > 0) {
+            outboundConsumed.push({
+              sheetName,
+              isHiddenSheet: isHidden,
+              rowNum: excelRowNum,
+              qtyCellRef: `G${excelRowNum}`,
+              ccCellRef,
+              itemCode,
+              itemName,
+              unit,
+              qty: outCons,
+              date: dateStr,
+              reqNo,
+              block: colJ,
+              element: colK,
+              costCenter: costCenterVal,
+              noCode,
+              codeWarn,
+              ccWarn: costCenterVal === ''
+            });
+          }
+
+          // 3. حركات الصرف بالخصم (العمود F)
+          if (outDed > 0) {
+            deductionsDetail.push({
+              sheetName,
+              isHiddenSheet: isHidden,
+              rowNum: excelRowNum,
+              qtyCellRef: `F${excelRowNum}`,
+              ccCellRef,
+              itemCode,
+              itemName,
+              unit,
+              qty: outDed,
+              date: dateStr,
+              reqNo,
+              block: colJ,
+              element: colK,
+              costCenter: costCenterVal,
+              noCode,
+              codeWarn,
+              ccWarn: costCenterVal === ''
+            });
+          }
+
+          // 4. حركات التحويل / المرتجع (العمود H أو E)
+          if (outTrans > 0 || inTrans > 0) {
+            const isOut = outTrans > 0;
+            transfers.push({
+              sheetName,
+              isHiddenSheet: isHidden,
+              rowNum: excelRowNum,
+              qtyCellRef: `${isOut ? 'H' : 'E'}${excelRowNum}`,
+              itemCode,
+              itemName,
+              unit,
+              direction: isOut ? 'منصرف (محول / مرتجع)' : 'وارد (محول / مرتجع)',
+              qty: isOut ? outTrans : inTrans,
+              date: dateStr,
+              permit: colJ,
+              destination: colK,
+              notes: [reqNo, costCenterVal].filter(Boolean).join(' | '),
+              noCode,
+              codeWarn
+            });
+          }
+        }
+      });
+
+      rawExtractedData = {
+        inbound,
+        outboundConsumed,
+        transfers,
+        deductionsDetail,
+        sheetsScanned,
+        hiddenSheetsCount: totalHiddenCount,
+        fileName: loadedFileName
+      };
+
+      const hiddenLabelEl = document.getElementById('includeHiddenSheetsLabel');
+      hiddenLabelEl.textContent = `تضمين الشيتات (الأدراج) المخفية في ملف الإكسيل (${totalHiddenCount} شيت مخفي)`;
+
+      statusBar.style.color = '#0284c7';
+      statusBar.textContent = includeHidden
+        ? `تم تحليل ${sheetsScanned} كارت صنف (شاملاً ${totalHiddenCount} شيت مخفي) بنجاح!`
+        : `تم تحليل ${sheetsScanned} كارت صنف ظاهر بنجاح (تم تجاهل ${totalHiddenCount} شيت مخفي).`;
+
+      renderDashboard();
     }
 
     function renderDashboard() {
@@ -1328,14 +1313,11 @@
     }
 
     // ==========================================
-    // 3. محرك الشات بوت للتدقيق وتتبع مصدر الخلايا
+    // 3. محرك تفاصيل التدقيق عند الضغط على الصف
     // ==========================================
     function toggleChat(open) {
       const win = document.getElementById('chatWindow');
       win.style.display = open ? 'flex' : 'none';
-      if (open) {
-        document.getElementById('chatInput').focus();
-      }
     }
 
     function appendChatMessage(sender, htmlContent) {
@@ -1366,12 +1348,12 @@
         buduDeductions: 'درج 6: قالب البودو المجمّع (خصم)'
       };
 
-      appendChatMessage('user', `القيمة دي جت منين؟ (صف #${rowIndex + 1} في ${drawerNames[tabKey]})`);
+      appendChatMessage('user', `تفاصيل صف #${rowIndex + 1} في ${drawerNames[tabKey]}`);
 
       if (tabKey === 'buduConsumed' || tabKey === 'buduDeductions') {
         const sourcesHtml = item.sources.map((src, idx) => `
           <div class="audit-card">
-            <strong>${idx + 1}) الشيت الأصلي:</strong> ${src.sheetName}<br>
+            <strong>${idx + 1}) الشيت الأصلي:</strong> ${src.sheetName} ${src.isHiddenSheet ? '<span style="color:#0369a1;font-weight:700;">(شيت مخفي)</span>' : ''}<br>
             • <strong>خلية الكمية:</strong> <span class="cell-badge">${src.qtyCellRef}</span> (الكمية: <strong>${src.qty}</strong>)<br>
             • <strong>خلية مركز التكلفة:</strong> <span class="cell-badge">${src.ccCellRef}</span><br>
             • <strong>التاريخ:</strong> ${src.date || 'غير مسجل'} | <strong>طلب صرف:</strong> ${src.reqNo || '-'}
@@ -1397,7 +1379,7 @@
         appendChatMessage('bot', `
           تم استخراج هذا السجل من:<br>
           <div class="audit-card">
-            • <strong>اسم الشيت (كارت الصنف):</strong> ${item.sheetName}<br>
+            • <strong>اسم الشيت (كارت الصنف):</strong> ${item.sheetName} ${item.isHiddenSheet ? '<span style="color:#0369a1;font-weight:700;">(شيت مخفي)</span>' : ''}<br>
             • <strong>رقم الصف في الإكسيل:</strong> الصف <strong>${item.rowNum}</strong><br>
             • <strong>خلية الكمية:</strong> <span class="cell-badge">${item.qtyCellRef}</span> (القيمة: <strong>${item.qty}</strong> ${item.unit || ''})<br>
             • <strong>خلية الكود:</strong> <span class="cell-badge">B2</span> (${item.itemCode || 'بدون كود'})<br>
@@ -1406,11 +1388,6 @@
           </div>
         `);
       }
-    }
-
-    function askBot(presetText) {
-      document.getElementById('chatInput').value = presetText;
-      handleChatSubmit(new Event('submit'));
     }
 
     function handleChatSubmit(e) {
@@ -1423,7 +1400,7 @@
       input.value = '';
 
       if (!currentEffectiveCache) {
-        appendChatMessage('bot', 'يرجى رفع ملف كارت الصنف أولاً حتى أتمكن من فحص البيانات والرد عليك.');
+        appendChatMessage('bot', 'يرجى رفع ملف كارت الصنف أولاً.');
         return;
       }
 
@@ -1433,45 +1410,6 @@
 
     function generateBotReply(q) {
       const eff = currentEffectiveCache;
-      const lowerQ = q.toLowerCase();
-
-      if (lowerQ.includes('ملخص') || lowerQ.includes('احصائيات') || lowerQ.includes('إحصائيات')) {
-        return `
-          <strong>ملخص الفحص الحالي للملف:</strong><br>
-          • تم فحص <strong>${eff.sheetsScanned}</strong> كارت صنف.<br>
-          • <strong>درج 1 (الوارد):</strong> ${eff.inbound.length} حركة.<br>
-          • <strong>درج 2 (المنصرف التفصيلي):</strong> ${eff.outboundConsumed.length} حركة.<br>
-          • <strong>درج 3 (قالب البودو المجمّع):</strong> ${eff.buduConsumed.length} بند.<br>
-          • <strong>درج التحويلات:</strong> ${eff.transfers.length} حركة.<br>
-          • <strong>إجمالي التنبيهات:</strong> ${eff.warningsCount} تنبيه.
-        `;
-      }
-
-      if (lowerQ.includes('تنبيه') || lowerQ.includes('مشاكل') || lowerQ.includes('خطأ') || lowerQ.includes('ناقص')) {
-        const noCodeItems = [...new Set(eff.inbound.filter(x => x.noCode).map(x => x.sheetName))];
-        const compoundItems = [...new Set([
-          ...eff.inbound.filter(x => x.codeWarn && !x.noCode).map(x => `${x.sheetName} (${x.itemCode})`),
-          ...eff.outboundConsumed.filter(x => x.codeWarn && !x.noCode).map(x => `${x.sheetName} (${x.itemCode})`)
-        ])];
-        const missingCC = eff.outboundConsumed.filter(x => x.ccWarn);
-
-        return `
-          <strong>تقرير التنبيهات في الشيت:</strong><br>
-          • <strong>أصناف بدون كود (خلية B2 فارغة):</strong> ${noCodeItems.length} صنف ${noCodeItems.length ? `(${noCodeItems.slice(0, 5).join('، ')}...)` : ''}<br>
-          • <strong>أصناف بأكواد مركبة:</strong> ${compoundItems.length} صنف ${compoundItems.length ? `(${compoundItems.slice(0, 4).join('، ')})` : ''}<br>
-          • <strong>حركات صرف بدون مركز تكلفة:</strong> ${missingCC.length} حركة.
-        `;
-      }
-
-      if (lowerQ.includes('بدون كود') || lowerQ.includes('ملهاش كود') || lowerQ.includes('ليس لها كود')) {
-        const list = [...new Set(rawExtractedData.inbound.filter(x => x.noCode).map(x => x.sheetName))];
-        if (!list.length) return 'لا توجد أي أصناف بدون كود في الحركات غير المتزامنة.';
-        return `
-          توجد <strong>${list.length}</strong> كروت أصناف بدون كود مسجل في الخلية <span class="cell-badge">B2</span>:<br>
-          <div class="audit-card">${list.map((name, i) => `${i + 1}. ${name}`).join('<br>')}</div>
-        `;
-      }
-
       const numMatch = q.match(/\d+(\.\d+)?/);
       const searchNum = numMatch ? Number(numMatch[0]) : null;
       const searchText = q.replace(/(القيمة|الكمية|دي|ده|جت|منين|فين|كود|صنف|رقم|طلب|صرف|بخصوص|عن|\?|\؟)/g, '').trim();
@@ -1526,11 +1464,11 @@
 
       if (matches.length > 0) {
         const shown = matches.slice(0, 5).join('');
-        const moreNote = matches.length > 5 ? `<br><small>تم عرض أول 5 نتائج من إجمالي ${matches.length} نتيجة مطابقة. يمكنك الضغط مباشرة على الصف المطلوب في الجدول لتدقيقه.</small>` : '';
+        const moreNote = matches.length > 5 ? `<br><small>تم عرض أول 5 نتائج من إجمالي ${matches.length} نتيجة مطابقة.</small>` : '';
         return `وجدت <strong>${matches.length}</strong> تطابق لبحثك:${shown}${moreNote}`;
       }
 
-      return 'لم أجد تطابقاً مباشراً لهذا النص. جرب كتابة <strong>كود الصنف</strong> أو <strong>اسم الصنف</strong> أو <strong>رقم طلب الصرف</strong>، أو اضغط مباشرة على أي صف في الجدول وسأعرض لك مصدر خلاياه فوراً.';
+      return 'لم أجد تطابقاً مباشراً. اضغط على أي صف في الجدول لعرض تفاصيله فوراً.';
     }
 
     // ==========================================
