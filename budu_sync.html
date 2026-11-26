@@ -333,6 +333,16 @@
       display: inline-block;
     }
 
+    .audit-hint {
+      font-size: 0.82rem;
+      color: var(--info);
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
     .tabs {
       display: flex;
       gap: 0.5rem;
@@ -387,8 +397,17 @@
       white-space: nowrap;
     }
 
+    tbody tr {
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+
     tbody tr:hover {
-      background-color: #f1f5f9;
+      background-color: #e0f2fe;
+    }
+
+    tbody tr.selected-row {
+      background-color: #bae6fd !important;
     }
 
     .cell-warn {
@@ -400,6 +419,194 @@
     .ltr-cell {
       direction: ltr;
       text-align: left;
+    }
+
+    /* ==========================================
+       تصميم الشات بوت الذكي للتدقيق وتتبع الخلايا
+       ========================================== */
+    .chat-fab {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: linear-gradient(135deg, var(--primary) 0%, #0284c7 100%);
+      color: #fff;
+      border: 2px solid #38bdf8;
+      border-radius: 999px;
+      padding: 0.75rem 1.3rem;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35);
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 999;
+      transition: transform 0.2s ease;
+    }
+
+    .chat-fab:hover {
+      transform: translateY(-2px);
+    }
+
+    .chat-window {
+      position: fixed;
+      bottom: 85px;
+      left: 24px;
+      width: 400px;
+      max-width: calc(100vw - 32px);
+      height: 500px;
+      max-height: calc(100vh - 110px);
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.22);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #fff;
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .chat-header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .chat-close {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .msg {
+      max-width: 90%;
+      padding: 0.7rem 0.95rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      line-height: 1.65;
+      word-wrap: break-word;
+    }
+
+    .msg.bot {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .msg.user {
+      background: var(--primary);
+      color: #ffffff;
+      align-self: flex-end;
+      border-bottom-left-radius: 4px;
+    }
+
+    .audit-card {
+      background: #f1f5f9;
+      border-right: 3px solid var(--info);
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
+      margin-top: 0.45rem;
+      font-size: 0.82rem;
+    }
+
+    .cell-badge {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 800;
+      padding: 0.1rem 0.45rem;
+      border-radius: 5px;
+      direction: ltr;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+
+    .chat-quick-actions {
+      padding: 0.45rem 0.75rem;
+      background: #f1f5f9;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+    }
+
+    .quick-chip {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      color: var(--secondary);
+      border-radius: 999px;
+      padding: 0.25rem 0.65rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .quick-chip:hover {
+      background: #e0f2fe;
+      border-color: var(--info);
+    }
+
+    .chat-input-area {
+      display: flex;
+      padding: 0.65rem;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      gap: 0.5rem;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 0.55rem 0.85rem;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .chat-input-area input:focus {
+      border-color: var(--info);
+    }
+
+    .chat-send-btn {
+      background: var(--info);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 1rem;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     footer {
@@ -475,6 +682,10 @@
 
         <div class="tabs" id="tabsContainer"></div>
 
+        <div class="audit-hint">
+          💡 تلميح: اضغط على أي صف في الجدول بالأسفل ليخبرك مساعد التدقيق فوراً باسم الشيت ورقم الخلية التي استُخرجت منها القيمة.
+        </div>
+
         <div class="table-wrapper">
           <table id="previewTable">
             <thead id="tableHead"></thead>
@@ -483,6 +694,39 @@
         </div>
       </div>
     </main>
+
+    <!-- زر ونافذة الشات بوت للتدقيق -->
+    <button type="button" class="chat-fab" id="chatFab" onclick="toggleChat(true)">
+      🤖 مساعد التدقيق وتتبع الخلايا
+    </button>
+
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <div class="chat-header-title">
+          <span>🤖</span>
+          <span>مساعد التدقيق وتتبع مصدر الخلايا</span>
+        </div>
+        <button type="button" class="chat-close" onclick="toggleChat(false)">✕</button>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg bot">
+          أهلاً بك يا هندسة! أنا متصل مباشرة ببيانات الشيت الذي رفعته.<br>
+          يمكنك <strong>الضغط على أي صف في الجدول</strong> أو سؤالي هنا عن أي كود صنف، كمية، أو رقم طلب صرف لأخبرك بالشيت والخلية الدقيقة التي أتى منها.
+        </div>
+      </div>
+
+      <div class="chat-quick-actions">
+        <button type="button" class="quick-chip" onclick="askBot('ملخص الفحص')">📊 ملخص الفحص</button>
+        <button type="button" class="quick-chip" onclick="askBot('التنبيهات والمشاكل')">⚠️ عرض التنبيهات</button>
+        <button type="button" class="quick-chip" onclick="askBot('أصناف بدون كود')">🏷️ أصناف بدون كود</button>
+      </div>
+
+      <form class="chat-input-area" onsubmit="handleChatSubmit(event)">
+        <input type="text" id="chatInput" placeholder="اسأل مثلاً: كود 10001 أو كمية 30 جت منين؟" autocomplete="off" />
+        <button type="submit" class="chat-send-btn">إرسال</button>
+      </form>
+    </div>
 
     <footer>
       تم التطوير بواسطة إدارة المخازن — <strong>BY ROMANY NASSER</strong>
@@ -556,6 +800,7 @@
       fileName: ''
     };
 
+    let currentEffectiveCache = null;
     let activeTabKey = 'inbound';
 
     const dropZone = document.getElementById('dropZone');
@@ -601,6 +846,11 @@
       return isNaN(n) ? 0 : n;
     }
 
+    function colIndexToLetter(colIdx) {
+      if (colIdx === null || colIdx === undefined || colIdx < 0) return '';
+      return XLSX.utils.encode_col(colIdx);
+    }
+
     // تعريف الصنف بدون كود فقط (B2 فارغ تماماً أو 0)
     function isNoCode(code) {
       const s = cleanStr(code);
@@ -617,16 +867,14 @@
     }
 
     // ==========================================
-    // محرك الاكتشاف الذكي لعمود مركز التكلفة
+    // محرك الاكتشاف الذكي لعمود مركز التكلفة وإحداثياته
     // ==========================================
     function isCostCenterPattern(val) {
       const s = cleanStr(val);
       if (!s || s.length < 6) return false;
-      // استبعاد الأرقام البحتة (مثل عمود الرصيد) وأوامر التوريد وجهة التوريد
       if (!isNaN(Number(s))) return false;
       if (/^po\s*#/i.test(s) || s.includes('جهه التوريد') || s.includes('جهة التوريد')) return false;
 
-      // التحقق من وجود حروف إنجليزية مع شرطات أو أكواد مشاريع وبلوكات البودو
       const hasEnglish = /[A-Za-z]{2,}/.test(s);
       const hyphenCount = (s.match(/-/g) || []).length;
       const hasBuduKeywords = /(BLK|KY|VH|NV|LM|Works|Material|Slab|BDRM|Villa|ST-|FL|Internal|Electrical|Plumbing|Finishing|Concrete|Steel)/i.test(s);
@@ -637,12 +885,10 @@
     function detectCostCenterColumn(rows) {
       const colScores = {};
 
-      // فحص جميع صفوف الحركات في الشيت لتحديد العمود الذي يحتوي على مراكز التكلفة
       for (let r = 6; r < rows.length; r++) {
         const row = rows[r];
         if (!row) continue;
 
-        // البحث بدءاً من العمود I (index 8) وحتى نهاية الأعمدة
         for (let c = 8; c < row.length; c++) {
           if (isCostCenterPattern(row[c])) {
             colScores[c] = (colScores[c] || 0) + 1;
@@ -650,7 +896,7 @@
         }
       }
 
-      let bestCol = 12; // الافتراضي العمود M في حال عدم وجود أي مركز تكلفة بالشيت
+      let bestCol = 12;
       let bestScore = 0;
 
       for (const [colIdx, score] of Object.entries(colScores)) {
@@ -662,22 +908,27 @@
       return bestCol;
     }
 
-    function extractRowCostCenter(row, primaryCol) {
+    // ترجع القيمة + رقم العمود الفعلي الذي وُجدت فيه للتدقيق
+    function extractRowCostCenterWithMeta(row, primaryCol) {
       const primaryVal = cleanStr(row[primaryCol]);
-      if (isCostCenterPattern(primaryVal)) return primaryVal;
+      if (isCostCenterPattern(primaryVal)) {
+        return { value: primaryVal, colIndex: primaryCol };
+      }
 
-      // فحص الأعمدة المجاورة في نفس الصف (يمين ويسار العمود الأساسي) تحسباً لإزاحة خلية
       const neighbors = [primaryCol - 1, primaryCol + 1, primaryCol + 2, primaryCol - 2];
       for (const c of neighbors) {
         if (c >= 8 && c < row.length) {
           const candidate = cleanStr(row[c]);
-          if (isCostCenterPattern(candidate)) return candidate;
+          if (isCostCenterPattern(candidate)) {
+            return { value: candidate, colIndex: c };
+          }
         }
       }
 
-      // إذا كان العمود الأساسي غير فارغ ولا يحتوي على أرقام رصيد، نعيد قيمته كما هي
-      if (primaryVal !== '' && isNaN(Number(primaryVal))) return primaryVal;
-      return '';
+      if (primaryVal !== '' && isNaN(Number(primaryVal))) {
+        return { value: primaryVal, colIndex: primaryCol };
+      }
+      return { value: '', colIndex: primaryCol };
     }
 
     function formatExcelDate(val) {
@@ -700,6 +951,7 @@
       return cleanStr(val);
     }
 
+    // تجميع مع حفظ سجل كامل بكل الخلايا الأصلية المكونة للرقم المجمع
     function aggregateForBudu(records) {
       const map = new Map();
       records.forEach((rec) => {
@@ -707,25 +959,26 @@
         if (!map.has(key)) {
           map.set(key, {
             itemCode: rec.itemCode,
+            itemName: rec.itemName,
             qty: 0,
             costCenter: rec.costCenter,
             codeWarn: rec.codeWarn,
-            ccWarn: rec.ccWarn
+            ccWarn: rec.ccWarn,
+            sources: []
           });
         }
-        map.get(key).qty += rec.qty;
+        const entry = map.get(key);
+        entry.qty += rec.qty;
+        entry.sources.push(rec);
       });
       return Array.from(map.values());
     }
 
-    // حساب البيانات الفعالة بناءً على حالة الـ Checkbox دون تعديل البيانات الخام
     function getEffectiveData() {
       const excludeNoCode = excludeNoCodeCheckbox.checked;
 
-      // الدرج الأول: يحتفظ دائماً بجميع حركات الوارد (بما فيها التي بلا كود)
       const inbound = rawExtractedData.inbound;
 
-      // أدراج المنصرف والخصم: تستبعد الأصناف التي بلا كود فقط عند تفعيل الخيار
       const outboundConsumed = excludeNoCode
         ? rawExtractedData.outboundConsumed.filter(r => !r.noCode)
         : rawExtractedData.outboundConsumed;
@@ -745,7 +998,7 @@
         deductionsDetail.filter(x => x.codeWarn || x.ccWarn).length +
         transfers.filter(x => x.codeWarn).length;
 
-      return {
+      currentEffectiveCache = {
         inbound,
         outboundConsumed,
         buduConsumed,
@@ -756,6 +1009,8 @@
         sheetsScanned: rawExtractedData.sheetsScanned,
         fileName: rawExtractedData.fileName
       };
+
+      return currentEffectiveCache;
     }
 
     function processFile(file) {
@@ -789,7 +1044,6 @@
             const noCode = isNoCode(itemCode);
             const codeWarn = isCodeInvalidOrCompound(itemCode);
 
-            // اكتشاف عمود مركز التكلفة ديناميكياً لهذا الشيت
             const ccColIndex = detectCostCenterColumn(rows);
 
             for (let r = 6; r < rows.length; r++) {
@@ -799,6 +1053,7 @@
               const colA = cleanStr(row[0]);
               if (colA !== '') continue;
 
+              const excelRowNum = r + 1;
               const dateStr = formatExcelDate(row[1]);
               const inSupp = parseNum(row[2]);
               const inPurch = parseNum(row[3]);
@@ -810,12 +1065,16 @@
               const reqNo = cleanStr(row[8]);
               const colJ = cleanStr(row[9]);
               const colK = cleanStr(row[10]);
-              const costCenterVal = extractRowCostCenter(row, ccColIndex);
+              const ccMeta = extractRowCostCenterWithMeta(row, ccColIndex);
+              const costCenterVal = ccMeta.value;
+              const ccCellRef = `${colIndexToLetter(ccMeta.colIndex)}${excelRowNum}`;
 
               // 1. حركات الوارد (موردين + مشتريات)
               if (inSupp > 0 || inPurch > 0) {
-                const qty = inSupp > 0 ? inSupp : inPurch;
-                const inType = inSupp > 0 ? 'موردين' : 'مشتريات';
+                const isSupp = inSupp > 0;
+                const qty = isSupp ? inSupp : inPurch;
+                const qtyCellRef = `${isSupp ? 'C' : 'D'}${excelRowNum}`;
+                const inType = isSupp ? 'موردين' : 'مشتريات';
                 let supplier = '';
                 let notesParts = [];
 
@@ -835,7 +1094,8 @@
 
                 inbound.push({
                   sheetName,
-                  rowNum: r + 1,
+                  rowNum: excelRowNum,
+                  qtyCellRef,
                   itemCode,
                   itemName,
                   unit,
@@ -853,7 +1113,9 @@
               if (outCons > 0) {
                 outboundConsumed.push({
                   sheetName,
-                  rowNum: r + 1,
+                  rowNum: excelRowNum,
+                  qtyCellRef: `G${excelRowNum}`,
+                  ccCellRef,
                   itemCode,
                   itemName,
                   unit,
@@ -873,7 +1135,9 @@
               if (outDed > 0) {
                 deductionsDetail.push({
                   sheetName,
-                  rowNum: r + 1,
+                  rowNum: excelRowNum,
+                  qtyCellRef: `F${excelRowNum}`,
+                  ccCellRef,
                   itemCode,
                   itemName,
                   unit,
@@ -894,7 +1158,8 @@
                 const isOut = outTrans > 0;
                 transfers.push({
                   sheetName,
-                  rowNum: r + 1,
+                  rowNum: excelRowNum,
+                  qtyCellRef: `${isOut ? 'H' : 'E'}${excelRowNum}`,
                   itemCode,
                   itemName,
                   unit,
@@ -921,6 +1186,7 @@
           };
 
           statusBar.textContent = `تم تحليل ${sheetsScanned} كارت صنف بنجاح!`;
+          document.getElementById('chatFab').style.display = 'inline-flex';
           renderDashboard();
         } catch (err) {
           console.error(err);
@@ -991,7 +1257,7 @@
           <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>نوع الوارد</th>
           <th>الكمية</th><th>تاريخ التوريد</th><th>المورد / الجهة</th><th>الملاحظات</th>
         </tr>`;
-        tbody.innerHTML = effective.inbound.map((r, i) => `<tr>
+        tbody.innerHTML = effective.inbound.map((r, i) => `<tr onclick="inspectRow('${key}', ${i}, this)">
           <td>${i + 1}</td>
           <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || '(بدون كود)'}</td>
           <td>${r.itemName}</td>
@@ -1008,7 +1274,7 @@
           <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>الكمية</th>
           <th>تاريخ الصرف</th><th>رقم طلب الصرف</th><th>البلوك</th><th>العنصر / البيان</th><th>مركز التكلفة</th>
         </tr>`;
-        tbody.innerHTML = list.map((r, i) => `<tr>
+        tbody.innerHTML = list.map((r, i) => `<tr onclick="inspectRow('${key}', ${i}, this)">
           <td>${i + 1}</td>
           <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || '(بدون كود)'}</td>
           <td>${r.itemName}</td>
@@ -1027,7 +1293,7 @@
           <th class="ltr-cell">Qty</th>
           <th class="ltr-cell">Cost Center Code</th>
         </tr>`;
-        tbody.innerHTML = list.map((r) => `<tr>
+        tbody.innerHTML = list.map((r, i) => `<tr onclick="inspectRow('${key}', ${i}, this)">
           <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || ''}</td>
           <td class="ltr-cell"><strong>${r.qty}</strong></td>
           <td class="${r.ccWarn ? 'cell-warn' : ''} ltr-cell">${r.costCenter || ''}</td>
@@ -1037,7 +1303,7 @@
           <th>#</th><th>كود الصنف</th><th>اسم الصنف</th><th>الوحدة</th><th>نوع الحركة</th>
           <th>الكمية</th><th>التاريخ</th><th>رقم التصريح / الإذن</th><th>جهة التحويل</th><th>ملاحظات</th>
         </tr>`;
-        tbody.innerHTML = effective.transfers.map((r, i) => `<tr>
+        tbody.innerHTML = effective.transfers.map((r, i) => `<tr onclick="inspectRow('${key}', ${i}, this)">
           <td>${i + 1}</td>
           <td class="${r.codeWarn ? 'cell-warn' : ''} ltr-cell">${r.itemCode || '(بدون كود)'}</td>
           <td>${r.itemName}</td>
@@ -1052,6 +1318,223 @@
       }
     }
 
+    // ==========================================
+    // 3. محرك الشات بوت للتدقيق وتتبع مصدر الخلايا
+    // ==========================================
+    function toggleChat(open) {
+      const win = document.getElementById('chatWindow');
+      win.style.display = open ? 'flex' : 'none';
+      if (open) {
+        document.getElementById('chatInput').focus();
+      }
+    }
+
+    function appendChatMessage(sender, htmlContent) {
+      const box = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = `msg ${sender}`;
+      div.innerHTML = htmlContent;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    // الفحص الفوري عند الضغط على أي صف في الجدول
+    function inspectRow(tabKey, rowIndex, trEl) {
+      document.querySelectorAll('#tableBody tr').forEach(tr => tr.classList.remove('selected-row'));
+      if (trEl) trEl.classList.add('selected-row');
+
+      if (!currentEffectiveCache) return;
+      const item = currentEffectiveCache[tabKey][rowIndex];
+      if (!item) return;
+
+      toggleChat(true);
+
+      const drawerNames = {
+        inbound: 'درج 1: وارد غير متزامن',
+        outboundConsumed: 'درج 2: منصرف مستهلك تفصيلي',
+        buduConsumed: 'درج 3: قالب البودو المجمّع (مستهلك)',
+        transfers: 'درج 4: التحويلات غير المتزامنة',
+        deductionsDetail: 'درج 5: خصم تفصيلي',
+        buduDeductions: 'درج 6: قالب البودو المجمّع (خصم)'
+      };
+
+      appendChatMessage('user', `القيمة دي جت منين؟ (صف #${rowIndex + 1} في ${drawerNames[tabKey]})`);
+
+      if (tabKey === 'buduConsumed' || tabKey === 'buduDeductions') {
+        const sourcesHtml = item.sources.map((src, idx) => `
+          <div class="audit-card">
+            <strong>${idx + 1}) الشيت الأصلي:</strong> ${src.sheetName}<br>
+            • <strong>خلية الكمية:</strong> <span class="cell-badge">${src.qtyCellRef}</span> (الكمية: <strong>${src.qty}</strong>)<br>
+            • <strong>خلية مركز التكلفة:</strong> <span class="cell-badge">${src.ccCellRef}</span><br>
+            • <strong>التاريخ:</strong> ${src.date || 'غير مسجل'} | <strong>طلب صرف:</strong> ${src.reqNo || '-'}
+          </div>
+        `).join('');
+
+        appendChatMessage('bot', `
+          هذه القيمة في <strong>${drawerNames[tabKey]}</strong> للصنف <strong>${item.itemName}</strong> (كود: <span class="cell-badge">${item.itemCode || 'بدون كود'}</span>) بإجمالي كمية <strong>${item.qty}</strong> ناتجة عن تجميع <strong>${item.sources.length}</strong> حركة:
+          ${sourcesHtml}
+        `);
+      } else {
+        let extraMeta = '';
+        if (item.ccCellRef) {
+          extraMeta += `• <strong>خلية مركز التكلفة:</strong> <span class="cell-badge">${item.ccCellRef}</span> (${item.costCenter || 'فارغة'})<br>`;
+        }
+        if (item.reqNo) {
+          extraMeta += `• <strong>رقم طلب الصرف:</strong> ${item.reqNo} (خلية <span class="cell-badge">I${item.rowNum}</span>)<br>`;
+        }
+        if (item.supplier) {
+          extraMeta += `• <strong>المورد / الجهة:</strong> ${item.supplier}<br>`;
+        }
+
+        appendChatMessage('bot', `
+          تم استخراج هذا السجل من:<br>
+          <div class="audit-card">
+            • <strong>اسم الشيت (كارت الصنف):</strong> ${item.sheetName}<br>
+            • <strong>رقم الصف في الإكسيل:</strong> الصف <strong>${item.rowNum}</strong><br>
+            • <strong>خلية الكمية:</strong> <span class="cell-badge">${item.qtyCellRef}</span> (القيمة: <strong>${item.qty}</strong> ${item.unit || ''})<br>
+            • <strong>خلية الكود:</strong> <span class="cell-badge">B2</span> (${item.itemCode || 'بدون كود'})<br>
+            ${extraMeta}
+            • <strong>سبب السحب:</strong> خلية رقم الإذن <span class="cell-badge">A${item.rowNum}</span> فارغة (غير متزامنة).
+          </div>
+        `);
+      }
+    }
+
+    function askBot(presetText) {
+      document.getElementById('chatInput').value = presetText;
+      handleChatSubmit(new Event('submit'));
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const query = cleanStr(input.value);
+      if (!query) return;
+
+      appendChatMessage('user', query);
+      input.value = '';
+
+      if (!currentEffectiveCache) {
+        appendChatMessage('bot', 'يرجى رفع ملف كارت الصنف أولاً حتى أتمكن من فحص البيانات والرد عليك.');
+        return;
+      }
+
+      const reply = generateBotReply(query);
+      appendChatMessage('bot', reply);
+    }
+
+    function generateBotReply(q) {
+      const eff = currentEffectiveCache;
+      const lowerQ = q.toLowerCase();
+
+      // 1. طلب ملخص عام
+      if (lowerQ.includes('ملخص') || lowerQ.includes('احصائيات') || lowerQ.includes('إحصائيات')) {
+        return `
+          <strong>ملخص الفحص الحالي للملف:</strong><br>
+          • تم فحص <strong>${eff.sheetsScanned}</strong> كارت صنف.<br>
+          • <strong>درج 1 (الوارد):</strong> ${eff.inbound.length} حركة.<br>
+          • <strong>درج 2 (المنصرف التفصيلي):</strong> ${eff.outboundConsumed.length} حركة.<br>
+          • <strong>درج 3 (قالب البودو المجمّع):</strong> ${eff.buduConsumed.length} بند.<br>
+          • <strong>درج التحويلات:</strong> ${eff.transfers.length} حركة.<br>
+          • <strong>إجمالي التنبيهات:</strong> ${eff.warningsCount} تنبيه.
+        `;
+      }
+
+      // 2. طلب عرض التنبيهات والمشاكل
+      if (lowerQ.includes('تنبيه') || lowerQ.includes('مشاكل') || lowerQ.includes('خطأ') || lowerQ.includes('ناقص')) {
+        const noCodeItems = [...new Set(eff.inbound.filter(x => x.noCode).map(x => x.sheetName))];
+        const compoundItems = [...new Set([
+          ...eff.inbound.filter(x => x.codeWarn && !x.noCode).map(x => `${x.sheetName} (${x.itemCode})`),
+          ...eff.outboundConsumed.filter(x => x.codeWarn && !x.noCode).map(x => `${x.sheetName} (${x.itemCode})`)
+        ])];
+        const missingCC = eff.outboundConsumed.filter(x => x.ccWarn);
+
+        return `
+          <strong>تقرير التنبيهات في الشيت:</strong><br>
+          • <strong>أصناف بدون كود (خلية B2 فارغة):</strong> ${noCodeItems.length} صنف ${noCodeItems.length ? `(${noCodeItems.slice(0, 5).join('، ')}...)` : ''}<br>
+          • <strong>أصناف بأكواد مركبة:</strong> ${compoundItems.length} صنف ${compoundItems.length ? `(${compoundItems.slice(0, 4).join('، ')})` : ''}<br>
+          • <strong>حركات صرف بدون مركز تكلفة:</strong> ${missingCC.length} حركة.
+        `;
+      }
+
+      // 3. سؤال عن الأصناف التي ليس لها كود
+      if (lowerQ.includes('بدون كود') || lowerQ.includes('ملهاش كود') || lowerQ.includes('ليس لها كود')) {
+        const list = [...new Set(rawExtractedData.inbound.filter(x => x.noCode).map(x => x.sheetName))];
+        if (!list.length) return 'لا توجد أي أصناف بدون كود في الحركات غير المتزامنة.';
+        return `
+          توجد <strong>${list.length}</strong> كروت أصناف بدون كود مسجل في الخلية <span class="cell-badge">B2</span>:<br>
+          <div class="audit-card">${list.map((name, i) => `${i + 1}. ${name}`).join('<br>')}</div>
+        `;
+      }
+
+      // 4. البحث بالرقم (كمية أو كود أو رقم طلب صرف) أو باسم الصنف
+      const numMatch = q.match(/\d+(\.\d+)?/);
+      const searchNum = numMatch ? Number(numMatch[0]) : null;
+      const searchText = q.replace(/(القيمة|الكمية|دي|ده|جت|منين|فين|كود|صنف|رقم|طلب|صرف|بخصوص|عن|\?|\؟)/g, '').trim();
+
+      const matches = [];
+
+      // البحث في المنصرف التفصيلي
+      eff.outboundConsumed.forEach(r => {
+        const hit =
+          (searchText.length >= 2 && (r.itemName.includes(searchText) || r.itemCode.includes(searchText) || r.reqNo === searchText)) ||
+          (searchNum !== null && (r.qty === searchNum || r.itemCode.includes(String(searchNum)) || r.reqNo === String(searchNum)));
+        if (hit) {
+          matches.push(`
+            <div class="audit-card">
+              <strong>[درج 2 - منصرف]</strong> ${r.itemName} (كود: <span class="cell-badge">${r.itemCode || 'فارغ'}</span>)<br>
+              • <strong>الشيت:</strong> ${r.sheetName} | <strong>الخلية:</strong> <span class="cell-badge">${r.qtyCellRef}</span> (الكمية: <strong>${r.qty}</strong>)<br>
+              • <strong>مركز التكلفة:</strong> <span class="cell-badge">${r.ccCellRef}</span> (${r.costCenter || 'فارغ'}) | <strong>طلب:</strong> ${r.reqNo || '-'}
+            </div>
+          `);
+        }
+      });
+
+      // البحث في قالب البودو المجمّع
+      eff.buduConsumed.forEach(r => {
+        const hit =
+          (searchText.length >= 2 && (r.itemName.includes(searchText) || r.itemCode.includes(searchText))) ||
+          (searchNum !== null && (r.qty === searchNum || r.itemCode.includes(String(searchNum))));
+        if (hit) {
+          const cellsList = r.sources.map(s => `<span class="cell-badge">${s.qtyCellRef}</span> (${s.qty})`).join(' + ');
+          matches.push(`
+            <div class="audit-card">
+              <strong>[درج 3 - قالب البودو المجمّع]</strong> ${r.itemName}<br>
+              • <strong>إجمالي الكمية:</strong> <strong>${r.qty}</strong> من شيت <strong>${r.sources[0].sheetName}</strong><br>
+              • <strong>الخلايا المجمّعة:</strong> ${cellsList}
+            </div>
+          `);
+        }
+      });
+
+      // البحث في الوارد
+      eff.inbound.forEach(r => {
+        const hit =
+          (searchText.length >= 2 && (r.itemName.includes(searchText) || r.itemCode.includes(searchText))) ||
+          (searchNum !== null && (r.qty === searchNum || r.itemCode.includes(String(searchNum))));
+        if (hit) {
+          matches.push(`
+            <div class="audit-card">
+              <strong>[درج 1 - وارد]</strong> ${r.itemName} (كود: <span class="cell-badge">${r.itemCode || 'فارغ'}</span>)<br>
+              • <strong>الشيت:</strong> ${r.sheetName} | <strong>الخلية:</strong> <span class="cell-badge">${r.qtyCellRef}</span> (الكمية: <strong>${r.qty}</strong>)<br>
+              • <strong>المورد:</strong> ${r.supplier} | <strong>التاريخ:</strong> ${r.date}
+            </div>
+          `);
+        }
+      });
+
+      if (matches.length > 0) {
+        const shown = matches.slice(0, 5).join('');
+        const moreNote = matches.length > 5 ? `<br><small>تم عرض أول 5 نتائج من إجمالي ${matches.length} نتيجة مطابقة. يمكنك الضغط مباشرة على الصف المطلوب في الجدول لتدقيقه.</small>` : '';
+        return `وجدت <strong>${matches.length}</strong> تطابق لبحثك:${shown}${moreNote}`;
+      }
+
+      return 'لم أجد تطابقاً مباشراً لهذا النص. جرب كتابة **كود الصنف** أو **اسم الصنف** أو **رقم طلب الصرف**، أو اضغط مباشرة على أي صف في الجدول وسأعرض لك مصدر خلاياه فوراً.';
+    }
+
+    // ==========================================
+    // 4. تصدير ملف الإكسيل المنسّق
+    // ==========================================
     document.getElementById('exportBtn').addEventListener('click', exportExcel);
 
     function exportExcel() {
@@ -1118,7 +1601,7 @@
         return ws;
       }
 
-      // درج 1: وارد غير متزامن (يظل كاملاً دائماً لمتابعته مع المشتريات)
+      // درج 1: وارد غير متزامن
       const inHeaders = ['كود الصنف', 'اسم الصنف', 'الوحدة', 'نوع الوارد', 'الكمية', 'تاريخ التوريد', 'المورد / الجهة', 'الملاحظات'];
       const inRows = effective.inbound.map(r => ({
         values: [r.itemCode, r.itemName, r.unit, r.inType, r.qty, r.date, r.supplier, r.notes],
