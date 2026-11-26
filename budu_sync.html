@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>أداة مزامنة مع البودو | BY ROMANY NASSER</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>أداة مزامنة مع البودو V3 | BY ROMANY NASSER</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <style>
@@ -189,10 +192,10 @@
       background: var(--accent);
       color: #fff;
       border: none;
-      padding: 0.7rem 1.6rem;
+      padding: 0.7rem 1.4rem;
       border-radius: 10px;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       cursor: pointer;
       transition: background 0.2s;
       display: inline-flex;
@@ -210,6 +213,14 @@
 
     .btn-success:hover {
       background: #047857;
+    }
+
+    .btn-audit {
+      background: var(--info);
+    }
+
+    .btn-audit:hover {
+      background: #0369a1;
     }
 
     #fileInput {
@@ -284,7 +295,7 @@
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 0.85rem;
     }
 
     .filter-checkbox-label {
@@ -334,13 +345,17 @@
     }
 
     .audit-hint {
-      font-size: 0.82rem;
-      color: var(--info);
+      font-size: 0.86rem;
+      color: #0369a1;
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      padding: 0.55rem 0.95rem;
+      border-radius: 8px;
       font-weight: 700;
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.85rem;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.5rem;
     }
 
     .tabs {
@@ -421,9 +436,7 @@
       text-align: left;
     }
 
-    /* ==========================================
-       تصميم الشات بوت الذكي للتدقيق وتتبع الخلايا
-       ========================================== */
+    /* الشات بوت الذكي للتدقيق وتتبع الخلايا */
     .chat-fab {
       position: fixed;
       bottom: 24px;
@@ -437,10 +450,10 @@
       font-size: 0.92rem;
       cursor: pointer;
       box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35);
-      display: none;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      z-index: 999;
+      z-index: 9999;
       transition: transform 0.2s ease;
     }
 
@@ -452,18 +465,18 @@
       position: fixed;
       bottom: 85px;
       left: 24px;
-      width: 400px;
+      width: 410px;
       max-width: calc(100vw - 32px);
-      height: 500px;
+      height: 510px;
       max-height: calc(100vh - 110px);
       background: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 16px;
-      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.22);
+      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.25);
       display: none;
       flex-direction: column;
       overflow: hidden;
-      z-index: 1000;
+      z-index: 10000;
       animation: fadeIn 0.2s ease;
     }
 
@@ -507,7 +520,7 @@
     }
 
     .msg {
-      max-width: 90%;
+      max-width: 92%;
       padding: 0.7rem 0.95rem;
       border-radius: 12px;
       font-size: 0.85rem;
@@ -645,7 +658,7 @@
       </div>
       <div class="header-meta">
         <span class="session-pill" id="sessionScopeLabel">جاري التحقق...</span>
-        <div class="signature-badge">BY ROMANY NASSER</div>
+        <div class="signature-badge">V3.0 | BY ROMANY NASSER</div>
       </div>
     </header>
 
@@ -673,6 +686,10 @@
               <input type="checkbox" id="excludeNoCodeCheckbox" />
               <span>استثناء الأصناف التي ليس لها أكواد من أدراج المنصرف وقوالب البودو (والاحتفاظ بها في درج الوارد فقط)</span>
             </label>
+
+            <button type="button" class="btn btn-audit" onclick="toggleChat(true)">
+              🤖 فتح مساعد التدقيق
+            </button>
 
             <button type="button" class="btn btn-success" id="exportBtn">
               ⬇️ تحميل شيت الإكسيل النهائي (الأدراج المستخرجة)
@@ -851,14 +868,12 @@
       return XLSX.utils.encode_col(colIdx);
     }
 
-    // تعريف الصنف بدون كود فقط (B2 فارغ تماماً أو 0)
     function isNoCode(code) {
       const s = cleanStr(code);
       if (!s || s === '0' || s.toLowerCase() === 'nan' || s.toLowerCase() === 'none') return true;
       return false;
     }
 
-    // تعريف التنبيه البصري (يشمل بدون كود + الأكواد المركبة مثل 9949+1100402)
     function isCodeInvalidOrCompound(code) {
       if (isNoCode(code)) return true;
       const s = cleanStr(code);
@@ -866,9 +881,6 @@
       return false;
     }
 
-    // ==========================================
-    // محرك الاكتشاف الذكي لعمود مركز التكلفة وإحداثياته
-    // ==========================================
     function isCostCenterPattern(val) {
       const s = cleanStr(val);
       if (!s || s.length < 6) return false;
@@ -908,7 +920,6 @@
       return bestCol;
     }
 
-    // ترجع القيمة + رقم العمود الفعلي الذي وُجدت فيه للتدقيق
     function extractRowCostCenterWithMeta(row, primaryCol) {
       const primaryVal = cleanStr(row[primaryCol]);
       if (isCostCenterPattern(primaryVal)) {
@@ -951,7 +962,6 @@
       return cleanStr(val);
     }
 
-    // تجميع مع حفظ سجل كامل بكل الخلايا الأصلية المكونة للرقم المجمع
     function aggregateForBudu(records) {
       const map = new Map();
       records.forEach((rec) => {
@@ -1186,7 +1196,6 @@
           };
 
           statusBar.textContent = `تم تحليل ${sheetsScanned} كارت صنف بنجاح!`;
-          document.getElementById('chatFab').style.display = 'inline-flex';
           renderDashboard();
         } catch (err) {
           console.error(err);
@@ -1338,7 +1347,6 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // الفحص الفوري عند الضغط على أي صف في الجدول
     function inspectRow(tabKey, rowIndex, trEl) {
       document.querySelectorAll('#tableBody tr').forEach(tr => tr.classList.remove('selected-row'));
       if (trEl) trEl.classList.add('selected-row');
@@ -1427,7 +1435,6 @@
       const eff = currentEffectiveCache;
       const lowerQ = q.toLowerCase();
 
-      // 1. طلب ملخص عام
       if (lowerQ.includes('ملخص') || lowerQ.includes('احصائيات') || lowerQ.includes('إحصائيات')) {
         return `
           <strong>ملخص الفحص الحالي للملف:</strong><br>
@@ -1440,7 +1447,6 @@
         `;
       }
 
-      // 2. طلب عرض التنبيهات والمشاكل
       if (lowerQ.includes('تنبيه') || lowerQ.includes('مشاكل') || lowerQ.includes('خطأ') || lowerQ.includes('ناقص')) {
         const noCodeItems = [...new Set(eff.inbound.filter(x => x.noCode).map(x => x.sheetName))];
         const compoundItems = [...new Set([
@@ -1457,7 +1463,6 @@
         `;
       }
 
-      // 3. سؤال عن الأصناف التي ليس لها كود
       if (lowerQ.includes('بدون كود') || lowerQ.includes('ملهاش كود') || lowerQ.includes('ليس لها كود')) {
         const list = [...new Set(rawExtractedData.inbound.filter(x => x.noCode).map(x => x.sheetName))];
         if (!list.length) return 'لا توجد أي أصناف بدون كود في الحركات غير المتزامنة.';
@@ -1467,14 +1472,12 @@
         `;
       }
 
-      // 4. البحث بالرقم (كمية أو كود أو رقم طلب صرف) أو باسم الصنف
       const numMatch = q.match(/\d+(\.\d+)?/);
       const searchNum = numMatch ? Number(numMatch[0]) : null;
       const searchText = q.replace(/(القيمة|الكمية|دي|ده|جت|منين|فين|كود|صنف|رقم|طلب|صرف|بخصوص|عن|\?|\؟)/g, '').trim();
 
       const matches = [];
 
-      // البحث في المنصرف التفصيلي
       eff.outboundConsumed.forEach(r => {
         const hit =
           (searchText.length >= 2 && (r.itemName.includes(searchText) || r.itemCode.includes(searchText) || r.reqNo === searchText)) ||
@@ -1490,7 +1493,6 @@
         }
       });
 
-      // البحث في قالب البودو المجمّع
       eff.buduConsumed.forEach(r => {
         const hit =
           (searchText.length >= 2 && (r.itemName.includes(searchText) || r.itemCode.includes(searchText))) ||
@@ -1507,7 +1509,6 @@
         }
       });
 
-      // البحث في الوارد
       eff.inbound.forEach(r => {
         const hit =
           (searchText.length >= 2 && (r.itemName.includes(searchText) || r.itemCode.includes(searchText))) ||
@@ -1529,7 +1530,7 @@
         return `وجدت <strong>${matches.length}</strong> تطابق لبحثك:${shown}${moreNote}`;
       }
 
-      return 'لم أجد تطابقاً مباشراً لهذا النص. جرب كتابة **كود الصنف** أو **اسم الصنف** أو **رقم طلب الصرف**، أو اضغط مباشرة على أي صف في الجدول وسأعرض لك مصدر خلاياه فوراً.';
+      return 'لم أجد تطابقاً مباشراً لهذا النص. جرب كتابة <strong>كود الصنف</strong> أو <strong>اسم الصنف</strong> أو <strong>رقم طلب الصرف</strong>، أو اضغط مباشرة على أي صف في الجدول وسأعرض لك مصدر خلاياه فوراً.';
     }
 
     // ==========================================
